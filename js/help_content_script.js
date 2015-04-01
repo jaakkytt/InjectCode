@@ -1,3 +1,65 @@
+// JSON helpers for handling objects with methods
+function JsonStringifyObject(obj, stringify_result) {
+    var __methods = {},
+        i;
+    // By default stringify the returned object as well
+    stringify_result = typeof stringify_result !== 'undefined' ? stringify_result : true;
+    // Check properties
+    for (i in obj) {
+        if (!obj.hasOwnProperty(i)) {
+            continue;
+        }
+        if (typeof obj[i] === 'function') {
+            // Gather up methods as strings
+            __methods[i] = obj[i].toString();
+        } else if (typeof obj[i] === 'object' && Object.keys(obj[i]).length) {
+            // Avoid directly stringifying nested objects
+            obj[i] = JsonStringifyObject(obj[i], false);
+        }
+    }
+    // Attach methods on a temp property
+    if (Object.keys(__methods).length) {
+        obj.__methods = __methods;
+    }
+    return stringify_result ? JSON.stringify(obj) : obj;
+}
+
+function JsonParseObject(obj) {
+    // In case a nested object is passed directly instead of a sting
+    var obj = typeof obj === 'string' ? JSON.parse(obj) : obj || {},
+        i;
+    // Check for nested objects
+    for (i in obj) {
+        if (obj.hasOwnProperty(i) && typeof obj[i] === 'object' && Object.keys(obj[i]).length) {
+            obj[i] = JsonParseObject(obj[i]);
+        }
+    }
+    // Restore methods
+    if (obj.hasOwnProperty('__methods')) {
+        for (i in obj.__methods) {
+            eval('obj["' + i + '"] = ' + obj.__methods[i]);
+        }
+        delete obj.__methods;
+    }
+    return obj;
+}
+
+// Helper for adding window.InjectCode object to the content page
+function exportInjectCodeObject() {
+    if (!Object.keys(InjectCode).length) {
+        return;
+    }
+    runScriptInHead(JsonParseObject.toString() + ';window.InjectCode = JsonParseObject(' + JSON.stringify(JsonStringifyObject(InjectCode)) + ');');
+}
+
+// Helper for running a scripts directly on the content page
+function runScriptInHead(script) {
+    var temp = document.createElement('script');
+    temp.innerHTML = script;
+    document.head.appendChild(temp);
+    document.head.removeChild(temp);
+}
+
 // Helper to open tabs from within user defined scripts
 function openTab(tab_url) {
 	chrome.runtime.sendMessage(null, {text: 'crate_tab', url: tab_url}, function (msg) {
@@ -13,7 +75,6 @@ function openTab(tab_url) {
     var monitor = {},
         request_callbacks = {},
         active = false,
-        script_id = 'XhrMonitor',
         message_class = 'xhr_message';
     
     function deleteNode(node) {
@@ -46,25 +107,24 @@ function openTab(tab_url) {
         }
         // Work around app access limitations and modify the XMLHttpRequest prototype on the
         // content page side to create new html pieces holding the request URI
-        var zxc = document.createElement('script');
-        zxc.innerHTML = '(function () {'
-            + 'var proxied = window.XMLHttpRequest.prototype.open;'
-            + 'window.XMLHttpRequest.prototype.open = function () {'
-                + 'var request = JSON.stringify(arguments);'
-                + 'this.addEventListener("readystatechange", function () {'
-                    + 'if (this.readyState === 4) {'
-                        + 'var zxc = document.createElement("script");'
-                        + 'zxc.type = "text/json";'
-                        + 'zxc.setAttribute("class", "' + message_class + '");'
-                        + 'zxc.innerText = request;'
-                        + 'document.head.appendChild(zxc);'
-                    + '}'
-                + '});'
-                + 'return proxied.apply(this, [].slice.call(arguments));'
-            + '};'
-        +'}());';
-        zxc.id = script_id;
-        document.head.appendChild(zxc);
+        runScriptInHead(
+            '(function () {'
+                + 'var proxied = window.XMLHttpRequest.prototype.open;'
+                + 'window.XMLHttpRequest.prototype.open = function () {'
+                    + 'var request = JSON.stringify(arguments);'
+                    + 'this.addEventListener("readystatechange", function () {'
+                        + 'if (this.readyState === 4) {'
+                            + 'var script = document.createElement("script");'
+                            + 'script.type = "text/json";'
+                            + 'script.setAttribute("class", "' + message_class + '");'
+                            + 'script.innerText = request;'
+                            + 'document.head.appendChild(script);'
+                        + '}'
+                    + '});'
+                    + 'return proxied.apply(this, [].slice.call(arguments));'
+                + '};'
+            +'}());'
+        );
         // Since the app is notified about the DOM changes a listener can be used
         // to pick up when those changes were made by the monkey-patched XMLHttpRequest
         document.addEventListener('DOMSubtreeModified', domListener);
@@ -76,7 +136,6 @@ function openTab(tab_url) {
         if (!active) {
             return true;
         }
-        deleteNode(document.head.querySelectorAll('#' + script_id)[0]);
         document.removeEventListener('DOMSubtreeModified', domListener);
         active = false;
     }

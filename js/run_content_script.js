@@ -1,3 +1,6 @@
+// Initial export object
+InjectCode = {};
+
 // Fetch and eval user defined scripts 
 chrome.runtime.sendMessage(null, {text: 'get_stored_code'}, function (msg) {
     if (msg && msg.length) {
@@ -7,6 +10,7 @@ chrome.runtime.sendMessage(null, {text: 'get_stored_code'}, function (msg) {
                     eval(item.code);
                 }
             });
+            exportInjectCodeObject();               
         });
     }
 });

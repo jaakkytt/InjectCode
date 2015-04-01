@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "InjectCode",
 	"description": "Store and inject code to browser pages made super easy.",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"permissions" : [
         "tabs",
 		"activeTab",

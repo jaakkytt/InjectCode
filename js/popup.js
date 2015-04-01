@@ -282,7 +282,7 @@ function updateContentScript(script) {
 	var injectIntoTab = function (tab) {
         if (typeof script == 'string') {
             chrome.tabs.executeScript(tab.id, {
-                code: script
+                code: script + ';exportInjectCodeObject();'
             });
         } else {
             chrome.tabs.executeScript(tab.id, {file: "js/run_content_script.js"});
