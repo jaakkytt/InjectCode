@@ -62,9 +62,9 @@ function runScriptInHead(script) {
 
 // Helper to open tabs from within user defined scripts
 function openTab(tab_url) {
-	chrome.runtime.sendMessage(null, {text: 'crate_tab', url: tab_url}, function (msg) {
+    chrome.runtime.sendMessage(null, {text: 'crate_tab', url: tab_url}, function (msg) {
 
-	});
+    });
 }
 
 // Xhr event listener object for use in user defined scripts

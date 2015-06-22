@@ -1,21 +1,21 @@
 /* Popup design */
 body {
-	overflow-x: hidden;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 15px;
-	font-weight: bold;
-	color: #123d54;
+    overflow-x: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #123d54;
 }
 .group {
     width: 685px;
 }
 button {
-	font-size: 14px !important;
-	color: #123d54;		
+    font-size: 14px !important;
+    color: #123d54;        
     white-space: nowrap;
     margin: 0 8px 0 0 !important;
     cursor: pointer;
-	padding: 2px !important;
+    padding: 2px !important;
 }
 .button_separator {
     height: 10px;

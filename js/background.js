@@ -22,9 +22,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         if (msg.url.substring(0, 7) != 'http://' && msg.url.substring(0, 8) != 'https://') {
             msg.url = 'http://' + msg.url;
         }
-		chrome.tabs.create({url : msg.url}, function (tab) {
+        chrome.tabs.create({url : msg.url}, function (tab) {
             // TODO: optional callback to the new tab?
-		});
-		sendResponse('true');
+        });
+        sendResponse('true');
     }
 });

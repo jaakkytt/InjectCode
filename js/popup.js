@@ -279,7 +279,7 @@ function updateContentScript(script) {
     }
 
     // Execute a single script or all that are active
-	var injectIntoTab = function (tab) {
+    var injectIntoTab = function (tab) {
         if (typeof script == 'string') {
             chrome.tabs.executeScript(tab.id, {
                 code: script + ';exportInjectCodeObject();'
@@ -287,7 +287,7 @@ function updateContentScript(script) {
         } else {
             chrome.tabs.executeScript(tab.id, {file: "js/run_content_script.js"});
         }
-	}
+    }
 
     // Fire on the current tab or iterate through everything
     if (viewModel.scope() == 'local') {
