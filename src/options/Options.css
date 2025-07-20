@@ -1,0 +1,13 @@
+textarea.code {
+    resize: none;
+    width: calc(100% - 35px);
+    border: 2px solid black;
+    background: rgb(34, 34, 34);
+    padding: 15px;
+    color: white;
+}
+
+textarea.code:focus {
+    border: 2px solid grey;
+    outline: none;
+}

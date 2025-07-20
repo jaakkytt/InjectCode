@@ -1,0 +1,15 @@
+body {
+    margin: 10px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    overflow-x: scroll;
+}
+
+h1 {
+    color: #007bff;
+}
+
+button {
+    text-wrap: nowrap;
+    margin: 5px;
+}
