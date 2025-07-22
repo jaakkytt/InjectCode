@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
     DndContext,
@@ -21,10 +21,10 @@ import { OverlayItem } from './OverlayItem'
 import Container from './Container'
 import { AccordionItemData, OnUpdateItem } from './types'
 import { Accordion } from '@mui/material'
-import AccordionSummary from "@mui/material/AccordionSummary";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Typography from "@mui/material/Typography";
-import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from '@mui/material/AccordionSummary'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Typography from '@mui/material/Typography'
+import AccordionDetails from '@mui/material/AccordionDetails'
 
 export type ItemsDataState = Record<string, AccordionItemData[]>;
 
@@ -37,9 +37,34 @@ interface DraggableProps {
 const dragMinimumDelta = 5
 
 export default function DraggableAccordion({ items, setItems, onUpdateItem }: DraggableProps) {
-    const [expanded, setExpanded] = useState<string | false>(false)
+    const [expanded, setExpanded] = useState<string | false>(() => {
+        const savedExpanded = localStorage.getItem('childExpanded')
+        return savedExpanded ? savedExpanded : false
+    })
     const [activeItem, setActiveItem] = useState<AccordionItemData | null>(null)
     const [dragTranslation, setTranslation] = useState<{ top: number; left: number }|null>(null)
+    const [parentExpanded, setParentExpanded] = useState<Record<string, boolean>>(() => {
+        const savedState = localStorage.getItem('parentExpanded')
+        return savedState ? JSON.parse(savedState) : Object.keys(items).reduce((acc, key) => {
+            acc[key] = true
+            return acc
+        }, {} as Record<string, boolean>)
+    })
+
+    useEffect(() => {
+        localStorage.setItem('childExpanded', expanded || '')
+    }, [expanded])
+
+    useEffect(() => {
+        localStorage.setItem('parentExpanded', JSON.stringify(parentExpanded))
+    }, [parentExpanded])
+
+    const handleParentAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+        setParentExpanded((prevState) => ({
+            ...prevState,
+            [panel]: isExpanded,
+        }))
+    }
 
     const sensors = useSensors(useSensor(PointerSensor))
 
@@ -173,7 +198,13 @@ export default function DraggableAccordion({ items, setItems, onUpdateItem }: Dr
                     onDragEnd={handleDragEnd}
                 >
                     {Object.keys(items).map((containerId) => (
-                        <Accordion defaultExpanded key={`container-${containerId}`} style={{ flex: 1 }}>
+                        <Accordion
+                            defaultExpanded
+                            key={`container-${containerId}`}
+                            expanded={parentExpanded[containerId]}
+                            onChange={handleParentAccordionChange(containerId)}
+                            style={{ flex: 1 }}
+                        >
                             <AccordionSummary component="div" expandIcon={<ExpandMoreIcon />}>
                                 <Typography component="span">URL: {containerId}</Typography>
                             </AccordionSummary>

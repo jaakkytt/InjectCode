@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Accordion from '@mui/material/Accordion'
@@ -10,9 +10,9 @@ import DragHandleIcon from '@mui/icons-material/DragHandle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Typography from '@mui/material/Typography'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import {AccordionActions, Button, IconButton, Switch, TextField} from '@mui/material'
+import { AccordionActions, Button, IconButton, Switch } from '@mui/material'
 import { AccordionItemData, OnUpdateItem } from './types'
-import AccordionTitle from "./AccordionTitle";
+import AccordionTitle from './AccordionTitle'
 
 interface Props {
     item: AccordionItemData;

@@ -1,7 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react'
-import EditIcon from '@mui/icons-material/Edit';
-import {IconButton, TextField} from "@mui/material";
-import Typography from "@mui/material/Typography";
+import React, { useEffect, useRef, useState } from 'react'
+import EditIcon from '@mui/icons-material/Edit'
+import { IconButton, TextField } from '@mui/material'
+import Typography from '@mui/material/Typography'
 
 interface Props {
     value: string
@@ -16,19 +16,19 @@ export default function AccordionTitle({ value, allowEditing, onChange }: Props)
 
     useEffect(() => {
         if (isEditing && textFieldRef.current) {
-            textFieldRef.current.focus();
+            textFieldRef.current.focus()
         }
-    }, [isEditing]);
+    }, [isEditing])
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-            event.preventDefault();
+            event.preventDefault()
             if (textFieldRef.current) {
-                textFieldRef.current.blur();
-                setEditing(false);
+                textFieldRef.current.blur()
+                setEditing(false)
             }
         }
-    };
+    }
 
     return (
         allowEditing ? (
@@ -52,7 +52,7 @@ export default function AccordionTitle({ value, allowEditing, onChange }: Props)
                     <Typography component="span" sx={{ flexGrow: 0, textWrap: 'auto' }}>
                         {value}
                     </Typography>
-                    <Typography component="span" sx={{ flexGrow: 1, textAlign: 'left'}} style={{marginLeft: 4}}>
+                    <Typography component="span" sx={{ flexGrow: 1, textAlign: 'left' }} style={{ marginLeft: 4 }}>
                         <IconButton
                             color="primary"
                             component="span"
