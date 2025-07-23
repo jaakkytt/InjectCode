@@ -1,30 +1,35 @@
 import React, { useEffect, useState } from 'react'
 
 import {
+    ClientRect,
+    defaultDropAnimation,
     DndContext,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragStartEvent,
     DragEndEvent,
     DragOverEvent,
     DragOverlay,
+    DragStartEvent,
     DropAnimation,
-    defaultDropAnimation, rectIntersection, ClientRect,
+    PointerSensor,
+    rectIntersection,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core'
 
-import {
-    arrayMove,
-} from '@dnd-kit/sortable'
+import { arrayMove } from '@dnd-kit/sortable'
 
 import { OverlayItem } from './OverlayItem'
 import Container from './Container'
 import { AccordionItemData, OnUpdateItem } from './types'
-import { Accordion } from '@mui/material'
-import AccordionSummary from '@mui/material/AccordionSummary'
+import { Accordion, IconButton, styled, Typography } from '@mui/material'
+import MuiAccordionSummary, {
+    AccordionSummaryProps,
+    accordionSummaryClasses,
+} from '@mui/material/AccordionSummary'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import Typography from '@mui/material/Typography'
+import LinkIcon from '@mui/icons-material/Link'
 import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionTitle from './AccordionTitle'
+import Box from '@mui/material/Box'
 
 export type ItemsDataState = Record<string, AccordionItemData[]>;
 
@@ -37,41 +42,61 @@ interface DraggableProps {
 const dragMinimumDelta = 5
 
 export default function DraggableAccordion({ items, setItems, onUpdateItem }: DraggableProps) {
+    const [activeItem, setActiveItem] = useState<AccordionItemData | null>(null)
+    const [dragTranslation, setTranslation] = useState<{ top: number; left: number }|null>(null)
+
     const [expanded, setExpanded] = useState<string | false>(() => {
         const savedExpanded = localStorage.getItem('childExpanded')
         return savedExpanded ? savedExpanded : false
     })
-    const [activeItem, setActiveItem] = useState<AccordionItemData | null>(null)
-    const [dragTranslation, setTranslation] = useState<{ top: number; left: number }|null>(null)
-    const [parentExpanded, setParentExpanded] = useState<Record<string, boolean>>(() => {
-        const savedState = localStorage.getItem('parentExpanded')
-        return savedState ? JSON.parse(savedState) : Object.keys(items).reduce((acc, key) => {
-            acc[key] = true
-            return acc
-        }, {} as Record<string, boolean>)
+
+    const [closedParents, setClosedParents] = useState<Set<string>>(() => {
+        const savedState = localStorage.getItem('closedParents')
+        return savedState ? new Set(JSON.parse(savedState)) : new Set()
     })
+
+    useEffect(() => {
+        localStorage.setItem('closedParents', JSON.stringify(Array.from(closedParents)))
+    }, [closedParents])
 
     useEffect(() => {
         localStorage.setItem('childExpanded', expanded || '')
     }, [expanded])
 
-    useEffect(() => {
-        localStorage.setItem('parentExpanded', JSON.stringify(parentExpanded))
-    }, [parentExpanded])
-
-    const handleParentAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-        setParentExpanded((prevState) => ({
-            ...prevState,
-            [panel]: isExpanded,
-        }))
-    }
-
     const sensors = useSensors(useSensor(PointerSensor))
 
     const dropAnimation: DropAnimation = { ...defaultDropAnimation }
 
-    const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+    const handleAccordionChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false)
+    }
+
+    const handleParentAccordionChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+        setClosedParents((prevState) => {
+            const newState = new Set(prevState)
+            if (isExpanded) {
+                newState.delete(panel)
+            } else {
+                newState.add(panel)
+            }
+            return newState
+        })
+    }
+
+    const renameParentAccordionKey = (oldKey: string, newKey: string) => {
+        setItems((prevItems) => {
+            const { [oldKey]: oldValue, ...rest } = prevItems
+            const updatedItems = {
+                ...rest,
+                [newKey]: oldValue,
+            }
+
+            const sortedKeys = Object.keys(updatedItems).sort()
+            return sortedKeys.reduce((acc, key) => {
+                acc[key] = updatedItems[key]
+                return acc
+            }, {} as ItemsDataState)
+        })
     }
 
     const findContainer = (id: string) => {
@@ -123,6 +148,10 @@ export default function DraggableAccordion({ items, setItems, onUpdateItem }: Dr
         const overContainer = findContainer(overId)
 
         if (!activeContainer || !overContainer || activeContainer === overContainer) {
+            return
+        }
+
+        if (closedParents.has(overContainer)) {
             return
         }
 
@@ -185,6 +214,14 @@ export default function DraggableAccordion({ items, setItems, onUpdateItem }: Dr
         }
     }
 
+    const AccordionSummary = styled((props: AccordionSummaryProps) => (
+        <MuiAccordionSummary {...props} />
+    ))(() => ({
+        [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
+            margin: 0,
+        },
+    }))
+
     return (
         <div>
             <div>
@@ -201,12 +238,24 @@ export default function DraggableAccordion({ items, setItems, onUpdateItem }: Dr
                         <Accordion
                             defaultExpanded
                             key={`container-${containerId}`}
-                            expanded={parentExpanded[containerId]}
+                            expanded={!closedParents.has(containerId)}
                             onChange={handleParentAccordionChange(containerId)}
                             style={{ flex: 1 }}
                         >
                             <AccordionSummary component="div" expandIcon={<ExpandMoreIcon />}>
-                                <Typography component="span">URL: {containerId}</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', margin: 0 }}>
+                                    <AccordionTitle
+                                        value={containerId}
+                                        allowEditing={!closedParents.has(containerId)}
+                                        onChange={(newKey) => renameParentAccordionKey(containerId, newKey)}
+                                    >
+                                        <Typography component="span" style={{ marginRight: 8 }}>
+                                            <IconButton color="primary" component="span">
+                                                <LinkIcon />
+                                            </IconButton>
+                                        </Typography>
+                                    </AccordionTitle>
+                                </Box>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Container

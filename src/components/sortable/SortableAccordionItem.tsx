@@ -55,23 +55,24 @@ export default function SortableAccordionItem({ item, expandedPanel, onAccordion
                     component="div"
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                        <Typography
-                            component="span"
-                            {...attributes}
-                            {...listeners}
-                            style={{ cursor: 'grab', marginRight: 8 }}
-                            color="primary"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <IconButton color="primary" component="span" aria-label="drag" style={{ cursor: 'grab' }}>
-                                <DragHandleIcon />
-                            </IconButton>
-                        </Typography>
                         <AccordionTitle
                             value={item.title}
                             allowEditing={expandedPanel === item.id}
                             onChange={(newTitle) => onUpdateItem(item.id, { title: newTitle })}
-                        />
+                        >
+                            <Typography
+                                component="span"
+                                {...attributes}
+                                {...listeners}
+                                style={{ cursor: 'grab', marginRight: 8 }}
+                                color="primary"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <IconButton color="primary" component="span" aria-label="drag" style={{ cursor: 'grab' }}>
+                                    <DragHandleIcon />
+                                </IconButton>
+                            </Typography>
+                        </AccordionTitle>
                         <Typography
                             component="span"
                             style={{
