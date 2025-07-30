@@ -13,6 +13,7 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import { AccordionActions, Button, IconButton, Switch } from '@mui/material'
 import { AccordionItemData, OnUpdateItem } from './types'
 import AccordionTitle from './AccordionTitle'
+import AccordionBody from './AccordionBody'
 
 interface Props {
     item: AccordionItemData;
@@ -102,7 +103,10 @@ export default function SortableAccordionItem({ item, expandedPanel, onAccordion
                     </Box>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <Typography>{item.content}</Typography>
+                    <AccordionBody
+                        value={item.content}
+                        onChange={(newContent) => onUpdateItem(item.id, { content: newContent })}
+                    />
                 </AccordionDetails>
                 <AccordionActions>
                     <Button variant="outlined" startIcon={<PlayCircleOutlineIcon />}>
