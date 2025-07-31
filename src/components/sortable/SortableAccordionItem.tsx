@@ -2,7 +2,7 @@ import React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Accordion from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
+import { accordionSummaryClasses, AccordionSummaryProps } from '@mui/material/AccordionSummary'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import Box from '@mui/material/Box'
@@ -10,10 +10,11 @@ import DragHandleIcon from '@mui/icons-material/DragHandle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Typography from '@mui/material/Typography'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import { AccordionActions, Button, IconButton, Switch } from '@mui/material'
+import { AccordionActions, Button, IconButton, styled, Switch } from '@mui/material'
 import { AccordionItemData, OnUpdateItem } from './types'
 import AccordionTitle from './AccordionTitle'
 import AccordionBody from './AccordionBody'
+import MuiAccordionSummary from '@mui/material/AccordionSummary'
 
 interface Props {
     item: AccordionItemData;
@@ -35,6 +36,14 @@ export default function SortableAccordionItem({ item, expandedPanel, onAccordion
     const handleActiveChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         onUpdateItem(item.id, { active: event.target.checked })
     }
+
+    const AccordionSummary = styled((props: AccordionSummaryProps) => (
+        <MuiAccordionSummary {...props} />
+    ))(() => ({
+        [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
+            margin: 0,
+        },
+    }))
 
     return (
         <div

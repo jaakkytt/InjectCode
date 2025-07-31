@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { Fade, TextField } from '@mui/material'
 import CloudDoneIcon from '@mui/icons-material/CloudDone'
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import Box from '@mui/material/Box'
+import './AccordionBody.css'
+import CloudDotsIcon from '../CloudDotsIcon'
 
 interface Props {
     value: string
@@ -15,7 +16,7 @@ type Status = 'idle' | 'upToDate' | 'unsaved' | 'saved'
 const icons = {
     idle: <CloudDoneIcon />,
     upToDate: <CloudDoneIcon />,
-    unsaved: <MoreHorizIcon />,
+    unsaved: <CloudDotsIcon />,
     saved: <CloudUploadIcon />,
 }
 
@@ -125,6 +126,7 @@ export default function AccordionBody({ value, onChange }: Props) {
 
     return (
         <TextField
+            className="codeTextField"
             fullWidth
             multiline
             minRows={4}

@@ -1,0 +1,7 @@
+.codeTextField legend {
+    width: 29px;
+}
+.codeTextField .Mui-focused legend {
+    width: 28px;
+    margin-left: -1px;
+}
