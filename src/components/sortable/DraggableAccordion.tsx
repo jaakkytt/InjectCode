@@ -20,7 +20,7 @@ import { arrayMove } from '@dnd-kit/sortable'
 import { OverlayItem } from './OverlayItem'
 import Container from './Container'
 import { AccordionItemData, OnUpdateItem } from './types'
-import { Accordion, IconButton, styled, Typography } from '@mui/material'
+import { Accordion, Badge, badgeClasses, IconButton, styled, Typography } from '@mui/material'
 import MuiAccordionSummary, {
     AccordionSummaryProps,
     accordionSummaryClasses,
@@ -30,6 +30,8 @@ import LinkIcon from '@mui/icons-material/Link'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionTitle from './AccordionTitle'
 import Box from '@mui/material/Box'
+import ConfirmDelete from '../ConfirmDelete'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 
 export type ItemsDataState = Record<string, AccordionItemData[]>;
 
@@ -37,11 +39,16 @@ interface DraggableProps {
     items: ItemsDataState;
     setItems: React.Dispatch<React.SetStateAction<ItemsDataState>>;
     onUpdateItem: OnUpdateItem
+    removeItem: (itemId: string) => void;
+    removeContainer: (containerId: string) => void;
 }
 
 const dragMinimumDelta = 5
 
-export default function DraggableAccordion({ items, setItems, onUpdateItem }: DraggableProps) {
+export default function DraggableAccordion(
+    { items, setItems, onUpdateItem, removeItem, removeContainer }: DraggableProps,
+) {
+
     const [activeItem, setActiveItem] = useState<AccordionItemData | null>(null)
     const [dragTranslation, setTranslation] = useState<{ top: number; left: number }|null>(null)
 
@@ -222,58 +229,77 @@ export default function DraggableAccordion({ items, setItems, onUpdateItem }: Dr
         },
     }))
 
+    const StyledBadge = styled(Badge)`
+        & .${badgeClasses.badge} {
+            top: -12px;
+            right: 0;
+            font-weight: bold;
+        }
+    `
+
     return (
         <div>
-            <div>
-                <h1>Draggable Accordions</h1>
-                <p>Drag the accordions by their handle to reorder them or move them between containers.</p>
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={rectIntersection}
-                    onDragStart={handleDragStart}
-                    onDragOver={handleDragOver}
-                    onDragEnd={handleDragEnd}
-                >
-                    {Object.keys(items).map((containerId) => (
-                        <Accordion
-                            defaultExpanded
-                            key={`container-${containerId}`}
-                            expanded={!closedParents.has(containerId)}
-                            onChange={handleParentAccordionChange(containerId)}
-                            style={{ flex: 1 }}
-                        >
-                            <AccordionSummary component="div" expandIcon={<ExpandMoreIcon />}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', margin: 0 }}>
-                                    <AccordionTitle
-                                        value={containerId}
-                                        allowEditing={!closedParents.has(containerId)}
-                                        onChange={(newKey) => renameParentAccordionKey(containerId, newKey)}
-                                    >
-                                        <Typography component="span" style={{ marginRight: 8 }}>
-                                            <IconButton color="primary" component="span">
-                                                <LinkIcon />
-                                            </IconButton>
-                                        </Typography>
-                                    </AccordionTitle>
-                                </Box>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Container
-                                    id={containerId}
-                                    key={containerId}
-                                    items={items[containerId]}
-                                    expandedPanel={expanded}
-                                    onAccordionChange={handleAccordionChange}
-                                    onUpdateItem={onUpdateItem}
-                                />
-                            </AccordionDetails>
-                        </Accordion>
-                    ))}
-                    <DragOverlay dropAnimation={dropAnimation}>
-                        {activeItem ? <OverlayItem item={activeItem} isExpanded={expanded === activeItem.id} isDragging /> : null}
-                    </DragOverlay>
-                </DndContext>
-            </div>
+            <h1>Draggable Accordions</h1>
+            <p>Drag the accordions by their handle to reorder them or move them between containers.</p>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={rectIntersection}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+            >
+                {Object.keys(items).map((containerId) => (
+                    <Accordion
+                        defaultExpanded
+                        key={`container-${containerId}`}
+                        expanded={!closedParents.has(containerId)}
+                        onChange={handleParentAccordionChange(containerId)}
+                        style={{ flex: 1 }}
+                    >
+                        <AccordionSummary component="div" expandIcon={<ExpandMoreIcon />}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', margin: '0 8px 0 0' }}>
+                                <AccordionTitle
+                                    value={containerId}
+                                    allowEditing={!closedParents.has(containerId)}
+                                    onChange={(newKey) => renameParentAccordionKey(containerId, newKey)}
+                                >
+                                    <Typography component="span" style={{ marginRight: 8 }}>
+                                        <IconButton color="primary" component="span">
+                                            <LinkIcon />
+                                        </IconButton>
+                                    </Typography>
+                                </AccordionTitle>
+                                { items[containerId].length > 0 ? (
+                                    <Typography component="span" onClick={(e) => e.stopPropagation()}>
+                                        <IconButton component="span" color="primary" aria-label="play">
+                                            <PlayCircleOutlineIcon />
+                                            <StyledBadge badgeContent={items[containerId].length} color="default" overlap="circular" />
+                                        </IconButton>
+                                    </Typography>
+                                ) : (
+                                    <Typography component="span">
+                                        <ConfirmDelete onConfirm={ () => removeContainer(containerId)} hasText={false} />
+                                    </Typography>
+                                ) }
+                            </Box>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Container
+                                id={containerId}
+                                key={containerId}
+                                items={items[containerId]}
+                                expandedPanel={expanded}
+                                onAccordionChange={handleAccordionChange}
+                                onUpdateItem={onUpdateItem}
+                                removeItem={removeItem}
+                            />
+                        </AccordionDetails>
+                    </Accordion>
+                ))}
+                <DragOverlay dropAnimation={dropAnimation}>
+                    {activeItem ? <OverlayItem item={activeItem} isExpanded={expanded === activeItem.id} isDragging /> : null}
+                </DragOverlay>
+            </DndContext>
         </div>
     )
 }

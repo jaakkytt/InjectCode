@@ -65,6 +65,25 @@ export default function UserScripts() {
         })
     }
 
+    const removeItem = (id: string) => {
+        setItems((prevState) =>
+            Object.fromEntries(
+                Object.entries(prevState).map(([containerId, children]) => [
+                    containerId,
+                    children.filter((item) => item.id !== id),
+                ]),
+            ),
+        )
+    }
+
+    const removeContainer = (containerId: string) => {
+        setItems((prevState) => {
+            const newState = { ...prevState }
+            delete newState[containerId]
+            return newState
+        })
+    }
+
     const onUpdateItem = (id: string, changes: Partial<AccordionItemData>) => {
         setItems((prevState) =>
             Object.fromEntries(
@@ -80,7 +99,13 @@ export default function UserScripts() {
         <>
             <button onClick={addContainer}>New URL</button>
             <button onClick={addItem}>New Script</button>
-            <DraggableAccordion items={items} setItems={setItems} onUpdateItem={onUpdateItem} />
+            <DraggableAccordion
+                items={items}
+                setItems={setItems}
+                onUpdateItem={onUpdateItem}
+                removeItem={removeItem}
+                removeContainer={removeContainer}
+            />
         </>
     )
 }

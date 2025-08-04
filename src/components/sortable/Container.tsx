@@ -10,9 +10,12 @@ interface ContainerProps {
     expandedPanel: string | false;
     onAccordionChange: (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
     onUpdateItem: OnUpdateItem;
+    removeItem: (itemId: string) => void;
 }
 
-export default function Container({ id, items, expandedPanel, onAccordionChange, onUpdateItem } : ContainerProps) {
+export default function Container(
+    { id, items, expandedPanel, onAccordionChange, onUpdateItem, removeItem } : ContainerProps,
+) {
     const { isOver, setNodeRef } = useDroppable({ id })
 
     const containerStyle: React.CSSProperties = {
@@ -41,6 +44,7 @@ export default function Container({ id, items, expandedPanel, onAccordionChange,
                             expandedPanel={expandedPanel}
                             onAccordionChange={onAccordionChange}
                             onUpdateItem={onUpdateItem}
+                            removeItem={removeItem}
                         />
                     ))
                 ) : (

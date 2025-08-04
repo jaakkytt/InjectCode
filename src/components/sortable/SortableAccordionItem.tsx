@@ -7,7 +7,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import Box from '@mui/material/Box'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
-import DeleteIcon from '@mui/icons-material/Delete'
 import Typography from '@mui/material/Typography'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import { AccordionActions, Button, IconButton, styled, Switch } from '@mui/material'
@@ -15,15 +14,19 @@ import { AccordionItemData, OnUpdateItem } from './types'
 import AccordionTitle from './AccordionTitle'
 import AccordionBody from './AccordionBody'
 import MuiAccordionSummary from '@mui/material/AccordionSummary'
+import ConfirmDelete from '../ConfirmDelete'
 
 interface Props {
     item: AccordionItemData;
     expandedPanel: string | false;
     onAccordionChange: (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
     onUpdateItem: OnUpdateItem;
+    removeItem: (itemId: string) => void;
 }
 
-export default function SortableAccordionItem({ item, expandedPanel, onAccordionChange, onUpdateItem }: Props) {
+export default function SortableAccordionItem(
+    { item, expandedPanel, onAccordionChange, onUpdateItem, removeItem }: Props,
+) {
     const {
         attributes,
         listeners,
@@ -85,6 +88,7 @@ export default function SortableAccordionItem({ item, expandedPanel, onAccordion
                         </AccordionTitle>
                         <Typography
                             component="span"
+                            onClick={(e) => e.stopPropagation()}
                             style={{
                                 opacity: expandedPanel === item.id ? 0 : 1,
                                 visibility: expandedPanel === item.id ? 'hidden' : 'visible',
@@ -131,11 +135,9 @@ export default function SortableAccordionItem({ item, expandedPanel, onAccordion
                             onClick={(e) => e.stopPropagation()}
                         />}
                     >
-                        { item.active ? 'Enabled' : 'Disabled' }
+                        <span style={{ minWidth: '10ch' }}>{ item.active ? 'Enabled' : 'Disabled' }</span>
                     </Button>
-                    <Button variant="outlined" color="warning" startIcon={<DeleteIcon />}>
-                        Delete
-                    </Button>
+                    <ConfirmDelete onConfirm={ () => removeItem(item.id) } hasText={true} />
                 </AccordionActions>
             </Accordion>
         </div>
