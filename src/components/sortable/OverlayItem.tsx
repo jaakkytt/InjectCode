@@ -5,9 +5,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Box from '@mui/material/Box'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 import Typography from '@mui/material/Typography'
-import { AccordionItemData } from './types'
 import { IconButton, Switch } from '@mui/material'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import { AccordionItemData } from '../../types'
 
 export const OverlayItem = React.forwardRef<HTMLDivElement, { item: AccordionItemData, isExpanded: boolean, isDragging?: boolean }>(
     ({ item, isExpanded, isDragging, ...props }, ref) => {

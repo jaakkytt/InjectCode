@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 
 import DraggableAccordion from './sortable/DraggableAccordion'
-import { AccordionItemData } from './sortable/types'
+
+import { AccordionItemData, ScriptType } from '../types'
 
 export default function UserScripts() {
 
@@ -13,6 +14,7 @@ export default function UserScripts() {
                 secondaryText: '',
                 content: '1.',
                 active: true,
+                type: 'js',
             },
             {
                 id: 'panel2',
@@ -20,6 +22,7 @@ export default function UserScripts() {
                 secondaryText: '',
                 content: '2.',
                 active: false,
+                type: 'js',
             },
             {
                 id: 'panel3',
@@ -27,6 +30,7 @@ export default function UserScripts() {
                 secondaryText: '',
                 content: '3.',
                 active: true,
+                type: 'js',
             },
             {
                 id: 'panel4',
@@ -34,6 +38,7 @@ export default function UserScripts() {
                 secondaryText: '',
                 content: 'Nunc vitae orci ultricies, auctor nunc in, volutpat nisl. Integer sit amet egestas eros, vitae egestas augue. Duis vel est augue.',
                 active: true,
+                type: 'css',
             },
         ],
         'https://github.com/*': [],
@@ -48,7 +53,7 @@ export default function UserScripts() {
         }))
     }
 
-    const addItem = () => {
+    const addItem = (type: ScriptType) => {
         const newItemId = `item${Math.random().toString(36).substring(2, 15)}`
         setItems((prev) => {
             const firstContainerKey = Object.keys(prev)[0]
@@ -56,10 +61,11 @@ export default function UserScripts() {
                 ...prev,
                 [firstContainerKey]: [...prev[firstContainerKey], {
                     id: newItemId,
-                    title: 'New entry' + newItemId,
+                    title: 'New entry ' + newItemId,
                     secondaryText: '',
-                    content: 'Nunc vitae orci ultricies, auctor nunc in, volutpat nisl. Integer sit amet egestas eros, vitae egestas augue. Duis vel est augue.',
+                    content: '',
                     active: true,
+                    type: type,
                 }],
             }
         })
@@ -98,7 +104,8 @@ export default function UserScripts() {
     return (
         <>
             <button onClick={addContainer}>New URL</button>
-            <button onClick={addItem}>New Script</button>
+            <button onClick={() => addItem('js')}>New Script</button>
+            <button onClick={() => addItem('css')}>New Style</button>
             <DraggableAccordion
                 items={items}
                 setItems={setItems}

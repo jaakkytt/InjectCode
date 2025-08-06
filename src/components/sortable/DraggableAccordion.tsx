@@ -19,7 +19,6 @@ import { arrayMove } from '@dnd-kit/sortable'
 
 import { OverlayItem } from './OverlayItem'
 import Container from './Container'
-import { AccordionItemData, OnUpdateItem } from './types'
 import { Accordion, Badge, badgeClasses, IconButton, styled, Typography } from '@mui/material'
 import MuiAccordionSummary, {
     AccordionSummaryProps,
@@ -32,6 +31,7 @@ import AccordionTitle from './AccordionTitle'
 import Box from '@mui/material/Box'
 import ConfirmDelete from '../ConfirmDelete'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import { AccordionItemData, OnUpdateItem } from '../../types'
 
 export type ItemsDataState = Record<string, AccordionItemData[]>;
 
