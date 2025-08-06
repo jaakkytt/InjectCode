@@ -78,7 +78,6 @@ export default function SortableAccordionItem(
                             left: 0,
                             top: 0,
                             opacity: 0.3,
-                            transform: 'rotate(-45deg)',
                         }}>{ item.type === 'js' ? <JavascriptIcon /> : <CssIcon /> }</span>
                         <AccordionTitle
                             value={item.title}

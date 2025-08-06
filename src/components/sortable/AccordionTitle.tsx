@@ -8,13 +8,21 @@ interface Props {
     value: string
     allowEditing: boolean
     onChange: (newValue: string) => void
+    inputValidator?: (input: string) => string | undefined
     children?: React.ReactNode
 }
 
-export default function AccordionTitle({ value, allowEditing, onChange, children }: Props) {
+export default function AccordionTitle({
+    value,
+    allowEditing,
+    onChange,
+    inputValidator = (input: string) => input.trim() === '' ? 'This field cannot be empty' : undefined,
+    children,
+}: Props) {
 
     const [isEditing, setEditing] = useState(false)
     const [isSaved, setSaved] = useState(false)
+    const [error, setError] = useState<string | undefined>(undefined)
     const [inputValue, setInputValue] = useState(value)
     const textFieldRef = useRef<HTMLInputElement>(null)
 
@@ -36,6 +44,13 @@ export default function AccordionTitle({ value, allowEditing, onChange, children
     }
 
     const handleSave = () => {
+        const validationError = inputValidator(inputValue)
+        if (validationError) {
+            setSaved(false)
+            setError(validationError)
+            return
+        }
+        setError(undefined)
         if (inputValue.trim() !== value.trim()) {
             setSaved(true)
             onChange(inputValue.trim())
@@ -71,16 +86,25 @@ export default function AccordionTitle({ value, allowEditing, onChange, children
                     <Typography component="span" sx={{ flexGrow: 1, textWrap: 'auto' }}>
                         <TextField
                             fullWidth
-                            required
+                            error={!!error}
+                            label={error}
                             variant="standard"
                             size="medium"
                             value={inputValue}
                             onClick={e => e.stopPropagation()}
-                            onChange={(e) => setInputValue(e.target.value)}
+                            onChange={(e) => {
+                                setInputValue(e.target.value)
+                                if (e.target.value.trim() !== value.trim() || value.trim() === '') {
+                                    setError(inputValidator(e.target.value))
+                                } else {
+                                    setError(undefined)
+                                }
+                            }}
                             onBlur={() => {
                                 if (!isSaved) {
                                     setInputValue(value)
                                 }
+                                setError(undefined)
                                 setEditing(false)
                             }}
                             inputRef={textFieldRef}

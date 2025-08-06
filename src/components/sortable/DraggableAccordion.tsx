@@ -32,6 +32,7 @@ import Box from '@mui/material/Box'
 import ConfirmDelete from '../ConfirmDelete'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import { AccordionItemData, OnUpdateItem } from '../../types'
+import { RESERVED_URL } from '../../constants'
 
 export type ItemsDataState = Record<string, AccordionItemData[]>;
 
@@ -98,8 +99,10 @@ export default function DraggableAccordion(
                 [newKey]: oldValue,
             }
 
-            const sortedKeys = Object.keys(updatedItems).sort()
-            return sortedKeys.reduce((acc, key) => {
+            const keys = Object.keys(updatedItems)
+            const [firstKey, ...otherKeys] = keys
+            const sortedOtherKeys = otherKeys.sort()
+            return [firstKey, ...sortedOtherKeys].reduce((acc, key) => {
                 acc[key] = updatedItems[key]
                 return acc
             }, {} as ItemsDataState)
@@ -221,6 +224,19 @@ export default function DraggableAccordion(
         }
     }
 
+    const titleInputValidator = (value: string) => {
+        if (value.trim() === '') {
+            return 'This field cannot be empty'
+        }
+        if (value === RESERVED_URL) {
+            return `"${RESERVED_URL}" is reserved and cannot be used`
+        }
+        if (Object.keys(items).includes(value)) {
+            return `"${value}" already exists`
+        }
+        return undefined
+    }
+
     const AccordionSummary = styled((props: AccordionSummaryProps) => (
         <MuiAccordionSummary {...props} />
     ))(() => ({
@@ -260,8 +276,9 @@ export default function DraggableAccordion(
                             <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', margin: '0 8px 0 0' }}>
                                 <AccordionTitle
                                     value={containerId}
-                                    allowEditing={!closedParents.has(containerId)}
+                                    allowEditing={!closedParents.has(containerId) && containerId !== RESERVED_URL}
                                     onChange={(newKey) => renameParentAccordionKey(containerId, newKey)}
+                                    inputValidator={titleInputValidator}
                                 >
                                     <Typography component="span" style={{ marginRight: 8 }}>
                                         <IconButton color="primary" component="span">
@@ -277,9 +294,11 @@ export default function DraggableAccordion(
                                         </IconButton>
                                     </Typography>
                                 ) : (
-                                    <Typography component="span">
-                                        <ConfirmDelete onConfirm={ () => removeContainer(containerId)} hasText={false} />
-                                    </Typography>
+                                    containerId !== RESERVED_URL && (
+                                        <Typography component="span">
+                                            <ConfirmDelete onConfirm={ () => removeContainer(containerId)} hasText={false} />
+                                        </Typography>
+                                    )
                                 ) }
                             </Box>
                         </AccordionSummary>

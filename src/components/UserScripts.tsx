@@ -3,11 +3,12 @@ import React, { useState } from 'react'
 import DraggableAccordion from './sortable/DraggableAccordion'
 
 import { AccordionItemData, ScriptType } from '../types'
+import { RESERVED_URL } from '../constants'
 
 export default function UserScripts() {
 
     const [items, setItems] = useState<Record<string, AccordionItemData[]>>({
-        '<all_urls>': [
+        [RESERVED_URL]: [
             {
                 id: 'panel1',
                 title: 'General settings',
