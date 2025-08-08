@@ -19,7 +19,7 @@ import { arrayMove } from '@dnd-kit/sortable'
 
 import { OverlayItem } from './OverlayItem'
 import Container from './Container'
-import { Accordion, Badge, badgeClasses, IconButton, styled, Typography } from '@mui/material'
+import { Accordion, IconButton, styled, Typography } from '@mui/material'
 import MuiAccordionSummary, {
     AccordionSummaryProps,
     accordionSummaryClasses,
@@ -30,9 +30,9 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionTitle from './AccordionTitle'
 import Box from '@mui/material/Box'
 import ConfirmDelete from '../ConfirmDelete'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import { AccordionItemData, OnUpdateItem } from '../../types'
 import { RESERVED_URL } from '../../constants'
+import CounterPlay from './CounterPlay'
 
 export type ItemsDataState = Record<string, AccordionItemData[]>;
 
@@ -245,14 +245,6 @@ export default function DraggableAccordion(
         },
     }))
 
-    const StyledBadge = styled(Badge)`
-        & .${badgeClasses.badge} {
-            top: -12px;
-            right: 0;
-            font-weight: bold;
-        }
-    `
-
     return (
         <div>
             <h1>Draggable Accordions</h1>
@@ -287,12 +279,9 @@ export default function DraggableAccordion(
                                     </Typography>
                                 </AccordionTitle>
                                 { items[containerId].length > 0 ? (
-                                    <Typography component="span" onClick={(e) => e.stopPropagation()}>
-                                        <IconButton component="span" color="primary" aria-label="play">
-                                            <PlayCircleOutlineIcon />
-                                            <StyledBadge badgeContent={items[containerId].length} color="default" overlap="circular" />
-                                        </IconButton>
-                                    </Typography>
+                                    <CounterPlay items={items[containerId]} onClick={() => {
+                                        console.log('Play clicked for container:', containerId)
+                                    }} />
                                 ) : (
                                     containerId !== RESERVED_URL && (
                                         <Typography component="span">

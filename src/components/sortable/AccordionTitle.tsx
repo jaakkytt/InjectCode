@@ -40,6 +40,15 @@ export default function AccordionTitle({
             if (textFieldRef.current) {
                 handleSave()
             }
+        } else if (event.key === 'Escape') {
+            event.preventDefault()
+            setInputValue(value)
+            setError(undefined)
+            setEditing(false)
+            setSaved(true)
+            if (textFieldRef.current) {
+                textFieldRef.current.blur()
+            }
         }
     }
 

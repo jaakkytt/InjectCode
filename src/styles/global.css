@@ -1,6 +1,11 @@
+@import url('~@fontsource/roboto/300.css');
+@import url('~@fontsource/roboto/400.css');
+@import url('~@fontsource/roboto/500.css');
+@import url('~@fontsource/roboto/700.css');
+
 body {
     margin: 10px;
-    font-family: Arial, sans-serif;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
     background-color: #f4f4f4;
     overflow-y: scroll;
 }
