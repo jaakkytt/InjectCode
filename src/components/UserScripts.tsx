@@ -55,14 +55,15 @@ export default function UserScripts() {
     }
 
     const addItem = (type: ScriptType) => {
-        const newItemId = `item${Math.random().toString(36).substring(2, 15)}`
+        const dateTimeStringAsTitle = new Date().toLocaleString()
+        const newItemId = `${type}-${dateTimeStringAsTitle}-${Math.random().toString(36).substring(2, 10)}`
         setItems((prev) => {
             const firstContainerKey = Object.keys(prev)[0]
             return {
                 ...prev,
                 [firstContainerKey]: [...prev[firstContainerKey], {
                     id: newItemId,
-                    title: 'New entry ' + newItemId,
+                    title: dateTimeStringAsTitle,
                     secondaryText: '',
                     content: '',
                     active: true,
