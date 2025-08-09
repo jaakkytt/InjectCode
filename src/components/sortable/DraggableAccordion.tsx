@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-
 import {
     ClientRect,
     defaultDropAnimation,
@@ -14,27 +13,22 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core'
-
 import { arrayMove } from '@dnd-kit/sortable'
-
 import { OverlayItem } from './OverlayItem'
 import Container from './Container'
 import { Accordion, IconButton, styled, Typography } from '@mui/material'
-import MuiAccordionSummary, {
-    AccordionSummaryProps,
-    accordionSummaryClasses,
-} from '@mui/material/AccordionSummary'
+import MuiAccordionSummary, { accordionSummaryClasses, AccordionSummaryProps } from '@mui/material/AccordionSummary'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import LinkIcon from '@mui/icons-material/Link'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionTitle from './AccordionTitle'
 import Box from '@mui/material/Box'
 import ConfirmDelete from '../ConfirmDelete'
-import { AccordionItemData, OnUpdateItem } from '../../types'
+import { AccordionItemData, ItemsDataState, OnUpdateItem } from '../../types'
 import { RESERVED_URL } from '../../constants'
 import CounterPlay from './CounterPlay'
-
-export type ItemsDataState = Record<string, AccordionItemData[]>;
+import { urlPatternValidator } from '../../domain/urlPatternValidator'
+import { urlCharacterFilter } from '../../domain/urlCharacterFilter'
 
 interface DraggableProps {
     items: ItemsDataState;
@@ -224,19 +218,6 @@ export default function DraggableAccordion(
         }
     }
 
-    const titleInputValidator = (value: string) => {
-        if (value.trim() === '') {
-            return 'This field cannot be empty'
-        }
-        if (value === RESERVED_URL) {
-            return `"${RESERVED_URL}" is reserved and cannot be used`
-        }
-        if (Object.keys(items).includes(value)) {
-            return `"${value}" already exists`
-        }
-        return undefined
-    }
-
     const AccordionSummary = styled((props: AccordionSummaryProps) => (
         <MuiAccordionSummary {...props} />
     ))(() => ({
@@ -270,7 +251,8 @@ export default function DraggableAccordion(
                                     value={containerId}
                                     allowEditing={!closedParents.has(containerId) && containerId !== RESERVED_URL}
                                     onChange={(newKey) => renameParentAccordionKey(containerId, newKey)}
-                                    inputValidator={titleInputValidator}
+                                    inputValidator={(value) => urlPatternValidator(value, Object.keys(items))}
+                                    inputTransformer={urlCharacterFilter}
                                 >
                                     <Typography component="span" style={{ marginRight: 8 }}>
                                         <IconButton color="primary" component="span">

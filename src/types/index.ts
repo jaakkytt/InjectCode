@@ -10,3 +10,5 @@ export interface AccordionItemData {
 }
 
 export type OnUpdateItem = (id: string, changes: Partial<AccordionItemData>) => void;
+
+export type ItemsDataState = Record<string, AccordionItemData[]>;

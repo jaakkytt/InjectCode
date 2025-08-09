@@ -8,7 +8,8 @@ interface Props {
     value: string
     allowEditing: boolean
     onChange: (newValue: string) => void
-    inputValidator?: (input: string) => string | undefined
+    inputValidator?: (input: string) => Promise<string | undefined>
+    inputTransformer?: (input: string) => string
     children?: React.ReactNode
 }
 
@@ -16,7 +17,8 @@ export default function AccordionTitle({
     value,
     allowEditing,
     onChange,
-    inputValidator = (input: string) => input.trim() === '' ? 'This field cannot be empty' : undefined,
+    inputValidator = (input: string) => Promise.resolve(input.trim() === '' ? 'This field cannot be empty' : undefined),
+    inputTransformer,
     children,
 }: Props) {
 
@@ -33,6 +35,17 @@ export default function AccordionTitle({
     }, [isEditing])
 
     useEffect(() => setInputValue(value), [value])
+
+    const handleOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value
+        const transformedValue = inputTransformer ? inputTransformer(rawValue) : rawValue
+        setInputValue(transformedValue)
+        if (transformedValue.trim() !== value.trim() || value.trim() === '') {
+            setError(await inputValidator(transformedValue))
+        } else {
+            setError(undefined)
+        }
+    }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -52,8 +65,8 @@ export default function AccordionTitle({
         }
     }
 
-    const handleSave = () => {
-        const validationError = inputValidator(inputValue)
+    const handleSave = async () => {
+        const validationError = await inputValidator(inputValue)
         if (validationError) {
             setSaved(false)
             setError(validationError)
@@ -101,14 +114,7 @@ export default function AccordionTitle({
                             size="medium"
                             value={inputValue}
                             onClick={e => e.stopPropagation()}
-                            onChange={(e) => {
-                                setInputValue(e.target.value)
-                                if (e.target.value.trim() !== value.trim() || value.trim() === '') {
-                                    setError(inputValidator(e.target.value))
-                                } else {
-                                    setError(undefined)
-                                }
-                            }}
+                            onChange={handleOnChange}
                             onBlur={() => {
                                 if (!isSaved) {
                                     setInputValue(value)
