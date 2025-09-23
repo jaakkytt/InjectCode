@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Stack } from '@mui/material'
-import './UrlTabs.css'
+import '../UrlTabs.css'
 import Skeleton from '@mui/material/Skeleton'
 import Paper from '@mui/material/Paper'
 

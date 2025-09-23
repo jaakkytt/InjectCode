@@ -16,8 +16,6 @@ export interface AccordionItemData {
     type: ScriptType;
 }
 
-export type OnUpdateItem = (id: string, changes: Partial<AccordionItemData>) => void;
-
 export type ItemsDataState = Record<string, AccordionItemData[]>;
 
 export type StoreState = {

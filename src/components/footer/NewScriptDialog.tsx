@@ -9,14 +9,14 @@ import {
     SelectChangeEvent,
     TextField,
 } from '@mui/material'
-import { useUrls, useUrlsDispatch } from '../providers/UrlsContextProvider'
-import { ScriptType } from '../types'
+import { useUrls, useUrlsDispatch } from '../../providers/UrlsContextProvider'
+import { ScriptType } from '../../types'
 import CloseIcon from '@mui/icons-material/Close'
 import { useEffect, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import MenuItem from '@mui/material/MenuItem'
-import { useLastInteracted } from '../providers/LastInteractedProvider'
-import { RESERVED_URL } from '../constants'
+import { useLastInteracted } from '../../providers/LastInteractedProvider'
+import { RESERVED_URL } from '../../constants'
 
 interface Props {
     isOpen: boolean

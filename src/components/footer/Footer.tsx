@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { Button, Stack, Switch } from '@mui/material'
-import './UrlTabs.css'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
-import PublicIcon from '@mui/icons-material/Public'
+import { Button, Stack } from '@mui/material'
 import ExpandingActionButton from './ExpandingActionButton'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
-import { useRunScope } from '../providers/RunScopeProvider'
+import { useRunScope } from '../../providers/RunScopeProvider'
+import { IconSwitch } from './IconSwitch'
+import { RunScope } from '../../types'
 
 interface Props {
     handleRunAll: () => void;
@@ -28,6 +27,23 @@ const Footer = ({ handleRunAll, handleRunCurrent } : Props) => {
         setScope(event.target.checked ? 'global' : 'current')
     }
 
+    const renderTintedButton = (color: 'success' | 'warning', scopeValue: RunScope, label: string) => (
+        <Button
+            color={color}
+            disableRipple={true}
+            onClick={() => {
+                if (scope !== scopeValue) {
+                    setScope(scopeValue)
+                }
+            }}
+            sx={{
+                opacity: scope === scopeValue ? 1 : 0.5,
+                cursor: scope === scopeValue ? 'default' : 'pointer',
+                background: 'none',
+            }}
+        >{label}</Button>
+    )
+
     return (
         <Stack direction="row" spacing={1} sx={{ pl: 1, pt: 0, pr: 1, pb: 1, justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', alignItems: 'center' }}>
@@ -37,9 +53,9 @@ const Footer = ({ handleRunAll, handleRunCurrent } : Props) => {
                     onClick={handleClick}
                 >Run all</Button>
                 <Stack direction="row" spacing={0} sx={{ justifyContent: 'flex-end', alignItems: 'center' }}>
-                    <Button component="span" endIcon={<LocationOnIcon />} disabled>current tab</Button>
-                    <Switch size="small" checked={scope === 'global'} onChange={handleChange} color="warning" />
-                    <Button component="span" startIcon={<PublicIcon />} disabled>all tabs</Button>
+                    {renderTintedButton('success', 'current', 'current tab')}
+                    <IconSwitch checked={scope === 'global'} onChange={handleChange} />
+                    {renderTintedButton('warning', 'global', 'all tabs')}
                 </Stack>
             </Stack>
             <ExpandingActionButton/>

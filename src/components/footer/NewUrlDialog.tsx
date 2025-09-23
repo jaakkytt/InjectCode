@@ -7,19 +7,19 @@ import {
     DialogTitle,
     TextField,
 } from '@mui/material'
-import { useUrlsDispatch } from '../providers/UrlsContextProvider'
+import { useUrlsDispatch } from '../../providers/UrlsContextProvider'
 import { useEffect, useState } from 'react'
-import { useExistingUrls } from '../providers/ExistingUrlsProvider'
-import { urlPatternValidator } from '../domain/urlPatternValidator'
-import { urlCharacterFilter } from '../domain/urlCharacterFilter'
+import { useExistingUrls } from '../../providers/ExistingUrlsProvider'
+import { urlPatternValidator } from '../../domain/urlPatternValidator'
+import { urlCharacterFilter } from '../../domain/urlCharacterFilter'
 import CloseIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
-import { useCurrentUrl } from '../providers/CurrentUrlProvider'
-import { useTab } from '../providers/TabProvider'
-import { TabIndex } from '../types'
+import { useCurrentUrl } from '../../providers/CurrentUrlProvider'
+import { useTab } from '../../providers/TabProvider'
+import { TabIndex } from '../../types'
 import { matchPattern } from 'browser-extension-url-match'
-import { MATCH_PATTERN_DOCS } from '../constants'
-import { useLastInteracted } from '../providers/LastInteractedProvider'
+import { MATCH_PATTERN_DOCS } from '../../constants'
+import { useLastInteracted } from '../../providers/LastInteractedProvider'
 
 interface Props {
     isOpen: boolean
