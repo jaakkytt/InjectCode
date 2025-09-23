@@ -5,3 +5,7 @@
     width: 28px;
     margin-left: -1px;
 }
+
+.MuiPaper-root.MuiAccordion-root.Mui-expanded {
+    margin: 8px 0;
+}

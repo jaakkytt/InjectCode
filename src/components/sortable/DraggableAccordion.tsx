@@ -13,7 +13,6 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core'
-import { arrayMove } from '@dnd-kit/sortable'
 import { OverlayItem } from './OverlayItem'
 import Container from './Container'
 import { Accordion, IconButton, styled, Typography } from '@mui/material'
@@ -23,46 +22,50 @@ import LinkIcon from '@mui/icons-material/Link'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionTitle from './AccordionTitle'
 import Box from '@mui/material/Box'
-import ConfirmDelete from '../ConfirmDelete'
-import { AccordionItemData, ItemsDataState, OnUpdateItem } from '../../types'
-import { RESERVED_URL } from '../../constants'
+import ConfirmDeleteButton from '../ConfirmDeleteButton'
+import { AccordionItemData } from '../../types'
+import { LOCAL_STORAGE_CHILD_EXPANDED, LOCAL_STORAGE_CLOSE_PARENTS, RESERVED_URL } from '../../constants'
 import CounterPlay from './CounterPlay'
 import { urlPatternValidator } from '../../domain/urlPatternValidator'
 import { urlCharacterFilter } from '../../domain/urlCharacterFilter'
-
-interface DraggableProps {
-    items: ItemsDataState;
-    setItems: React.Dispatch<React.SetStateAction<ItemsDataState>>;
-    onUpdateItem: OnUpdateItem
-    removeItem: (itemId: string) => void;
-    removeContainer: (containerId: string) => void;
-}
+import { useUrls, useUrlsDispatch } from '../../providers/UrlsContextProvider'
+import { ScriptsContextProvider } from '../../providers/ScriptsContextProvider'
+import { useExistingUrls } from '../../providers/ExistingUrlsProvider'
+import { useLastInteracted } from '../../providers/LastInteractedProvider'
 
 const dragMinimumDelta = 5
 
-export default function DraggableAccordion(
-    { items, setItems, onUpdateItem, removeItem, removeContainer }: DraggableProps,
-) {
+export default function DraggableAccordion() {
+
+    const items = useUrls()
+    const dispatch = useUrlsDispatch()
+    const existingUrls = useExistingUrls()
+
+    const { setLastUrl } = useLastInteracted()
 
     const [activeItem, setActiveItem] = useState<AccordionItemData | null>(null)
     const [dragTranslation, setTranslation] = useState<{ top: number; left: number }|null>(null)
 
     const [expanded, setExpanded] = useState<string | false>(() => {
-        const savedExpanded = localStorage.getItem('childExpanded')
+        const savedExpanded = localStorage.getItem(LOCAL_STORAGE_CHILD_EXPANDED)
         return savedExpanded ? savedExpanded : false
     })
 
     const [closedParents, setClosedParents] = useState<Set<string>>(() => {
-        const savedState = localStorage.getItem('closedParents')
+        const savedState = localStorage.getItem(LOCAL_STORAGE_CLOSE_PARENTS)
         return savedState ? new Set(JSON.parse(savedState)) : new Set()
     })
 
+    const removeContainer = (containerId: string) => {
+        dispatch({ name: 'deleted', id: containerId })
+    }
+
     useEffect(() => {
-        localStorage.setItem('closedParents', JSON.stringify(Array.from(closedParents)))
+        localStorage.setItem(LOCAL_STORAGE_CLOSE_PARENTS, JSON.stringify(Array.from(closedParents)))
     }, [closedParents])
 
     useEffect(() => {
-        localStorage.setItem('childExpanded', expanded || '')
+        localStorage.setItem(LOCAL_STORAGE_CHILD_EXPANDED, expanded || '')
     }, [expanded])
 
     const sensors = useSensors(useSensor(PointerSensor))
@@ -83,24 +86,12 @@ export default function DraggableAccordion(
             }
             return newState
         })
+        setLastUrl(panel)
     }
 
     const renameParentAccordionKey = (oldKey: string, newKey: string) => {
-        setItems((prevItems) => {
-            const { [oldKey]: oldValue, ...rest } = prevItems
-            const updatedItems = {
-                ...rest,
-                [newKey]: oldValue,
-            }
-
-            const keys = Object.keys(updatedItems)
-            const [firstKey, ...otherKeys] = keys
-            const sortedOtherKeys = otherKeys.sort()
-            return [firstKey, ...sortedOtherKeys].reduce((acc, key) => {
-                acc[key] = updatedItems[key]
-                return acc
-            }, {} as ItemsDataState)
-        })
+        dispatch({ name: 'renamed', id: oldKey, title: newKey })
+        setLastUrl(newKey)
     }
 
     const findContainer = (id: string) => {
@@ -111,12 +102,14 @@ export default function DraggableAccordion(
     }
 
     function handleDragStart(event: DragStartEvent) {
-        const { active } = event
+        dispatch({ name: 'dragStart' })
 
+        const { active } = event
         const activeId = active.id.toString()
         const container = findContainer(activeId)
 
         if (container) {
+            setLastUrl(container)
             const item = items[container].find(i => i.id === activeId)
             if (item) {
                 setActiveItem(item)
@@ -159,63 +152,59 @@ export default function DraggableAccordion(
             return
         }
 
-        setItems((prev) => {
+        const activeItems = items[activeContainer]
+        const overItems = items[overContainer]
+        const activeIndex = activeItems.findIndex((item) => item.id === activeId)
+        const overIndex = overItems.findIndex((item) => item.id === overId)
 
-            if (prev[overContainer].some(item => item.id === activeId)) {
-                return prev
-            }
+        const newIndexInOver = overId in items ? overItems.length : (overIndex >= 0 ? overIndex : overItems.length)
 
-            const activeItems = prev[activeContainer]
-            const overItems = prev[overContainer]
-            const activeIndex = activeItems.findIndex((item) => item.id === activeId)
-            const overIndex = overItems.findIndex((item) => item.id === overId)
-
-            let newIndexInOver: number
-            if (overId in prev) {
-                newIndexInOver = overItems.length
-            } else {
-                newIndexInOver = overIndex >= 0 ? overIndex : overItems.length
-            }
-
-            return {
-                ...prev,
-                [activeContainer]: activeItems.filter((item) => item.id !== activeId),
-                [overContainer]: [
-                    ...overItems.slice(0, newIndexInOver),
-                    activeItems[activeIndex],
-                    ...overItems.slice(newIndexInOver),
-                ],
-            }
+        dispatch({
+            name: 'dragAcrossContainer',
+            itemId: activeId,
+            fromId: activeContainer,
+            fromIndex: activeIndex,
+            toId: overContainer,
+            toIndex: newIndexInOver,
         })
     }
 
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event
         setActiveItem(null)
+
         if (!over) {
+            dispatch({ name: 'dragCancel' })
             return
         }
 
         const activeId = active.id.toString()
         const overId = over.id.toString()
-
         const activeContainer = findContainer(activeId)
         const overContainer = findContainer(overId)
 
-        if (!activeContainer || !overContainer || activeContainer !== overContainer) {
+        if (!activeContainer || !overContainer) {
+            dispatch({ name: 'dragCancel' })
             return
         }
 
-        const containerItems = items[activeContainer]
-        const oldIndex = containerItems.findIndex((i) => i.id === activeId)
-        const newIndex = containerItems.findIndex((i) => i.id === overId)
+        if (activeContainer === overContainer) {
+            const containerItems = items[activeContainer]
+            const oldIndex = containerItems.findIndex((i) => i.id === activeId)
+            const newIndex = containerItems.findIndex((i) => i.id === overId)
 
-        if (oldIndex !== newIndex) {
-            setItems((prev) => ({
-                ...prev,
-                [activeContainer]: arrayMove(prev[activeContainer], oldIndex, newIndex),
-            }))
+            if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+                dispatch({
+                    name: 'dragWithinContainer',
+                    containerId: activeContainer,
+                    fromIndex: oldIndex,
+                    toIndex: newIndex,
+                })
+            }
         }
+
+        dispatch({ name: 'dragDrop' })
+        setLastUrl(overContainer)
     }
 
     const AccordionSummary = styled((props: AccordionSummaryProps) => (
@@ -227,16 +216,14 @@ export default function DraggableAccordion(
     }))
 
     return (
-        <div>
-            <h1>Draggable Accordions</h1>
-            <p>Drag the accordions by their handle to reorder them or move them between containers.</p>
-            <DndContext
-                sensors={sensors}
-                collisionDetection={rectIntersection}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-            >
+        <DndContext
+            sensors={sensors}
+            collisionDetection={rectIntersection}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+        >
+            <div>
                 {Object.keys(items).map((containerId) => (
                     <Accordion
                         defaultExpanded
@@ -251,7 +238,7 @@ export default function DraggableAccordion(
                                     value={containerId}
                                     allowEditing={!closedParents.has(containerId) && containerId !== RESERVED_URL}
                                     onChange={(newKey) => renameParentAccordionKey(containerId, newKey)}
-                                    inputValidator={(value) => urlPatternValidator(value, Object.keys(items))}
+                                    inputValidator={(value) => urlPatternValidator(value, existingUrls)}
                                     inputTransformer={urlCharacterFilter}
                                 >
                                     <Typography component="span" style={{ marginRight: 8 }}>
@@ -267,29 +254,28 @@ export default function DraggableAccordion(
                                 ) : (
                                     containerId !== RESERVED_URL && (
                                         <Typography component="span">
-                                            <ConfirmDelete onConfirm={ () => removeContainer(containerId)} hasText={false} />
+                                            <ConfirmDeleteButton onConfirm={ () => removeContainer(containerId)} placement='left' showDeleteTooltip={true} />
                                         </Typography>
                                     )
                                 ) }
                             </Box>
                         </AccordionSummary>
-                        <AccordionDetails>
-                            <Container
-                                id={containerId}
-                                key={containerId}
-                                items={items[containerId]}
-                                expandedPanel={expanded}
-                                onAccordionChange={handleAccordionChange}
-                                onUpdateItem={onUpdateItem}
-                                removeItem={removeItem}
-                            />
+                        <AccordionDetails sx={{ p: 1 }}>
+                            <ScriptsContextProvider containerId={containerId}>
+                                <Container
+                                    id={containerId}
+                                    key={containerId}
+                                    expandedPanel={expanded}
+                                    onAccordionChange={handleAccordionChange}
+                                />
+                            </ScriptsContextProvider>
                         </AccordionDetails>
                     </Accordion>
                 ))}
-                <DragOverlay dropAnimation={dropAnimation}>
-                    {activeItem ? <OverlayItem item={activeItem} isExpanded={expanded === activeItem.id} isDragging /> : null}
-                </DragOverlay>
-            </DndContext>
-        </div>
+            </div>
+            <DragOverlay dropAnimation={dropAnimation}>
+                {activeItem ? <OverlayItem item={activeItem} isExpanded={expanded === activeItem.id} isDragging /> : null}
+            </DragOverlay>
+        </DndContext>
     )
 }

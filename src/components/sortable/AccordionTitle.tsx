@@ -66,18 +66,29 @@ export default function AccordionTitle({
     }
 
     const handleSave = async () => {
-        const validationError = await inputValidator(inputValue)
+        if (inputValue.trim() === value.trim()) {
+            setError(undefined)
+            setEditing(false)
+            setSaved(true)
+            if (textFieldRef.current) {
+                textFieldRef.current.blur()
+            }
+            return
+        }
+
+        const validationError = await inputValidator(inputValue.trim())
         if (validationError) {
             setSaved(false)
             setError(validationError)
             return
         }
+
         setError(undefined)
-        if (inputValue.trim() !== value.trim()) {
-            setSaved(true)
-            onChange(inputValue.trim())
-        }
+        setSaved(true)
         setEditing(false)
+
+        onChange(inputValue.trim())
+
         if (textFieldRef.current) {
             textFieldRef.current.blur()
         }

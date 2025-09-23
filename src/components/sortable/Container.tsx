@@ -2,22 +2,19 @@ import React from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import SortableAccordionItem from './SortableAccordionItem'
-
-import { AccordionItemData, OnUpdateItem } from '../../types'
+import { useScripts } from '../../providers/ScriptsContextProvider'
 
 interface ContainerProps {
     id: string;
-    items: AccordionItemData[];
     expandedPanel: string | false;
     onAccordionChange: (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
-    onUpdateItem: OnUpdateItem;
-    removeItem: (itemId: string) => void;
 }
 
 export default function Container(
-    { id, items, expandedPanel, onAccordionChange, onUpdateItem, removeItem } : ContainerProps,
+    { id, expandedPanel, onAccordionChange } : ContainerProps,
 ) {
     const { isOver, setNodeRef } = useDroppable({ id })
+    const items = useScripts()
 
     const containerStyle: React.CSSProperties = {
         transition: 'background-color 0.2s ease',
@@ -44,8 +41,6 @@ export default function Container(
                             item={item}
                             expandedPanel={expandedPanel}
                             onAccordionChange={onAccordionChange}
-                            onUpdateItem={onUpdateItem}
-                            removeItem={removeItem}
                         />
                     ))
                 ) : (

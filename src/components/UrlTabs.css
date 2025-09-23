@@ -1,0 +1,6 @@
+.urlTabsButtons .MuiButtonBase-root {
+    min-height: 48px;
+}
+.urlTabsButtons {
+    margin-bottom: 8px;
+}

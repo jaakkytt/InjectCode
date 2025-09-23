@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Badge, badgeClasses, IconButton, styled } from '@mui/material'
+import { Badge, badgeClasses, Fade, IconButton, styled } from '@mui/material'
 import Typography from '@mui/material/Typography'
 import { AccordionItemData } from '../../types'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import TutorialTooltip from '../TutorialTooltip'
 
 interface Props {
     items: AccordionItemData[];
@@ -30,10 +31,17 @@ export default function CounterPlay({ items, onClick }: Props) {
             }
             e.stopPropagation()
         }}>
-            <IconButton component="span" disabled={activeCount < 1} color="primary" aria-label="play">
-                <PlayCircleOutlineIcon />
-                <StyledBadge badgeContent={activeCount} color="default" overlap="circular" />
-            </IconButton>
+            <TutorialTooltip
+                title='Run'
+                placement='left'
+                slots={{ transition: Fade }}
+                arrow
+            >
+                <IconButton component="span" disabled={activeCount < 1} color="primary" aria-label="play">
+                    <PlayCircleOutlineIcon />
+                    <StyledBadge badgeContent={activeCount} color="default" overlap="circular" />
+                </IconButton>
+            </TutorialTooltip>
         </Typography>
     )
 }

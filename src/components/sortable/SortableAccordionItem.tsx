@@ -11,23 +11,23 @@ import JavascriptIcon from '@mui/icons-material/Javascript'
 import CssIcon from '@mui/icons-material/Css'
 import Typography from '@mui/material/Typography'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import { AccordionActions, Button, IconButton, styled, Switch } from '@mui/material'
+import { Fade, IconButton, styled, Switch } from '@mui/material'
 import AccordionTitle from './AccordionTitle'
 import AccordionBody from './AccordionBody'
 import MuiAccordionSummary from '@mui/material/AccordionSummary'
-import ConfirmDelete from '../ConfirmDelete'
-import { AccordionItemData, OnUpdateItem } from '../../types'
+import ConfirmDeleteButton from '../ConfirmDeleteButton'
+import { AccordionItemData } from '../../types'
+import TutorialTooltip from '../TutorialTooltip'
+import { useScriptsDispatch } from '../../providers/ScriptsContextProvider'
 
 interface Props {
     item: AccordionItemData;
     expandedPanel: string | false;
     onAccordionChange: (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
-    onUpdateItem: OnUpdateItem;
-    removeItem: (itemId: string) => void;
 }
 
 export default function SortableAccordionItem(
-    { item, expandedPanel, onAccordionChange, onUpdateItem, removeItem }: Props,
+    { item, expandedPanel, onAccordionChange }: Props,
 ) {
     const {
         attributes,
@@ -38,9 +38,7 @@ export default function SortableAccordionItem(
         isDragging,
     } = useSortable({ id: item.id })
 
-    const handleActiveChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onUpdateItem(item.id, { active: event.target.checked })
-    }
+    const dispatch = useScriptsDispatch()
 
     const AccordionSummary = styled((props: AccordionSummaryProps) => (
         <MuiAccordionSummary {...props} />
@@ -82,7 +80,7 @@ export default function SortableAccordionItem(
                         <AccordionTitle
                             value={item.title}
                             allowEditing={expandedPanel === item.id}
-                            onChange={(newTitle) => onUpdateItem(item.id, { title: newTitle })}
+                            onChange={(newTitle) => dispatch.update(item.id, { title: newTitle })}
                         >
                             <Typography
                                 component="span"
@@ -100,56 +98,41 @@ export default function SortableAccordionItem(
                         <Typography
                             component="span"
                             onClick={(e) => e.stopPropagation()}
-                            style={{
-                                opacity: expandedPanel === item.id ? 0 : 1,
-                                visibility: expandedPanel === item.id ? 'hidden' : 'visible',
-                                transition: 'all 0.1s ease-in-out',
-                            }}
                         >
-                            <IconButton component="span" color="primary" aria-label="play">
-                                <PlayCircleOutlineIcon />
-                            </IconButton>
+                            <TutorialTooltip title="Run" placement="top" slots={{ transition: Fade }} arrow>
+                                <IconButton component="span" color="primary" aria-label="play">
+                                    <PlayCircleOutlineIcon />
+                                </IconButton>
+                            </TutorialTooltip>
+                        </Typography>
+                        <Typography component="span">
+                            <TutorialTooltip title={item.active ? 'Enabled' : 'Disabled'} placement="top" slots={{ transition: Fade }} arrow>
+                                <Switch
+                                    checked={item.active}
+                                    onChange={e => { dispatch.update(item.id, { active: e.target.checked }) }}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            </TutorialTooltip>
                         </Typography>
                         <Typography
                             component="span"
+                            onClick={(e) => e.stopPropagation()}
                             style={{
-                                opacity: expandedPanel === item.id ? 0 : 1,
-                                visibility: expandedPanel === item.id ? 'hidden' : 'visible',
-                                transition: 'all 0.1s ease-in-out',
+                                opacity: expandedPanel === item.id ? 1 : 0,
+                                display: expandedPanel === item.id ? 'block' : 'none',
+                                transition: 'all 0.3s ease-in-out',
                             }}
                         >
-                            <Switch
-                                checked={item.active}
-                                onChange={handleActiveChange}
-                                onClick={(e) => e.stopPropagation()}
-                            />
+                            <ConfirmDeleteButton onConfirm={ () => dispatch.remove(item.id) } placement='top' showDeleteTooltip={true} />
                         </Typography>
                     </Box>
                 </AccordionSummary>
                 <AccordionDetails>
                     <AccordionBody
                         value={item.content}
-                        onChange={(newContent) => onUpdateItem(item.id, { content: newContent })}
+                        onChange={(newContent) => dispatch.update(item.id, { content: newContent })}
                     />
                 </AccordionDetails>
-                <AccordionActions>
-                    <Button variant="outlined" startIcon={<PlayCircleOutlineIcon />}>
-                        Run
-                    </Button>
-                    <Button
-                        component="label"
-                        variant="outlined"
-                        startIcon={<Switch
-                            size="small"
-                            checked={item.active}
-                            onChange={handleActiveChange}
-                            onClick={(e) => e.stopPropagation()}
-                        />}
-                    >
-                        <span style={{ minWidth: '10ch' }}>{ item.active ? 'Enabled' : 'Disabled' }</span>
-                    </Button>
-                    <ConfirmDelete onConfirm={ () => removeItem(item.id) } hasText={true} />
-                </AccordionActions>
             </Accordion>
         </div>
     )

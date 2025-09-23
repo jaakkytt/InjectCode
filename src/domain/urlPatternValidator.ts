@@ -25,6 +25,10 @@ const checkHost = (value: string) : string | undefined => {
     }
 
     const hostPart = urlParts[2]
+    if (hostPart === 'localhost') {
+        return undefined
+    }
+
     if (!hostPart.includes('.') || hostPart.endsWith('.')) {
         return 'Host must be a valid domain name or IP address'
     }
@@ -62,7 +66,7 @@ export const urlPatternValidator = async (value: string, existing: string[]) => 
         return 'Pattern must also include a host and a path'
     }
 
-    // matchPattern does not check file path existence
+    // matchPattern does not check file path presence
     if (value.endsWith(':///')) {
         return 'Pattern must also include a path'
     }

@@ -4,7 +4,7 @@
 @import url('~@fontsource/roboto/700.css');
 
 body {
-    margin: 10px;
+    margin: 0;
     font-family: Roboto, Helvetica, Arial, sans-serif;
     background-color: #f4f4f4;
     overflow-y: scroll;

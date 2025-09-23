@@ -1,13 +1,15 @@
-import { Button, IconButton } from '@mui/material'
+import { Fade, IconButton } from '@mui/material'
 import React, { useState } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
+import TutorialTooltip from './TutorialTooltip'
 
 interface Props {
     onConfirm: () => void,
-    hasText: boolean
+    placement: 'left' | 'top',
+    showDeleteTooltip: boolean,
 }
 
-const ConfirmDelete = ({ onConfirm, hasText } : Props) => {
+const ConfirmDeleteButton = ({ onConfirm, showDeleteTooltip, placement } : Props) => {
 
     const [isConfirming, setIsConfirming] = useState(false)
 
@@ -25,18 +27,13 @@ const ConfirmDelete = ({ onConfirm, hasText } : Props) => {
     }
 
     return (
-        hasText ? (
-            <Button
-                variant="outlined"
-                startIcon={<DeleteIcon />}
-                color={isConfirming ? 'warning' : 'primary'}
-                sx={{ transition: 'background-color 0.3s ease, color 0.3s ease' }}
-                onClick={isConfirming ? handleConfirmClick : handleInitialClick}
-                onMouseLeave={handleMouseLeave}
-            >
-                <span style={{ minWidth: '9ch' }}>{isConfirming ? 'Confirm' : 'Delete'}</span>
-            </Button>
-        ) : (
+        <TutorialTooltip
+            open={showDeleteTooltip ? undefined : isConfirming}
+            title={showDeleteTooltip ? (isConfirming ? 'Confirm' : 'Delete') : 'Confirm'}
+            placement={placement}
+            slots={{ transition: Fade }}
+            arrow
+        >
             <IconButton
                 color={isConfirming ? 'warning' : 'primary'}
                 sx={{ transition: 'background-color 0.3s ease, color 0.3s ease' }}
@@ -52,8 +49,8 @@ const ConfirmDelete = ({ onConfirm, hasText } : Props) => {
             >
                 <DeleteIcon />
             </IconButton>
-        )
+        </TutorialTooltip>
     )
 }
 
-export default ConfirmDelete
+export default ConfirmDeleteButton
