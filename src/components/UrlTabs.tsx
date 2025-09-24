@@ -2,9 +2,10 @@ import * as React from 'react'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
-import { AppBar } from '@mui/material'
+import { AppBar, IconButton, Link } from '@mui/material'
 import JoinLeftIcon from '@mui/icons-material/JoinLeft'
 import JoinFullIcon from '@mui/icons-material/JoinFull'
+import SettingsIcon from '@mui/icons-material/Settings'
 import './UrlTabs.css'
 import { useTab } from '../providers/TabProvider'
 import { TabIndex } from '../types'
@@ -66,6 +67,27 @@ const UrlTabs = ({ curren, all, currentFooter, allFooter } : Props) => {
                 >
                     <Tab label="Currently Matching" icon={<JoinLeftIcon />} iconPosition="start" {...a11yProps(TabIndex.Current)} />
                     <Tab label="All Scripts" icon={<JoinFullIcon />} iconPosition="start" {...a11yProps(TabIndex.All)} />
+                    <Link
+                        href="#"
+                        onClick={e => {
+                            e.preventDefault()
+                            chrome.runtime.openOptionsPage()
+                        }}
+                        target="_blank"
+                        rel="noreferrer"
+                        color="inherit"
+                        underline="none"
+                    >
+                        <IconButton
+                            size="large"
+                            edge="start"
+                            color="inherit"
+                            aria-label="settings"
+                            sx={{ mr: 0 }}
+                        >
+                            <SettingsIcon />
+                        </IconButton>
+                    </Link>
                 </Tabs>
             </AppBar>
             <TabPanel value={tabIndex} index={TabIndex.Current}>

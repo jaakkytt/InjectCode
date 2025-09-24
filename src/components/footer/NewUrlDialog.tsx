@@ -5,6 +5,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Link,
     TextField,
 } from '@mui/material'
 import { useUrlsDispatch } from '../../providers/UrlsContextProvider'
@@ -110,8 +111,7 @@ const NewUrlDialog = ({ isOpen, onClose } : Props) => {
             <DialogTitle>New URL Match Pattern</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Must follow the format specified in the <a href={MATCH_PATTERN_DOCS} target="_blank">
-                    Chrome Extensions Docs</a>.
+                    Must follow the format specified in the <Link href={MATCH_PATTERN_DOCS} target="_blank" rel="noreferrer" underline="hover">Chrome Extensions Docs</Link>.
                 </DialogContentText>
                 <form onSubmit={handleSubmit} id="newUrlForm">
                     <TextField
