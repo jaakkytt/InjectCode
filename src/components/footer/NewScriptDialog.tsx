@@ -81,7 +81,9 @@ const NewScriptDialog = ({ isOpen, scriptTye, onClose } : Props) => {
     }
 
     return (
-        <Dialog open={isOpen} onClose={handleClose} maxWidth={'md'} fullWidth={true} disableScrollLock={true}>
+        <Dialog open={isOpen} onClose={handleClose} maxWidth={'md'} fullWidth={true} disableScrollLock={true} sx={{
+            '.MuiDialogActions-spacing': { pt: 0, pl: 3, pr: 3, pb: 3 },
+        }}>
             <DialogTitle>New {scriptTye.toUpperCase()} {scriptTye === 'js' ? 'Script' : 'Style'}</DialogTitle>
             <DialogContent>
                 <form onSubmit={handleSubmit} id="newScriptForm">

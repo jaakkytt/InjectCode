@@ -104,7 +104,9 @@ const NewUrlDialog = ({ isOpen, onClose } : Props) => {
     }
 
     return (
-        <Dialog open={isOpen} onClose={handleClose} maxWidth={'md'} fullWidth={true} disableScrollLock={true}>
+        <Dialog open={isOpen} onClose={handleClose} maxWidth={'md'} fullWidth={true} disableScrollLock={true} sx={{
+            '.MuiDialogActions-spacing': { pt: 0, pl: 3, pr: 3, pb: 3 },
+        }}>
             <DialogTitle>New URL Match Pattern</DialogTitle>
             <DialogContent>
                 <DialogContentText>
