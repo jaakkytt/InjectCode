@@ -5,22 +5,23 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import { useRunScope } from '../../providers/RunScopeProvider'
 import { IconSwitch } from './IconSwitch'
 import { RunScope } from '../../types'
+import { useUrls } from '../../providers/UrlsContextProvider'
+import { scriptApi } from '../../service/scriptApi'
 
-interface Props {
-    handleRunAll: () => void;
-    handleRunCurrent: () => void;
-}
-
-const Footer = ({ handleRunAll, handleRunCurrent } : Props) => {
+const Footer = () => {
 
     const { scope, setScope } = useRunScope()
+    const urls = useUrls()
 
     const handleClick = () => {
-        if (scope === 'current') {
-            handleRunCurrent()
-        } else {
-            handleRunAll()
-        }
+        // TODO: probably should use a dedicated play button component with its own state to reuse elsewhere
+        // TODO: set up a spinner and disable the button while running
+        scriptApi.run(urls, scope).catch((err) => {
+            console.error('Error running scripts:', err)
+            // TODO: show some error message to the user
+        }).finally(() => {
+            // TODO: remove spinner and re-enable the button
+        })
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
