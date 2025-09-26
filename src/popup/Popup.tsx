@@ -5,7 +5,7 @@ import { UrlsContextProvider } from '../providers/UrlsContextProvider'
 import Footer from '../components/footer/Footer'
 import { UrlsFilterScope } from '../providers/UrlsFilterScope'
 import { urlsRootReducer } from '../providers/urlsReducer'
-import DraggableAccordion from '../components/sortable/DraggableAccordion'
+import UrlAccordion from '../components/sortable/UrlAccordion'
 import { ExistingUrlsProvider } from '../providers/ExistingUrlsProvider'
 import { useCurrentUrl } from '../providers/CurrentUrlProvider'
 import AccordionSkeleton from '../components/sortable/AccordionSkeleton'
@@ -52,13 +52,13 @@ const Popup = () => {
                         curren={
                             currentUrl ? (
                                 <UrlsFilterScope activePageUrl={currentUrl.href}>
-                                    <DraggableAccordion/>
+                                    <UrlAccordion/>
                                 </UrlsFilterScope>
                             ) : (
                                 <AccordionSkeleton/>
                             )
                         }
-                        all={<DraggableAccordion/>}
+                        all={<UrlAccordion/>}
                         currentFooter={
                             currentUrl ? (
                                 <UrlsFilterScope activePageUrl={currentUrl.href}>

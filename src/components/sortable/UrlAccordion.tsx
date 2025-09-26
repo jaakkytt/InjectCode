@@ -14,37 +14,21 @@ import {
     useSensors,
 } from '@dnd-kit/core'
 import { OverlayItem } from './OverlayItem'
-import Container from './Container'
-import { Accordion, IconButton, styled, Typography } from '@mui/material'
-import MuiAccordionSummary, { accordionSummaryClasses, AccordionSummaryProps } from '@mui/material/AccordionSummary'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import LinkIcon from '@mui/icons-material/Link'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import AccordionTitle from './AccordionTitle'
-import Box from '@mui/material/Box'
-import ConfirmDeleteButton from '../ConfirmDeleteButton'
 import { AccordionItemData } from '../../types'
 import { LOCAL_STORAGE_CHILD_EXPANDED, LOCAL_STORAGE_CLOSE_PARENTS, RESERVED_URL } from '../../constants'
-import CounterPlay from './CounterPlay'
-import { urlPatternValidator } from '../../service/urlPatternValidator'
-import { urlCharacterFilter } from '../../service/urlCharacterFilter'
 import { useUrls, useUrlsDispatch } from '../../providers/UrlsContextProvider'
-import { ScriptsContextProvider } from '../../providers/ScriptsContextProvider'
-import { useExistingUrls } from '../../providers/ExistingUrlsProvider'
 import { useLastInteracted } from '../../providers/LastInteractedProvider'
+import AccordionItem from './AccordionItem'
 
 const dragMinimumDelta = 5
 
-export default function DraggableAccordion() {
-
+export default function UrlAccordion() {
     const items = useUrls()
     const dispatch = useUrlsDispatch()
-    const existingUrls = useExistingUrls()
-
     const { setLastUrl } = useLastInteracted()
 
     const [activeItem, setActiveItem] = useState<AccordionItemData | null>(null)
-    const [dragTranslation, setTranslation] = useState<{ top: number; left: number }|null>(null)
+    const [dragTranslation, setTranslation] = useState<{ top: number; left: number } | null>(null)
 
     const [expanded, setExpanded] = useState<string | false>(() => {
         const savedExpanded = localStorage.getItem(LOCAL_STORAGE_CHILD_EXPANDED)
@@ -69,7 +53,6 @@ export default function DraggableAccordion() {
     }, [expanded])
 
     const sensors = useSensors(useSensor(PointerSensor))
-
     const dropAnimation: DropAnimation = { ...defaultDropAnimation }
 
     const handleAccordionChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -207,14 +190,6 @@ export default function DraggableAccordion() {
         setLastUrl(overContainer)
     }
 
-    const AccordionSummary = styled((props: AccordionSummaryProps) => (
-        <MuiAccordionSummary {...props} />
-    ))(() => ({
-        [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
-            margin: 0,
-        },
-    }))
-
     return (
         <DndContext
             sensors={sensors}
@@ -225,56 +200,26 @@ export default function DraggableAccordion() {
         >
             <div>
                 {Object.keys(items).map((containerId) => (
-                    <Accordion
-                        defaultExpanded
+                    <AccordionItem
                         key={`container-${containerId}`}
-                        expanded={!closedParents.has(containerId)}
-                        onChange={handleParentAccordionChange(containerId)}
-                        style={{ flex: 1 }}
-                    >
-                        <AccordionSummary component="div" expandIcon={<ExpandMoreIcon />}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', margin: '0 8px 0 0' }}>
-                                <AccordionTitle
-                                    value={containerId}
-                                    allowEditing={!closedParents.has(containerId) && containerId !== RESERVED_URL}
-                                    onChange={(newKey) => renameParentAccordionKey(containerId, newKey)}
-                                    inputValidator={(value) => urlPatternValidator(value, existingUrls)}
-                                    inputTransformer={urlCharacterFilter}
-                                >
-                                    <Typography component="span" style={{ marginRight: 8 }}>
-                                        <IconButton color="primary" component="span">
-                                            <LinkIcon />
-                                        </IconButton>
-                                    </Typography>
-                                </AccordionTitle>
-                                { items[containerId].length > 0 ? (
-                                    <CounterPlay items={items[containerId]} onClick={() => {
-                                        console.log('Play clicked for container:', containerId)
-                                    }} />
-                                ) : (
-                                    containerId !== RESERVED_URL && (
-                                        <Typography component="span">
-                                            <ConfirmDeleteButton onConfirm={ () => removeContainer(containerId)} placement='left' showDeleteTooltip={true} />
-                                        </Typography>
-                                    )
-                                ) }
-                            </Box>
-                        </AccordionSummary>
-                        <AccordionDetails sx={{ p: 1 }}>
-                            <ScriptsContextProvider containerId={containerId}>
-                                <Container
-                                    id={containerId}
-                                    key={containerId}
-                                    expandedPanel={expanded}
-                                    onAccordionChange={handleAccordionChange}
-                                />
-                            </ScriptsContextProvider>
-                        </AccordionDetails>
-                    </Accordion>
+                        containerId={containerId}
+                        items={items[containerId]}
+                        isExpanded={!closedParents.has(containerId)}
+                        onParentChange={handleParentAccordionChange(containerId)}
+                        allowEditing={!closedParents.has(containerId) && containerId !== RESERVED_URL}
+                        onRename={(newKey) => renameParentAccordionKey(containerId, newKey)}
+                        reservedUrl={RESERVED_URL}
+                        onRemove={() => removeContainer(containerId)}
+                        expandedPanel={expanded}
+                        onAccordionChange={handleAccordionChange}
+                    />
                 ))}
             </div>
+
             <DragOverlay dropAnimation={dropAnimation}>
-                {activeItem ? <OverlayItem item={activeItem} isExpanded={expanded === activeItem.id} isDragging /> : null}
+                {activeItem ? (
+                    <OverlayItem item={activeItem} isExpanded={expanded === activeItem.id} isDragging />
+                ) : null}
             </DragOverlay>
         </DndContext>
     )

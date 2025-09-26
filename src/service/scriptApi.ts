@@ -7,12 +7,14 @@ export interface ScriptApi {
 
 export class ChromeScriptAPI implements ScriptApi {
     async run(scripts: ItemsDataState, scope: RunScope) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
         console.debug('ChromeScriptAPI run', scripts, scope)
     }
 }
 
 export class DummyScriptAPI implements ScriptApi {
     async run(scripts: ItemsDataState, scope: RunScope) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
         console.debug('DummyScriptAPI run', scripts, scope)
     }
 }

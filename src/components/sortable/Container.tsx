@@ -1,8 +1,9 @@
 import React from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
-import SortableAccordionItem from './SortableAccordionItem'
+import ScriptAccordion from './ScriptAccordion'
 import { useScripts } from '../../providers/ScriptsContextProvider'
+import Typography from '@mui/material/Typography'
 
 interface ContainerProps {
     id: string;
@@ -36,17 +37,18 @@ export default function Container(
             >
                 {items.length > 0 ? (
                     items.map(item => (
-                        <SortableAccordionItem
+                        <ScriptAccordion
                             key={item.id}
                             item={item}
+                            parentId={id}
                             expandedPanel={expandedPanel}
                             onAccordionChange={onAccordionChange}
                         />
                     ))
                 ) : (
-                    <div>
-                        Drop items here
-                    </div>
+                    <Typography component="div">
+                        Drop scripts here
+                    </Typography>
                 )}
             </div>
         </SortableContext>

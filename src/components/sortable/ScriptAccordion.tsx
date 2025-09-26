@@ -19,15 +19,17 @@ import ConfirmDeleteButton from '../ConfirmDeleteButton'
 import { AccordionItemData } from '../../types'
 import TutorialTooltip from '../TutorialTooltip'
 import { useScriptsDispatch } from '../../providers/ScriptsContextProvider'
+import { usePlayControls } from '../usePlayControls'
 
 interface Props {
     item: AccordionItemData;
+    parentId: string;
     expandedPanel: string | false;
     onAccordionChange: (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
 }
 
-export default function SortableAccordionItem(
-    { item, expandedPanel, onAccordionChange }: Props,
+export default function ScriptAccordion(
+    { item, parentId, expandedPanel, onAccordionChange }: Props,
 ) {
     const {
         attributes,
@@ -39,6 +41,7 @@ export default function SortableAccordionItem(
     } = useSortable({ id: item.id })
 
     const dispatch = useScriptsDispatch()
+    const play = usePlayControls({ [parentId]: [item] })
 
     const AccordionSummary = styled((props: AccordionSummaryProps) => (
         <MuiAccordionSummary {...props} />
@@ -100,7 +103,7 @@ export default function SortableAccordionItem(
                             onClick={(e) => e.stopPropagation()}
                         >
                             <TutorialTooltip title="Run" placement="top" slots={{ transition: Fade }} arrow>
-                                <IconButton component="span" color="primary" aria-label="play">
+                                <IconButton component="span" color="primary" aria-label="play" {...play.buttonProps}>
                                     <PlayCircleOutlineIcon />
                                 </IconButton>
                             </TutorialTooltip>

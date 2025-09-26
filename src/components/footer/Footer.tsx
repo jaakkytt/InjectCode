@@ -1,28 +1,18 @@
 import * as React from 'react'
 import { Button, Stack } from '@mui/material'
 import ExpandingActionButton from './ExpandingActionButton'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import { useRunScope } from '../../providers/RunScopeProvider'
 import { IconSwitch } from './IconSwitch'
 import { RunScope } from '../../types'
 import { useUrls } from '../../providers/UrlsContextProvider'
-import { scriptApi } from '../../service/scriptApi'
+import { usePlayControls } from '../usePlayControls'
+import { PlayBadgeIcon } from '../PlayBadgeIcon'
 
 const Footer = () => {
 
     const { scope, setScope } = useRunScope()
     const urls = useUrls()
-
-    const handleClick = () => {
-        // TODO: probably should use a dedicated play button component with its own state to reuse elsewhere
-        // TODO: set up a spinner and disable the button while running
-        scriptApi.run(urls, scope).catch((err) => {
-            console.error('Error running scripts:', err)
-            // TODO: show some error message to the user
-        }).finally(() => {
-            // TODO: remove spinner and re-enable the button
-        })
-    }
+    const play = usePlayControls(urls)
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setScope(event.target.checked ? 'global' : 'current')
@@ -49,9 +39,9 @@ const Footer = () => {
         <Stack direction="row" spacing={1} sx={{ pl: 1, pt: 0, pr: 1, pb: 1, justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', alignItems: 'center' }}>
                 <Button
-                    startIcon={<PlayCircleOutlineIcon />}
+                    startIcon={<PlayBadgeIcon count={play.activeCount} />}
                     variant="contained"
-                    onClick={handleClick}
+                    {...play.buttonProps}
                 >Run all</Button>
                 <Stack direction="row" spacing={0} sx={{ justifyContent: 'flex-end', alignItems: 'center' }}>
                     {renderTintedButton('success', 'current', 'current tab')}
