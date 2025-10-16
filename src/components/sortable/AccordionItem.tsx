@@ -17,7 +17,7 @@ import { urlPatternValidator } from '../../service/urlPatternValidator'
 import { urlCharacterFilter } from '../../service/urlCharacterFilter'
 import { usePlayControls } from '../usePlayControls'
 import { PlayBadgeIcon } from '../PlayBadgeIcon'
-import { BACKGROUND_URL } from '../../constants'
+import { SHARED_CODE } from '../../constants'
 
 interface AccordionItemProps {
     containerId: string
@@ -70,8 +70,8 @@ export default function AccordionItem({
                         inputTransformer={urlCharacterFilter}
                     >
                         <Typography component="span" style={{ marginRight: 8 }}>
-                            {containerId === BACKGROUND_URL ? (
-                                <TutorialTooltip title="Executes alongside any active URL-specific script" placement="top" slots={{ transition: Fade }} arrow>
+                            {containerId === SHARED_CODE ? (
+                                <TutorialTooltip title="Automatically included with any active script" placement="top" slots={{ transition: Fade }} arrow>
                                     <IconButton color="warning" component="span">
                                         <InfoOutlineIcon />
                                     </IconButton>
@@ -83,7 +83,7 @@ export default function AccordionItem({
                             )}
                         </Typography>
                     </AccordionTitle>
-                    {containerId !== BACKGROUND_URL && (
+                    {containerId !== SHARED_CODE && (
                         items.length > 0 ? (
                             <Typography component="span">
                                 <TutorialTooltip title="Run" placement="left" slots={{ transition: Fade }} arrow>

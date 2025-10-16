@@ -1,21 +1,21 @@
-import { ItemsDataState, RunScope } from '../types'
+import { AccordionItemData, ItemsDataState, RunScope } from '../types'
 // import { USER_SCRIPT_ID } from '../constants'
 
 export interface ScriptApi {
-    run(scripts: ItemsDataState, scope: RunScope): Promise<void>
+    run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope): Promise<void>
 }
 
 export class ChromeScriptAPI implements ScriptApi {
-    async run(scripts: ItemsDataState, scope: RunScope) {
+    async run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope) {
         await new Promise(resolve => setTimeout(resolve, 1000))
-        console.debug('ChromeScriptAPI run', scripts, scope)
+        console.debug('ChromeScriptAPI run', shared, scripts, scope)
     }
 }
 
 export class DummyScriptAPI implements ScriptApi {
-    async run(scripts: ItemsDataState, scope: RunScope) {
+    async run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope) {
         await new Promise(resolve => setTimeout(resolve, 1000))
-        console.debug('DummyScriptAPI run', scripts, scope)
+        console.debug('DummyScriptAPI run', shared, scripts, scope)
     }
 }
 

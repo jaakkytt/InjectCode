@@ -3,11 +3,15 @@ import { ItemsDataState } from '../types'
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRunScope } from '../providers/RunScopeProvider'
 import { scriptApi } from '../service/scriptApi'
-import { BACKGROUND_URL } from '../constants'
+import { SHARED_CODE } from '../constants'
+import { useUrls } from '../providers/UrlsContextProvider'
 
 function deepCopyAndFilterInactive(data: ItemsDataState): ItemsDataState {
     const result: ItemsDataState = {}
     for (const [key, items] of Object.entries(data)) {
+        if (key === SHARED_CODE) {
+            continue
+        }
         const filtered = items.filter(item => item.active)
         if (filtered.length > 0) {
             result[key] = filtered.map(item => ({ ...item }))
@@ -19,8 +23,9 @@ function deepCopyAndFilterInactive(data: ItemsDataState): ItemsDataState {
 export function usePlayControls(urls: ItemsDataState) {
 
     const [loading, setLoading] = useState(false)
-    const mountedRef = useRef(true)
     const { scope } = useRunScope()
+    const mountedRef = useRef(true)
+    const urlsContext = useUrls()
 
     useEffect(() => () => {
         mountedRef.current = false
@@ -30,10 +35,7 @@ export function usePlayControls(urls: ItemsDataState) {
         deepCopyAndFilterInactive(urls)
     ), [urls])
 
-    const activeCount = Object.entries(active).reduce((sum, [key, items]) =>
-        key === BACKGROUND_URL ? sum : sum + items.length
-    , 0)
-
+    const activeCount = Object.values(active).flat().length
     const disabled = activeCount === 0
 
     const onClick = useCallback(
@@ -43,9 +45,11 @@ export function usePlayControls(urls: ItemsDataState) {
                 return
             }
 
+            const shared = (urlsContext?.[SHARED_CODE] ?? []).filter(item => item.active)
+
             setLoading(true)
 
-            scriptApi.run(active, scope).catch((err) => {
+            scriptApi.run(active, shared, scope).catch((err) => {
                 console.error('Error running scripts:', err)
                 // TODO: show some error message to the user
             }).finally(() => {

@@ -20,7 +20,7 @@ import { AccordionItemData } from '../../types'
 import TutorialTooltip from '../TutorialTooltip'
 import { useScriptsDispatch } from '../../providers/ScriptsContextProvider'
 import { usePlayControls } from '../usePlayControls'
-import { BACKGROUND_URL } from '../../constants'
+import { SHARED_CODE } from '../../constants'
 
 interface Props {
     item: AccordionItemData;
@@ -99,7 +99,7 @@ export default function ScriptAccordion(
                                 </IconButton>
                             </Typography>
                         </AccordionTitle>
-                        {parentId !== BACKGROUND_URL && (
+                        {parentId !== SHARED_CODE && (
                             <Typography
                                 component="span"
                                 onClick={(e) => e.stopPropagation()}

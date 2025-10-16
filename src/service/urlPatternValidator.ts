@@ -1,4 +1,4 @@
-import { BACKGROUND_URL } from '../constants'
+import { SHARED_CODE } from '../constants'
 import { urlPatternMatcher } from './urlPatternMatcher'
 
 const checkScheme = (value: string) : string | undefined => {
@@ -51,8 +51,8 @@ export const urlPatternValidator = async (value: string, existing: string[]) => 
         return 'Pattern must follow the structure <scheme>://<host>/<path>'
     }
 
-    if (value === BACKGROUND_URL) {
-        return `"${BACKGROUND_URL}" is reserved and cannot be used`
+    if (value === SHARED_CODE) {
+        return `"${SHARED_CODE}" is reserved and cannot be used`
     }
 
     // Error message by MatcherOrInvalid is too generic for this case

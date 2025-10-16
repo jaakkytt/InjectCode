@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import MenuItem from '@mui/material/MenuItem'
 import { useLastInteracted } from '../../providers/LastInteractedProvider'
-import { BACKGROUND_URL } from '../../constants'
+import { SHARED_CODE } from '../../constants'
 
 interface Props {
     isOpen: boolean
@@ -38,7 +38,7 @@ const NewScriptDialog = ({ isOpen, scriptTye, onClose } : Props) => {
         if (urls && Object.keys(urls).length > 0 && lastUrl in urls) {
             setSelectedUrl(lastUrl)
         } else {
-            setSelectedUrl(BACKGROUND_URL)
+            setSelectedUrl(SHARED_CODE)
         }
     }, [urls, lastUrl])
 

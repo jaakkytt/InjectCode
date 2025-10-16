@@ -15,7 +15,7 @@ import {
 } from '@dnd-kit/core'
 import { OverlayItem } from './OverlayItem'
 import { AccordionItemData } from '../../types'
-import { LOCAL_STORAGE_CHILD_EXPANDED, LOCAL_STORAGE_CLOSE_PARENTS, BACKGROUND_URL } from '../../constants'
+import { LOCAL_STORAGE_CHILD_EXPANDED, LOCAL_STORAGE_CLOSE_PARENTS, SHARED_CODE } from '../../constants'
 import { useUrls, useUrlsDispatch } from '../../providers/UrlsContextProvider'
 import { useLastInteracted } from '../../providers/LastInteractedProvider'
 import AccordionItem from './AccordionItem'
@@ -206,7 +206,7 @@ export default function UrlAccordion() {
                         items={items[containerId]}
                         isExpanded={!closedParents.has(containerId)}
                         onParentChange={handleParentAccordionChange(containerId)}
-                        allowEditing={!closedParents.has(containerId) && containerId !== BACKGROUND_URL}
+                        allowEditing={!closedParents.has(containerId) && containerId !== SHARED_CODE}
                         onRename={(newKey) => renameParentAccordionKey(containerId, newKey)}
                         onRemove={() => removeContainer(containerId)}
                         expandedPanel={expanded}
