@@ -3,6 +3,7 @@ import { Accordion, Fade, IconButton, styled, Typography } from '@mui/material'
 import MuiAccordionSummary, { accordionSummaryClasses, AccordionSummaryProps } from '@mui/material/AccordionSummary'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import LinkIcon from '@mui/icons-material/Link'
+import InfoOutlineIcon from '@mui/icons-material/InfoOutline'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import Box from '@mui/material/Box'
 import ConfirmDeleteButton from '../ConfirmDeleteButton'
@@ -16,6 +17,7 @@ import { urlPatternValidator } from '../../service/urlPatternValidator'
 import { urlCharacterFilter } from '../../service/urlCharacterFilter'
 import { usePlayControls } from '../usePlayControls'
 import { PlayBadgeIcon } from '../PlayBadgeIcon'
+import { BACKGROUND_URL } from '../../constants'
 
 interface AccordionItemProps {
     containerId: string
@@ -24,7 +26,6 @@ interface AccordionItemProps {
     onParentChange: (event: React.SyntheticEvent, isExpanded: boolean) => void
     allowEditing: boolean
     onRename: (newKey: string) => void
-    reservedUrl: string
     onRemove: () => void
     expandedPanel: string | false
     onAccordionChange: (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => void
@@ -49,7 +50,6 @@ export default function AccordionItem({
     onParentChange,
     allowEditing,
     onRename,
-    reservedUrl,
     onRemove,
     expandedPanel,
     onAccordionChange,
@@ -70,22 +70,29 @@ export default function AccordionItem({
                         inputTransformer={urlCharacterFilter}
                     >
                         <Typography component="span" style={{ marginRight: 8 }}>
-                            <IconButton color="primary" component="span">
-                                <LinkIcon />
-                            </IconButton>
+                            {containerId === BACKGROUND_URL ? (
+                                <TutorialTooltip title="Executes alongside any active URL-specific script" placement="top" slots={{ transition: Fade }} arrow>
+                                    <IconButton color="warning" component="span">
+                                        <InfoOutlineIcon />
+                                    </IconButton>
+                                </TutorialTooltip>
+                            ) : (
+                                <IconButton color="primary" component="span">
+                                    <LinkIcon />
+                                </IconButton>
+                            )}
                         </Typography>
                     </AccordionTitle>
-
-                    {items.length > 0 ? (
-                        <Typography component="span">
-                            <TutorialTooltip title="Run" placement="left" slots={{ transition: Fade }} arrow>
-                                <IconButton component="span" color="primary" aria-label="play" {...play.buttonProps}>
-                                    <PlayBadgeIcon count={play.activeCount} />
-                                </IconButton>
-                            </TutorialTooltip>
-                        </Typography>
-                    ) : (
-                        containerId !== reservedUrl && (
+                    {containerId !== BACKGROUND_URL && (
+                        items.length > 0 ? (
+                            <Typography component="span">
+                                <TutorialTooltip title="Run" placement="left" slots={{ transition: Fade }} arrow>
+                                    <IconButton component="span" color="primary" aria-label="play" {...play.buttonProps}>
+                                        <PlayBadgeIcon count={play.activeCount} />
+                                    </IconButton>
+                                </TutorialTooltip>
+                            </Typography>
+                        ) : (
                             <Typography component="span">
                                 <ConfirmDeleteButton onConfirm={onRemove} placement="left" showDeleteTooltip={true} />
                             </Typography>

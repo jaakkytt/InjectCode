@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react'
-import { RESERVED_URL, LOCAL_STORAGE_LAST_URL } from '../constants'
+import { BACKGROUND_URL, LOCAL_STORAGE_LAST_URL } from '../constants'
 
 type LastInteractedContextType = {
     lastUrl: string;
@@ -11,7 +11,7 @@ const LastInteractedContext = createContext<LastInteractedContextType | undefine
 export const LastInteractedProvider = ({ children }: { children: ReactNode }) => {
     const [lastUrl, setLastUrlState] = useState<string>(() => {
         const stored = localStorage.getItem(LOCAL_STORAGE_LAST_URL)
-        return stored !== null ? stored : RESERVED_URL
+        return stored !== null ? stored : BACKGROUND_URL
     })
 
     const setLastUrl = (id: string) => {

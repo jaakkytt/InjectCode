@@ -1,5 +1,6 @@
 export const USER_SCRIPT_ID = 'default'
-export const RESERVED_URL = '<all_urls>'
+export const BACKGROUND_URL = 'Background'
+export const ALL_URL = '<all_urls>'
 
 export const MATCH_PATTERN_DOCS = 'https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns'
 

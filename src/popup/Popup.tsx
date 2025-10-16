@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useRef } from 'react'
 import UrlTabs from '../components/UrlTabs'
-import { RESERVED_URL, STORAGE_SCRIPTS } from '../constants'
+import { BACKGROUND_URL, STORAGE_SCRIPTS } from '../constants'
 import { UrlsContextProvider } from '../providers/UrlsContextProvider'
 import Footer from '../components/footer/Footer'
 import { UrlsFilterScope } from '../providers/UrlsFilterScope'
@@ -20,13 +20,13 @@ const Popup = () => {
     const currentUrl = useCurrentUrl()
 
     const [state, dispatch] = useReducer(urlsRootReducer, {
-        committed: { [RESERVED_URL]: [] },
+        committed: { [BACKGROUND_URL]: [] },
         working: null,
         isDirty: false,
     })
 
     useEffect(() => {
-        storage.get(STORAGE_SCRIPTS, { [RESERVED_URL]: [] }).then((data) => {
+        storage.get(STORAGE_SCRIPTS, { [BACKGROUND_URL]: [] }).then((data) => {
             dispatch({ name: 'hydrate', payload: data })
         })
     }, [])

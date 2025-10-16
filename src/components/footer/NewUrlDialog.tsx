@@ -18,9 +18,9 @@ import AddIcon from '@mui/icons-material/Add'
 import { useCurrentUrl } from '../../providers/CurrentUrlProvider'
 import { useTab } from '../../providers/TabProvider'
 import { TabIndex } from '../../types'
-import { matchPattern } from 'browser-extension-url-match'
 import { MATCH_PATTERN_DOCS } from '../../constants'
 import { useLastInteracted } from '../../providers/LastInteractedProvider'
+import { urlPatternMatcher } from '../../service/urlPatternMatcher'
 
 interface Props {
     isOpen: boolean
@@ -91,7 +91,7 @@ const NewUrlDialog = ({ isOpen, onClose } : Props) => {
         handleClose()
 
         if (tabIndex === TabIndex.Current && currentUrl) {
-            const matcher = matchPattern(value)
+            const matcher = urlPatternMatcher(value)
             if (!matcher.valid || !matcher.match(currentUrl.href)) {
                 setTabIndex(TabIndex.All)
             }

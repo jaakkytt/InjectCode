@@ -20,6 +20,7 @@ import { AccordionItemData } from '../../types'
 import TutorialTooltip from '../TutorialTooltip'
 import { useScriptsDispatch } from '../../providers/ScriptsContextProvider'
 import { usePlayControls } from '../usePlayControls'
+import { BACKGROUND_URL } from '../../constants'
 
 interface Props {
     item: AccordionItemData;
@@ -98,16 +99,18 @@ export default function ScriptAccordion(
                                 </IconButton>
                             </Typography>
                         </AccordionTitle>
-                        <Typography
-                            component="span"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <TutorialTooltip title="Run" placement="top" slots={{ transition: Fade }} arrow>
-                                <IconButton component="span" color="primary" aria-label="play" {...play.buttonProps}>
-                                    <PlayCircleOutlineIcon />
-                                </IconButton>
-                            </TutorialTooltip>
-                        </Typography>
+                        {parentId !== BACKGROUND_URL && (
+                            <Typography
+                                component="span"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <TutorialTooltip title="Run" placement="top" slots={{ transition: Fade }} arrow>
+                                    <IconButton component="span" color="primary" aria-label="play" {...play.buttonProps}>
+                                        <PlayCircleOutlineIcon />
+                                    </IconButton>
+                                </TutorialTooltip>
+                            </Typography>
+                        )}
                         <Typography component="span">
                             <TutorialTooltip title={item.active ? 'Enabled' : 'Disabled'} placement="top" slots={{ transition: Fade }} arrow>
                                 <Switch

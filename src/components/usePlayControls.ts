@@ -3,6 +3,7 @@ import { ItemsDataState } from '../types'
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRunScope } from '../providers/RunScopeProvider'
 import { scriptApi } from '../service/scriptApi'
+import { BACKGROUND_URL } from '../constants'
 
 function deepCopyAndFilterInactive(data: ItemsDataState): ItemsDataState {
     const result: ItemsDataState = {}
@@ -29,7 +30,10 @@ export function usePlayControls(urls: ItemsDataState) {
         deepCopyAndFilterInactive(urls)
     ), [urls])
 
-    const activeCount = Object.values(active).flat().length
+    const activeCount = Object.entries(active).reduce((sum, [key, items]) =>
+        key === BACKGROUND_URL ? sum : sum + items.length
+    , 0)
+
     const disabled = activeCount === 0
 
     const onClick = useCallback(

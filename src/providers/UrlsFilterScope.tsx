@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { AccordionItemData, ItemsDataState } from '../types'
 import { UrlsContext, useUrls } from './UrlsContextProvider'
-import { matchPattern } from 'browser-extension-url-match'
+import { urlPatternMatcher } from '../service/urlPatternMatcher'
 
 type UrlsFilter = (containerId: string, items: AccordionItemData[]) => boolean
 
@@ -15,7 +15,7 @@ export function UrlsFilterScope({ children, activePageUrl }: Props) {
 
     const filter = useMemo<UrlsFilter>(() => {
         const byContainerId: UrlsFilter = (containerId) => {
-            const matcher = matchPattern(containerId)
+            const matcher = urlPatternMatcher(containerId)
             if (!matcher.valid) {
                 return false
             }

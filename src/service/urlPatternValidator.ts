@@ -1,5 +1,5 @@
-import { matchPattern, presets } from 'browser-extension-url-match'
-import { RESERVED_URL } from '../constants'
+import { BACKGROUND_URL } from '../constants'
+import { urlPatternMatcher } from './urlPatternMatcher'
 
 const checkScheme = (value: string) : string | undefined => {
     if (value[0] === 'h') {
@@ -37,7 +37,7 @@ const checkHost = (value: string) : string | undefined => {
 
 const patchWildcardError = (value: string, originalError: string) => {
     const asHttp = value.replace(/^\*:/, 'http:')
-    const matcher = matchPattern(asHttp, presets.chrome)
+    const matcher = urlPatternMatcher(asHttp)
 
     if (matcher.valid) {
         return originalError
@@ -51,22 +51,22 @@ export const urlPatternValidator = async (value: string, existing: string[]) => 
         return 'Pattern must follow the structure <scheme>://<host>/<path>'
     }
 
-    if (value === RESERVED_URL) {
-        return `"${RESERVED_URL}" is reserved and cannot be used`
+    if (value === BACKGROUND_URL) {
+        return `"${BACKGROUND_URL}" is reserved and cannot be used`
     }
 
-    // Error message by matchPattern is too generic for this case
+    // Error message by MatcherOrInvalid is too generic for this case
     const schemeError = checkScheme(value)
     if (schemeError !== undefined) {
         return schemeError
     }
 
-    // Error message by matchPattern is too generic for this case
+    // Error message by MatcherOrInvalid is too generic for this case
     if (value.endsWith('://')) {
         return 'Pattern must also include a host and a path'
     }
 
-    // matchPattern does not check file path presence
+    // MatcherOrInvalid does not check file path presence
     if (value.endsWith(':///')) {
         return 'Pattern must also include a path'
     }
@@ -75,7 +75,7 @@ export const urlPatternValidator = async (value: string, existing: string[]) => 
         return `"${value}" already exists`
     }
 
-    const matcher = matchPattern(value, presets.chrome)
+    const matcher = urlPatternMatcher(value)
     if (matcher.valid) {
         if (value.startsWith('file:///')) {
             const isAllowed = await chrome.extension?.isAllowedFileSchemeAccess()
