@@ -1,0 +1,54 @@
+name: injectcode
+
+x-toolchain: &toolchain
+  image: injectcode-tools
+  build:
+    context: ..
+    dockerfile: development/Dockerfile
+    target: toolchain
+  volumes:
+    - ..:/app
+    - node_modules:/app/node_modules
+    - pnpm-store:/pnpm-store
+
+services:
+  install:
+    <<: *toolchain
+    command: sh -c "pnpm install --frozen-lockfile --store-dir /pnpm-store"
+
+  install-update:
+    <<: *toolchain
+    command: sh -c "pnpm install --no-frozen-lockfile --store-dir /pnpm-store"
+
+  build:
+    <<: *toolchain
+    command: sh -c "pnpm install --frozen-lockfile --store-dir /pnpm-store && pnpm run build"
+
+  audit:
+    <<: *toolchain
+    command: sh -c "pnpm run audit"
+
+  audit-fix:
+    <<: *toolchain
+    command: sh -c "pnpm run audit-fix"
+
+  type-check:
+    <<: *toolchain
+    command: sh -c "pnpm run type-check"
+
+  lint:
+    <<: *toolchain
+    command: sh -c "pnpm run lint"
+
+  lint-fix:
+    <<: *toolchain
+    command: sh -c "pnpm run lint-fix"
+
+  dev:
+    <<: *toolchain
+    command: sh -c "pnpm run start"
+
+volumes:
+  node_modules:
+  pnpm-store:
+    external: true

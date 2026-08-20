@@ -23,7 +23,7 @@ const Options = () => {
         }
 
         const init = async () => {
-            const { storedType, storedScript } = await chrome.storage.local.get({
+            const { type: storedType, script: storedScript } = await chrome.storage.local.get<{ type: string; script: string }>({
                 type: 'custom',
                 script: 'alert(\'hi\');',
             })
