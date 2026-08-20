@@ -1,4 +1,4 @@
-ARG PNPM_VERSION=10.34.4
+ARG PNPM_VERSION=11.22.0
 
 FROM node:24-bookworm-slim AS toolchain
 ARG PNPM_VERSION

@@ -6,6 +6,8 @@ x-toolchain: &toolchain
     context: ..
     dockerfile: development/Dockerfile
     target: toolchain
+  environment:
+    - CI=true
   volumes:
     - ..:/app
     - node_modules:/app/node_modules
@@ -35,6 +37,10 @@ services:
   type-check:
     <<: *toolchain
     command: sh -c "pnpm run type-check"
+
+  test:
+    <<: *toolchain
+    command: sh -c "pnpm run test"
 
   lint:
     <<: *toolchain

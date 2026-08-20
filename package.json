@@ -1,7 +1,7 @@
 {
     "name": "injectcode",
     "version": "2.0.0",
-    "packageManager": "pnpm@10.34.4",
+    "packageManager": "pnpm@11.22.0",
     "scripts": {
         "build": "webpack --mode production",
         "dev": "webpack --mode development",
@@ -9,6 +9,7 @@
         "type-check": "tsc --noEmit",
         "lint": "eslint ./src --ext .ts,.tsx",
         "lint-fix": "eslint ./src --ext .ts,.tsx --fix",
+        "test": "vitest run",
         "audit": "pnpm audit",
         "audit-fix": "pnpm audit --fix"
     },
@@ -52,6 +53,7 @@
         "style-loader": "^4.0.0",
         "ts-loader": "^9.6.2",
         "typescript": "^5.9.3",
+        "vitest": "^4.1.11",
         "webpack": "^5.109.2",
         "webpack-cli": "^6.0.1"
     }

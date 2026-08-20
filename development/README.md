@@ -54,6 +54,12 @@ docker compose -f development/compose.yml run --rm lint
 docker compose -f development/compose.yml run --rm lint-fix
 ```
 
+## Tests
+
+```sh
+docker compose -f development/compose.yml run --rm test
+```
+
 ## Audit
 
 ```sh
