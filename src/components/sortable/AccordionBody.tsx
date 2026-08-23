@@ -9,6 +9,7 @@ import CloudDotsIcon from '../CloudDotsIcon'
 interface Props {
     value: string
     onChange: (newValue: string) => void
+    onFocusChange?: (focused: boolean) => void
 }
 
 type Status = 'idle' | 'upToDate' | 'unsaved' | 'saved'
@@ -56,7 +57,7 @@ function StatusIcon({ status }: { status: keyof typeof icons }) {
     )
 }
 
-export default function AccordionBody({ value, onChange }: Props) {
+export default function AccordionBody({ value, onChange, onFocusChange }: Props) {
     const [inputValue, setInputValue] = useState(value)
     const [status, setStatus] = useState<Status>('idle')
 
@@ -111,6 +112,7 @@ export default function AccordionBody({ value, onChange }: Props) {
         const trimmed = inputValueRef.current.trim()
         setStatus(trimmed === lastSavedValueRef.current.trim() ? 'upToDate' : 'unsaved')
         startAutoSave()
+        onFocusChange?.(true)
     }
 
     const handleBlur = () => {
@@ -122,6 +124,7 @@ export default function AccordionBody({ value, onChange }: Props) {
         } else {
             setStatus('idle')
         }
+        onFocusChange?.(false)
     }
 
     return (

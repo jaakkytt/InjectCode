@@ -3,7 +3,9 @@ import { urlPatternMatcher } from './urlPatternMatcher'
 
 const checkScheme = (value: string) : string | undefined => {
     if (value[0] === 'h') {
-        return value.startsWith('http://') || value.startsWith('https://') ? undefined : 'A http(s) scheme must start with "http://" or "https://"'
+        return value.startsWith('http://') || value.startsWith('https://')
+            ? undefined
+            : 'A http(s) scheme must start with "http://" or "https://"'
     }
     if (value[0] === '*') {
         return value.startsWith('*://') ? undefined : 'A wildcard scheme must start with "*://"'

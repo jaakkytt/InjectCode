@@ -36,4 +36,6 @@ export class ChromeStorageAPI implements StorageApi {
     }
 }
 
-export const storage: StorageApi = typeof chrome !== 'undefined' && chrome.storage ? new ChromeStorageAPI() : new LocalStorageAPI()
+export const storage: StorageApi = typeof chrome !== 'undefined' && chrome.storage
+    ? new ChromeStorageAPI()
+    : new LocalStorageAPI()

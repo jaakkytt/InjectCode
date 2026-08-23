@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Accordion from '@mui/material/Accordion'
@@ -11,7 +11,7 @@ import JavascriptIcon from '@mui/icons-material/Javascript'
 import CssIcon from '@mui/icons-material/Css'
 import Typography from '@mui/material/Typography'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import { Fade, IconButton, styled, Switch } from '@mui/material'
+import { Fade, IconButton, styled } from '@mui/material'
 import AccordionTitle from './AccordionTitle'
 import AccordionBody from './AccordionBody'
 import MuiAccordionSummary from '@mui/material/AccordionSummary'
@@ -21,6 +21,7 @@ import TutorialTooltip from '../TutorialTooltip'
 import { useScriptsDispatch } from '../../providers/ScriptsContextProvider'
 import { usePlayControls } from '../usePlayControls'
 import { SHARED_CODE } from '../../constants'
+import RunModeToggle from './RunModeToggle'
 
 interface Props {
     item: AccordionItemData;
@@ -28,6 +29,20 @@ interface Props {
     expandedPanel: string | false;
     onAccordionChange: (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
 }
+
+const AccordionSummary = styled((props: AccordionSummaryProps) => (
+    <MuiAccordionSummary {...props} />
+))(() => ({
+    [`&.${accordionSummaryClasses.expanded}`]: {
+        minHeight: 48,
+    },
+    [`& .${accordionSummaryClasses.content}`]: {
+        margin: 0,
+    },
+    [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
+        margin: 0,
+    },
+}))
 
 export default function ScriptAccordion(
     { item, parentId, expandedPanel, onAccordionChange }: Props,
@@ -43,22 +58,15 @@ export default function ScriptAccordion(
 
     const dispatch = useScriptsDispatch()
     const play = usePlayControls({ [parentId]: [item] })
-
-    const AccordionSummary = styled((props: AccordionSummaryProps) => (
-        <MuiAccordionSummary {...props} />
-    ))(() => ({
-        [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
-            margin: 0,
-        },
-    }))
+    const [contentFocused, setContentFocused] = useState(false)
 
     return (
         <div
             ref={setNodeRef}
             style={{
                 transform: CSS.Transform.toString(transform),
-                transition,
-                opacity: isDragging ? 0.5 : (item.active ? 1 : 0.5),
+                transition: [transition, 'opacity 200ms ease'].filter(Boolean).join(', '),
+                opacity: isDragging ? 0.5 : (item.runMode !== 'disabled' ? 1 : 0.5),
             }}
         >
             <Accordion
@@ -94,7 +102,12 @@ export default function ScriptAccordion(
                                 color="primary"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <IconButton color="primary" component="span" aria-label="drag" style={{ cursor: 'grab' }}>
+                                <IconButton
+                                    color="primary"
+                                    component="span"
+                                    aria-label="drag"
+                                    style={{ cursor: 'grab' }}
+                                >
                                     <DragHandleIcon />
                                 </IconButton>
                             </Typography>
@@ -105,20 +118,23 @@ export default function ScriptAccordion(
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <TutorialTooltip title="Run" placement="top" slots={{ transition: Fade }} arrow>
-                                    <IconButton component="span" color="primary" aria-label="play" {...play.buttonProps}>
+                                    <IconButton
+                                        component="span"
+                                        color="primary"
+                                        aria-label="play"
+                                        {...play.buttonProps}
+                                    >
                                         <PlayCircleOutlineIcon />
                                     </IconButton>
                                 </TutorialTooltip>
                             </Typography>
                         )}
                         <Typography component="span">
-                            <TutorialTooltip title={item.active ? 'Enabled' : 'Disabled'} placement="top" slots={{ transition: Fade }} arrow>
-                                <Switch
-                                    checked={item.active}
-                                    onChange={e => { dispatch.update(item.id, { active: e.target.checked }) }}
-                                    onClick={(e) => e.stopPropagation()}
-                                />
-                            </TutorialTooltip>
+                            <RunModeToggle
+                                mode={item.runMode}
+                                onModeChange={(runMode) => dispatch.update(item.id, { runMode })}
+                                warning={contentFocused && item.runMode === 'always'}
+                            />
                         </Typography>
                         <Typography
                             component="span"
@@ -129,7 +145,11 @@ export default function ScriptAccordion(
                                 transition: 'all 0.3s ease-in-out',
                             }}
                         >
-                            <ConfirmDeleteButton onConfirm={ () => dispatch.remove(item.id) } placement='top' showDeleteTooltip={true} />
+                            <ConfirmDeleteButton
+                                onConfirm={ () => dispatch.remove(item.id) }
+                                placement='top'
+                                showDeleteTooltip={true}
+                            />
                         </Typography>
                     </Box>
                 </AccordionSummary>
@@ -137,6 +157,7 @@ export default function ScriptAccordion(
                     <AccordionBody
                         value={item.content}
                         onChange={(newContent) => dispatch.update(item.id, { content: newContent })}
+                        onFocusChange={setContentFocused}
                     />
                 </AccordionDetails>
             </Accordion>

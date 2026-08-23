@@ -1,4 +1,4 @@
-import { Action, ItemsDataState, StoreState } from '../types'
+import { Action, AccordionItemData, ItemsDataState, ScriptPatch, StoreState } from '../types'
 
 function arrayMove<T>(arr: readonly T[], from: number, to: number): T[] {
     if (from === to) return arr.slice()
@@ -8,17 +8,25 @@ function arrayMove<T>(arr: readonly T[], from: number, to: number): T[] {
     return copy
 }
 
+function downgradeRunModeOnEdit(item: AccordionItemData, patch: ScriptPatch): ScriptPatch {
+    const contentChanged = patch.content !== undefined && patch.content !== item.content
+    if (contentChanged && patch.runMode === undefined && item.runMode === 'always') {
+        return { ...patch, runMode: 'active' }
+    }
+    return patch
+}
+
 function applyScriptAction(state: ItemsDataState, action: Action): ItemsDataState {
     switch (action.name) {
         case 'scriptAdd': {
             const dateTimeStringAsTitle = new Date().toLocaleString()
             const newItemId = `${action.type}-${dateTimeStringAsTitle}-${Math.random().toString(36).substring(2, 10)}`
-            const script = {
+            const script: AccordionItemData = {
                 id: newItemId,
                 title: action.title,
                 secondaryText: '',
                 content: '',
-                active: true,
+                runMode: 'active',
                 type: action.type,
             }
 
@@ -28,7 +36,7 @@ function applyScriptAction(state: ItemsDataState, action: Action): ItemsDataStat
         case 'scriptUpdate': {
             const { containerId, scriptId, patch } = action
             const arr = state[containerId] ?? []
-            const next = arr.map((s) => (s.id === scriptId ? { ...s, ...patch } : s))
+            const next = arr.map((s) => (s.id === scriptId ? { ...s, ...downgradeRunModeOnEdit(s, patch) } : s))
             return { ...state, [containerId]: next }
         }
         case 'scriptDelete': {

@@ -65,8 +65,18 @@ const UrlTabs = ({ curren, all, currentFooter, allFooter } : Props) => {
                     textColor="inherit"
                     variant="fullWidth"
                 >
-                    <Tab label="Currently Matching" icon={<JoinLeftIcon />} iconPosition="start" {...a11yProps(TabIndex.Current)} />
-                    <Tab label="All Scripts" icon={<JoinFullIcon />} iconPosition="start" {...a11yProps(TabIndex.All)} />
+                    <Tab
+                        label="Currently Matching"
+                        icon={<JoinLeftIcon />}
+                        iconPosition="start"
+                        {...a11yProps(TabIndex.Current)}
+                    />
+                    <Tab
+                        label="All Scripts"
+                        icon={<JoinFullIcon />}
+                        iconPosition="start"
+                        {...a11yProps(TabIndex.All)}
+                    />
                     <Link
                         href="#"
                         onClick={e => {

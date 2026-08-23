@@ -2,6 +2,8 @@ export type ScriptType = 'js' | 'css'
 
 export type RunScope = 'global' | 'current'
 
+export type ScriptRunMode = 'disabled' | 'active' | 'always'
+
 export enum TabIndex {
     Current = 0,
     All = 1,
@@ -12,7 +14,7 @@ export interface AccordionItemData {
     title: string;
     secondaryText: string;
     content: string;
-    active: boolean;
+    runMode: ScriptRunMode;
     type: ScriptType;
 }
 

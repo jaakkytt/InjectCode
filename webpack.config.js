@@ -1,19 +1,33 @@
 const path = require("path");
+const webpack = require("webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ROBOTO_PKG_DIR = path.dirname(require.resolve('@fontsource/roboto/package.json'));
 
+const outputPath = path.resolve(__dirname, "dist");
 
-module.exports = {
+const buildTimeDefine = new webpack.DefinePlugin({
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+});
+
+const tsRule = {
+    test: /\.tsx?$/,
+    use: "ts-loader",
+    exclude: /node_modules/,
+};
+
+const pagesConfig = {
+    name: 'pages',
     entry: {
         popup: "./src/popup/index.tsx",
         options: "./src/options/index.tsx",
-        background: "./src/background.ts"
     },
     output: {
-        path: path.resolve(__dirname, "dist"),
+        path: outputPath,
         filename: "[name].js",
-        clean: true,
+        clean: {
+            keep: /^background\.js(\.map)?$/,
+        },
     },
     devtool: 'source-map',
     resolve: {
@@ -24,11 +38,7 @@ module.exports = {
     },
     module: {
         rules: [
-            {
-                test: /\.tsx?$/,
-                use: "ts-loader",
-                exclude: /node_modules/,
-            },
+            tsRule,
             {
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],
@@ -69,7 +79,7 @@ module.exports = {
                     enforce: true,
                     priority: 20
                 },
-                vendor:{
+                vendor: {
                     test: /[\\/]node_modules[\\/]/,
                     name: 'vendor',
                     enforce: true,
@@ -80,6 +90,7 @@ module.exports = {
         },
     },
     plugins: [
+        buildTimeDefine,
         new CopyPlugin({
             patterns: [{
                 from: "public",
@@ -99,3 +110,37 @@ module.exports = {
         })
     ]
 };
+
+const backgroundConfig = {
+    name: 'background',
+    target: 'webworker',
+    entry: {
+        background: "./src/background.ts",
+    },
+    output: {
+        path: outputPath,
+        filename: "[name].js",
+    },
+    devtool: 'source-map',
+    resolve: {
+        extensions: [".ts", ".tsx", ".js"],
+    },
+    module: {
+        rules: [tsRule],
+    },
+    cache: {
+        type: 'filesystem',
+        buildDependencies: {
+            config: [__filename],
+            defaultWebpack: [path.resolve(__dirname, 'package.json')],
+        },
+    },
+    optimization: {
+        minimize: false,
+        moduleIds: 'deterministic',
+        chunkIds: 'deterministic',
+    },
+    plugins: [buildTimeDefine],
+};
+
+module.exports = [pagesConfig, backgroundConfig];

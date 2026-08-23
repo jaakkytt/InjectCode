@@ -8,7 +8,7 @@ function makeItem(overrides: Partial<AccordionItemData>): AccordionItemData {
         title: overrides.title ?? 'item-title',
         secondaryText: overrides.secondaryText ?? '',
         content: overrides.content ?? '',
-        active: overrides.active ?? true,
+        runMode: overrides.runMode ?? 'active',
         type: overrides.type ?? 'js',
     }
 }
@@ -29,7 +29,8 @@ describe('selectItemsForUrl', () => {
             'https://github.com/*': [makeItem({ id: 'exact', content: 'b' })],
         }
 
-        expect(selectItemsForUrl(scripts, 'https://github.com/foo').map(i => i.id).sort()).toEqual(['exact', 'wildcard'])
+        const ids = selectItemsForUrl(scripts, 'https://github.com/foo').map(i => i.id).sort()
+        expect(ids).toEqual(['exact', 'wildcard'])
     })
 
     it('returns nothing when no container pattern matches', () => {
@@ -102,7 +103,9 @@ describe('ChromeScriptAPI', () => {
         expect(tabsQuery).toHaveBeenCalledWith({ url: 'https://github.com/*' })
         expect(execute).toHaveBeenCalledTimes(2)
         expect(insertCSS).toHaveBeenCalledTimes(2)
-        expect(execute).toHaveBeenCalledWith(expect.objectContaining({ target: { tabId: 1 }, js: [{ code: 'own();' }] }))
+        expect(execute).toHaveBeenCalledWith(
+            expect.objectContaining({ target: { tabId: 1 }, js: [{ code: 'own();' }] }),
+        )
     })
 
     it('scope "global": skips querying tabs for containers with nothing active to inject', async () => {
@@ -124,7 +127,9 @@ describe('ChromeScriptAPI', () => {
         await new ChromeScriptAPI().run(scripts, [], 'current')
 
         expect(execute).toHaveBeenCalledTimes(1)
-        expect(execute).toHaveBeenCalledWith(expect.objectContaining({ target: { tabId: 7 }, js: [{ code: 'github();' }] }))
+        expect(execute).toHaveBeenCalledWith(
+            expect.objectContaining({ target: { tabId: 7 }, js: [{ code: 'github();' }] }),
+        )
     })
 
     it('scope "current": does nothing when the active tab matches no container', async () => {
@@ -140,9 +145,12 @@ describe('ChromeScriptAPI', () => {
         expect(insertCSS).not.toHaveBeenCalled()
     })
 
-    it('a tab that throws does not stop injection into other matching tabs, and gets logged with its id/url', async () => {
-        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
-        const permissionError = new Error('Cannot access contents of the page. Extension manifest must request permission to access the respective host.')
+    it('a throwing tab does not block the others, and gets logged with its id/url', async () => {
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+        const permissionError = new Error(
+            'Cannot access contents of the page. '
+            + 'Extension manifest must request permission to access the respective host.',
+        )
 
         tabsQuery.mockResolvedValue([
             { id: 1, url: 'https://blocked.example.com/' },

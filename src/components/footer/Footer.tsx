@@ -36,7 +36,11 @@ const Footer = () => {
     )
 
     return (
-        <Stack direction="row" spacing={1} sx={{ pl: 1, pt: 0, pr: 1, pb: 1, justifyContent: 'space-between', alignItems: 'center' }}>
+        <Stack
+            direction="row"
+            spacing={1}
+            sx={{ pl: 1, pt: 0, pr: 1, pb: 1, justifyContent: 'space-between', alignItems: 'center' }}
+        >
             <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', alignItems: 'center' }}>
                 <Button
                     startIcon={<PlayBadgeIcon count={play.activeCount} />}

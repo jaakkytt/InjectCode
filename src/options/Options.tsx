@@ -23,7 +23,10 @@ const Options = () => {
         }
 
         const init = async () => {
-            const { type: storedType, script: storedScript } = await chrome.storage.local.get<{ type: string; script: string }>({
+            const { type: storedType, script: storedScript } = await chrome.storage.local.get<{
+                type: string
+                script: string
+            }>({
                 type: 'custom',
                 script: 'alert(\'hi\');',
             })
@@ -110,7 +113,11 @@ const Options = () => {
         <div>
             <h1>Help</h1>
             <p>
-                URL patterns must match the format defined in <a target="_blank" href="https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns">Chrome Extensions docs</a>.
+                URL patterns must match the format defined in{' '}
+                <a
+                    target="_blank"
+                    href="https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns"
+                >Chrome Extensions docs</a>.
             </p>
             <p>TODO: note about file urls being needing a toggle in settings.</p>
         </div>

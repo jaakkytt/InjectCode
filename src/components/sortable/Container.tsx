@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import ScriptAccordion from './ScriptAccordion'
@@ -17,6 +17,8 @@ export default function Container(
     const { isOver, setNodeRef } = useDroppable({ id })
     const items = useScripts()
 
+    const itemIds = useMemo(() => items.map(i => i.id), [JSON.stringify(items.map(i => i.id))])
+
     const containerStyle: React.CSSProperties = {
         transition: 'background-color 0.2s ease',
         backgroundColor: isOver ? 'rgba(34, 139, 230, 0.1)' : '#F3F4F6',
@@ -30,7 +32,7 @@ export default function Container(
     }
 
     return (
-        <SortableContext id={id} items={items.map(i => i.id)} strategy={rectSortingStrategy}>
+        <SortableContext id={id} items={itemIds} strategy={rectSortingStrategy}>
             <div
                 ref={setNodeRef}
                 style={containerStyle}

@@ -71,7 +71,12 @@ export default function AccordionItem({
                     >
                         <Typography component="span" style={{ marginRight: 8 }}>
                             {containerId === SHARED_CODE ? (
-                                <TutorialTooltip title="Automatically included with any active script" placement="top" slots={{ transition: Fade }} arrow>
+                                <TutorialTooltip
+                                    title="Automatically included with any active script"
+                                    placement="top"
+                                    slots={{ transition: Fade }}
+                                    arrow
+                                >
                                     <IconButton color="warning" component="span">
                                         <InfoOutlineIcon />
                                     </IconButton>
@@ -87,7 +92,12 @@ export default function AccordionItem({
                         items.length > 0 ? (
                             <Typography component="span">
                                 <TutorialTooltip title="Run" placement="left" slots={{ transition: Fade }} arrow>
-                                    <IconButton component="span" color="primary" aria-label="play" {...play.buttonProps}>
+                                    <IconButton
+                                        component="span"
+                                        color="primary"
+                                        aria-label="play"
+                                        {...play.buttonProps}
+                                    >
                                         <PlayBadgeIcon count={play.activeCount} />
                                     </IconButton>
                                 </TutorialTooltip>
@@ -103,7 +113,12 @@ export default function AccordionItem({
 
             <AccordionDetails sx={{ p: 1 }}>
                 <ScriptsContextProvider containerId={containerId}>
-                    <Container id={containerId} key={containerId} expandedPanel={expandedPanel} onAccordionChange={onAccordionChange} />
+                    <Container
+                        id={containerId}
+                        key={containerId}
+                        expandedPanel={expandedPanel}
+                        onAccordionChange={onAccordionChange}
+                    />
                 </ScriptsContextProvider>
             </AccordionDetails>
         </Accordion>

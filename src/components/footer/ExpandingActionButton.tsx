@@ -56,17 +56,32 @@ const ExpandingActionButton = () => {
                             <div>
                                 <ClickAwayListener onClickAway={handleClose}>
                                     <Stack spacing={2} direction="row" sx={{ mr: 2, alignItems: 'flex-end' }}>
-                                        <Fab variant="circular" size="small" color="primary" onClick={() => { setUrlOpen(true) }}>
+                                        <Fab
+                                            variant="circular"
+                                            size="small"
+                                            color="primary"
+                                            onClick={() => { setUrlOpen(true) }}
+                                        >
                                             <span style={{ display: 'none' }}>URL</span>
                                             <LinkIcon sx={{ ml: 0 }} />
                                         </Fab>
 
-                                        <Fab variant="circular" size="small" color="primary" onClick={() => { setCssOpen(true) }}>
+                                        <Fab
+                                            variant="circular"
+                                            size="small"
+                                            color="primary"
+                                            onClick={() => { setCssOpen(true) }}
+                                        >
                                             <span style={{ display: 'none' }}>Style</span>
                                             <CssIcon sx={{ ml: 0 }} />
                                         </Fab>
 
-                                        <Fab variant="circular" size="small" color="primary" onClick={() => { setJsOpen(true) }}>
+                                        <Fab
+                                            variant="circular"
+                                            size="small"
+                                            color="primary"
+                                            onClick={() => { setJsOpen(true) }}
+                                        >
                                             <span style={{ display: 'none' }}>Script</span>
                                             <JavascriptIcon sx={{ ml: 0 }} />
                                         </Fab>

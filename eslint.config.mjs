@@ -56,6 +56,10 @@ export default defineConfig([{
         'no-tabs': ['off'],
         'keyword-spacing': 'error',
 
+        'max-len': ['error', {
+            code: 120,
+        }],
+
         'max-nested-callbacks': ['error', {
             max: 4,
         }],

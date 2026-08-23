@@ -111,7 +111,10 @@ const NewUrlDialog = ({ isOpen, onClose } : Props) => {
             <DialogTitle>New URL Match Pattern</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Must follow the format specified in the <Link href={MATCH_PATTERN_DOCS} target="_blank" rel="noreferrer" underline="hover">Chrome Extensions Docs</Link>.
+                    Must follow the format specified in the{' '}
+                    <Link href={MATCH_PATTERN_DOCS} target="_blank" rel="noreferrer" underline="hover">
+                        Chrome Extensions Docs
+                    </Link>.
                 </DialogContentText>
                 <form onSubmit={handleSubmit} id="newUrlForm">
                     <TextField
@@ -132,7 +135,12 @@ const NewUrlDialog = ({ isOpen, onClose } : Props) => {
                 </form>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={handleClose} startIcon={<CloseIcon/>}>Cancel</Button>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleClose}
+                    startIcon={<CloseIcon/>}
+                >Cancel</Button>
                 <Button
                     variant="outlined"
                     disabled={!!error || inputValue.trim() === '' && !placeholder}

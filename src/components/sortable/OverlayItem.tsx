@@ -9,7 +9,13 @@ import { IconButton, Switch } from '@mui/material'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import { AccordionItemData } from '../../types'
 
-export const OverlayItem = React.forwardRef<HTMLDivElement, { item: AccordionItemData, isExpanded: boolean, isDragging?: boolean }>(
+interface OverlayItemProps {
+    item: AccordionItemData
+    isExpanded: boolean
+    isDragging?: boolean
+}
+
+export const OverlayItem = React.forwardRef<HTMLDivElement, OverlayItemProps>(
     ({ item, isExpanded, isDragging, ...props }, ref) => {
         return (
             <div ref={ref} {...props} style={{ opacity: isDragging ? 0.5 : 1 }}>
@@ -25,7 +31,12 @@ export const OverlayItem = React.forwardRef<HTMLDivElement, { item: AccordionIte
                                 style={{ cursor: isDragging ? 'grabbing' : 'grab', marginRight: 8 }}
                                 color="primary"
                             >
-                                <IconButton component="span" color="primary" aria-label="drag" style={{ cursor: 'grab' }}>
+                                <IconButton
+                                    component="span"
+                                    color="primary"
+                                    aria-label="drag"
+                                    style={{ cursor: 'grab' }}
+                                >
                                     <DragHandleIcon />
                                 </IconButton>
                             </Typography>
@@ -38,7 +49,7 @@ export const OverlayItem = React.forwardRef<HTMLDivElement, { item: AccordionIte
                                 </IconButton>
                             </Typography>
                             <Typography component="span">
-                                <Switch checked={item.active} />
+                                <Switch checked={item.runMode !== 'disabled'} />
                             </Typography>
                         </Box>
                     </AccordionSummary>

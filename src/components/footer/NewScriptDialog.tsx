@@ -118,7 +118,12 @@ const NewScriptDialog = ({ isOpen, scriptTye, onClose } : Props) => {
                 </form>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={handleClose} startIcon={<CloseIcon/>}>Cancel</Button>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleClose}
+                    startIcon={<CloseIcon/>}
+                >Cancel</Button>
                 <Button
                     variant="outlined"
                     disabled={!!error || inputValue.trim() === ''}

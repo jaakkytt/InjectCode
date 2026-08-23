@@ -102,4 +102,6 @@ export class DummyScriptAPI implements ScriptApi {
     }
 }
 
-export const scriptApi: ScriptApi = typeof chrome !== 'undefined' && chrome.scripting ? new ChromeScriptAPI() : new DummyScriptAPI()
+export const scriptApi: ScriptApi = typeof chrome !== 'undefined' && chrome.scripting
+    ? new ChromeScriptAPI()
+    : new DummyScriptAPI()

@@ -7,8 +7,8 @@
         "dev": "webpack --mode development",
         "start": "webpack --watch",
         "type-check": "tsc --noEmit",
-        "lint": "eslint ./src --ext .ts,.tsx",
-        "lint-fix": "eslint ./src --ext .ts,.tsx --fix",
+        "lint": "eslint ./src ./test --ext .ts,.tsx",
+        "lint-fix": "eslint ./src ./test --ext .ts,.tsx --fix",
         "test": "vitest run",
         "audit": "pnpm audit",
         "audit-fix": "pnpm audit --fix"

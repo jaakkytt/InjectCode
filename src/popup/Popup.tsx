@@ -12,6 +12,7 @@ import AccordionSkeleton from '../components/sortable/AccordionSkeleton'
 import { TabProvider } from '../providers/TabProvider'
 import { LastInteractedProvider } from '../providers/LastInteractedProvider'
 import { storage } from '../service/storageApi'
+import BuildInfo from '../components/BuildInfo'
 
 const Popup = () => {
 
@@ -71,6 +72,7 @@ const Popup = () => {
                 </LastInteractedProvider>
             </TabProvider>
         </ExistingUrlsProvider>
+        <BuildInfo/>
     </UrlsContextProvider>
 }
 

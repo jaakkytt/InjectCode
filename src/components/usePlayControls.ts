@@ -6,13 +6,13 @@ import { scriptApi } from '../service/scriptApi'
 import { SHARED_CODE } from '../constants'
 import { useUrls } from '../providers/UrlsContextProvider'
 
-function deepCopyAndFilterInactive(data: ItemsDataState): ItemsDataState {
+function deepCopyAndFilterRunnable(data: ItemsDataState): ItemsDataState {
     const result: ItemsDataState = {}
     for (const [key, items] of Object.entries(data)) {
         if (key === SHARED_CODE) {
             continue
         }
-        const filtered = items.filter(item => item.active)
+        const filtered = items.filter(item => item.runMode !== 'disabled')
         if (filtered.length > 0) {
             result[key] = filtered.map(item => ({ ...item }))
         }
@@ -32,7 +32,7 @@ export function usePlayControls(urls: ItemsDataState) {
     }, [])
 
     const active = useMemo(() => (
-        deepCopyAndFilterInactive(urls)
+        deepCopyAndFilterRunnable(urls)
     ), [urls])
 
     const activeCount = Object.values(active).flat().length
@@ -45,7 +45,7 @@ export function usePlayControls(urls: ItemsDataState) {
                 return
             }
 
-            const shared = (urlsContext?.[SHARED_CODE] ?? []).filter(item => item.active)
+            const shared = (urlsContext?.[SHARED_CODE] ?? []).filter(item => item.runMode !== 'disabled')
 
             setLoading(true)
 
@@ -58,7 +58,7 @@ export function usePlayControls(urls: ItemsDataState) {
                 }
             })
         },
-        [disabled, active],
+        [disabled, active, scope, urlsContext],
     )
 
     const buttonProps = { disabled, onClick, loading } as const
