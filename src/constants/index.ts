@@ -9,5 +9,7 @@ export const LOCAL_STORAGE_CHILD_EXPANDED = 'childExpanded'
 export const LOCAL_STORAGE_SELECTED_TAB = 'selectedTab'
 export const LOCAL_STORAGE_LAST_URL = 'lastInteractedUrl'
 export const LOCAL_STORAGE_SCOPE = 'runScope'
+export const LOCAL_STORAGE_TOOLTIP_DISABLED = 'tooltipDisabled'
+export const LOCAL_STORAGE_TOOLTIP_COUNTERS = 'tooltipCounters'
 
 export const STORAGE_SCRIPTS = 'scripts'
