@@ -1,0 +1,72 @@
+# Isolation override for the sbx sandbox: docker compose -f compose.yml -f compose.sandbox.yml run ...
+# Gives sandbox runs their own pnpm store and node_modules volumes, separate from `node`/`dev`.
+#
+# verify_deps_before_run=warn: skip pnpm's own nested reinstall check on plain `pnpm run` scripts,
+# which was hitting a sandbox-only fsync error; `install` still always runs explicitly first.
+
+services:
+  install:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+
+  install-update:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+
+  build:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+
+  audit:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+
+  audit-fix:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+
+  type-check:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+    environment:
+      - pnpm_config_verify_deps_before_run=warn
+
+  test:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+    environment:
+      - pnpm_config_verify_deps_before_run=warn
+
+  lint:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+    environment:
+      - pnpm_config_verify_deps_before_run=warn
+
+  lint-fix:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+    environment:
+      - pnpm_config_verify_deps_before_run=warn
+
+volumes:
+  node_modules-sandbox:
+  pnpm-store-sandbox:

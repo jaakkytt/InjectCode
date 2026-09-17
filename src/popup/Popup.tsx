@@ -1,23 +1,23 @@
 import React, { useEffect, useReducer, useRef } from 'react'
-import UrlTabs from '../components/UrlTabs'
 import { SHARED_CODE, STORAGE_SCRIPTS } from '../constants'
-import { UrlsContextProvider } from '../providers/UrlsContextProvider'
+import { urlsRootReducer } from '../providers/urlsReducer'
+import { useCurrentUrl } from '../providers/CurrentUrlProvider'
+import { storage } from '../service/storageApi'
+import UrlTabs from '../components/UrlTabs'
+import { UrlsProvider } from '../providers/UrlsProvider'
 import Footer from '../components/footer/Footer'
 import { UrlsFilterScope } from '../providers/UrlsFilterScope'
-import { urlsRootReducer } from '../providers/urlsReducer'
 import UrlAccordion from '../components/sortable/UrlAccordion'
 import { ExistingUrlsProvider } from '../providers/ExistingUrlsProvider'
-import { useCurrentUrl } from '../providers/CurrentUrlProvider'
 import AccordionSkeleton from '../components/sortable/AccordionSkeleton'
 import { TabProvider } from '../providers/TabProvider'
 import { LastInteractedProvider } from '../providers/LastInteractedProvider'
-import { storage } from '../service/storageApi'
 import BuildInfo from '../components/BuildInfo'
 
-const Popup = () => {
+const SAVES_TO_IGNORE_BECAUSE_OF_HYDRATION = 2
 
+const Popup = () => {
     const saveSequence = useRef(0)
-    const savesToIgnoreBecauseOfHydration = 2
     const currentUrl = useCurrentUrl()
 
     const [state, dispatch] = useReducer(urlsRootReducer, {
@@ -25,6 +25,10 @@ const Popup = () => {
         working: null,
         isDirty: false,
     })
+
+    function shouldPersist(): boolean {
+        return saveSequence.current > SAVES_TO_IGNORE_BECAUSE_OF_HYDRATION && !state.isDirty
+    }
 
     useEffect(() => {
         storage.get(STORAGE_SCRIPTS, { [SHARED_CODE]: [] }).then((data) => {
@@ -34,18 +38,16 @@ const Popup = () => {
 
     useEffect(() => {
         saveSequence.current += 1
-        if (saveSequence.current <= savesToIgnoreBecauseOfHydration) {
+        if (!shouldPersist()) {
             return
         }
 
-        if (!state.isDirty) {
-            storage.set(STORAGE_SCRIPTS, state.committed).then(() => {
-                console.debug('State saved')
-            })
-        }
+        storage.set(STORAGE_SCRIPTS, state.committed).then(() => {
+            console.debug('State saved')
+        })
     }, [state.committed, state.isDirty])
 
-    return <UrlsContextProvider state={state} dispatch={dispatch}>
+    return <UrlsProvider state={state} dispatch={dispatch}>
         <ExistingUrlsProvider value={Object.keys(state.committed)}>
             <TabProvider>
                 <LastInteractedProvider>
@@ -73,7 +75,7 @@ const Popup = () => {
             </TabProvider>
         </ExistingUrlsProvider>
         <BuildInfo/>
-    </UrlsContextProvider>
+    </UrlsProvider>
 }
 
 export default Popup

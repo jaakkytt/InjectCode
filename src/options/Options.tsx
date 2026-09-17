@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 const USER_SCRIPT_ID = 'default'
+const DEFAULT_TYPE = 'custom'
+const DEFAULT_SCRIPT = 'alert(\'hi\');'
 
-const isUserScriptsAvailable = async () => {
+async function isUserScriptsAvailable() {
     try {
         return await chrome.userScripts.getScripts().then(() => true)
     } catch {
@@ -11,8 +13,8 @@ const isUserScriptsAvailable = async () => {
 }
 
 const Options = () => {
-    const [type, setType] = useState('custom')
-    const [script, setScript] = useState('alert(\'hi\');')
+    const [type, setType] = useState(DEFAULT_TYPE)
+    const [script, setScript] = useState(DEFAULT_SCRIPT)
     const [userScriptsAvailable, setUserScriptsAvailable] = useState(true)
 
     useEffect(() => {
@@ -27,8 +29,8 @@ const Options = () => {
                 type: string
                 script: string
             }>({
-                type: 'custom',
-                script: 'alert(\'hi\');',
+                type: DEFAULT_TYPE,
+                script: DEFAULT_SCRIPT,
             })
 
             setType(storedType)
@@ -42,9 +44,7 @@ const Options = () => {
         return () => chrome.storage.local.onChanged.removeListener(handleStorageChange)
     }, [])
 
-    const onSave = async () => {
-        if (!userScriptsAvailable) return
-
+    async function saveUserScript() {
         await chrome.storage.local.set({ type, script })
 
         const existingScripts = await chrome.userScripts.getScripts({ ids: [USER_SCRIPT_ID] })
@@ -60,8 +60,21 @@ const Options = () => {
         } else {
             await chrome.userScripts.register([newScript])
         }
+    }
+
+    async function handleSave() {
+        if (!userScriptsAvailable) return
+
+        await saveUserScript()
 
         console.log('Script saved and registered/updated.')
+    }
+
+    const handlers = {
+        selectFileType: () => setType('file'),
+        selectCustomType: () => setType('custom'),
+        handleScriptChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => setScript(e.target.value),
+        handleSave,
     }
 
     return <>
@@ -81,7 +94,7 @@ const Options = () => {
                     name="type"
                     value="file"
                     checked={type === 'file'}
-                    onChange={() => setType('file')}
+                    onChange={handlers.selectFileType}
                 />
                 <span>File</span>
             </label>
@@ -91,7 +104,7 @@ const Options = () => {
                     name="type"
                     value="custom"
                     checked={type === 'custom'}
-                    onChange={() => setType('custom')}
+                    onChange={handlers.selectCustomType}
                 />
                 <span>Custom text</span>
             </label>
@@ -102,13 +115,13 @@ const Options = () => {
                         name="custom-script"
                         className="code"
                         value={script}
-                        onChange={(e) => setScript(e.target.value)}
+                        onChange={handlers.handleScriptChange}
                         draggable="false"
                         placeholder="alert('hi');"
                     />
                 </div>
             )}
-            <button type="button" id="save-button" onClick={onSave}>Save & Enable</button>
+            <button type="button" id="save-button" onClick={handlers.handleSave}>Save & Enable</button>
         </form>
         <div>
             <h1>Help</h1>

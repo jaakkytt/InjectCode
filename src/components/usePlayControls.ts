@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRunScope } from '../providers/RunScopeProvider'
 import { scriptApi } from '../service/scriptApi'
 import { SHARED_CODE } from '../constants'
-import { useUrls } from '../providers/UrlsContextProvider'
+import { useUrls } from '../providers/urlsContext'
 
 function deepCopyAndFilterRunnable(data: ItemsDataState): ItemsDataState {
     const result: ItemsDataState = {}

@@ -1,4 +1,6 @@
 import { defineConfig } from 'eslint/config'
+import { importX } from 'eslint-plugin-import-x'
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import globals from 'globals'
 import tsParser from '@typescript-eslint/parser'
@@ -24,6 +26,13 @@ export default defineConfig([{
 
     plugins: {
         '@typescript-eslint': typescriptEslint,
+        'import-x': importX,
+    },
+
+    settings: {
+        'import-x/resolver-next': [
+            createTypeScriptImportResolver({ alwaysTryTypes: true }),
+        ],
     },
 
     languageOptions: {
@@ -37,6 +46,13 @@ export default defineConfig([{
     },
 
     rules: {
+        'import-x/no-extraneous-dependencies': ['error', {
+            devDependencies: true,
+            includeTypes: true,
+        }],
+
+        '@typescript-eslint/parameter-properties': 'error',
+
         'arrow-spacing': ['warn', {
             before: true,
             after: true,
@@ -104,5 +120,14 @@ export default defineConfig([{
         'space-unary-ops': 'error',
         'spaced-comment': 'error',
         yoda: 'error',
+    },
+}, {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+
+    rules: {
+        'no-restricted-syntax': ['error', {
+            selector: 'JSXAttribute[name.name="data-testid"]',
+            message: 'No test-only hooks in source - adapt the test locator instead.',
+        }],
     },
 }])

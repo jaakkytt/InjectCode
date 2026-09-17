@@ -29,6 +29,8 @@ export const RunScopeProvider = ({ children }: { children: ReactNode }) => {
 
 export const useRunScope = () => {
     const context = useContext(RunScopeContext)
-    if (!context) throw new Error('useRunScope must be used within RunScopeProvider')
+    if (!context) {
+        throw new Error('useRunScope must be used within RunScopeProvider')
+    }
     return context
 }

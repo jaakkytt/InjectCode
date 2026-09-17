@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { AccordionItemData, ItemsDataState } from '../types'
-import { UrlsContext, useUrls } from './UrlsContextProvider'
+import { UrlsContext, useUrls } from './urlsContext'
 import { urlPatternMatcher } from '../service/urlPatternMatcher'
 
 type UrlsFilter = (containerId: string, items: AccordionItemData[]) => boolean

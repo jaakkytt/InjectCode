@@ -16,7 +16,9 @@ export function ExistingUrlsProvider({ value, children } : Props) {
 }
 
 export function useExistingUrls(): string[] {
-    const ctx = useContext(ExistingUrlsContext)
-    if (!ctx) throw new Error('useExistingUrls must be used within <ExistingUrlsProvider>')
-    return ctx
+    const context = useContext(ExistingUrlsContext)
+    if (!context) {
+        throw new Error('useExistingUrls must be used within <ExistingUrlsProvider>')
+    }
+    return context
 }

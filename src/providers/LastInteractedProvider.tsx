@@ -28,6 +28,8 @@ export const LastInteractedProvider = ({ children }: { children: ReactNode }) =>
 
 export const useLastInteracted = () => {
     const context = useContext(LastInteractedContext)
-    if (!context) throw new Error('useLastInteracted must be used within LastInteractedProvider')
+    if (!context) {
+        throw new Error('useLastInteracted must be used within LastInteractedProvider')
+    }
     return context
 }
