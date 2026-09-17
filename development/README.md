@@ -66,3 +66,26 @@ docker compose -f development/compose.yml run --rm test
 docker compose -f development/compose.yml run --rm audit
 docker compose -f development/compose.yml run --rm audit-fix
 ```
+
+## Validate all
+
+```sh
+docker compose -f development/compose.yml run --rm validate
+```
+
+## Update dependencies
+
+1. Clear the `overrides` list in `pnpm-workspace.yaml`.
+
+2. Bump everything past the ranges currently pinned in `package.json`:
+    ```sh
+    docker compose -f development/compose.yml run --rm update-latest
+    ```
+3. Review the diff in `package.json` and `pnpm-lock.yaml`.
+
+4. Re-apply overrides for whatever's still vulnerable against the new versions:
+    ```sh
+    docker compose -f development/compose.yml run --rm audit-fix
+    ```
+
+5. Run `type-check`, `lint`, `test`, and `build` (see above) to catch breakage from major bumps.

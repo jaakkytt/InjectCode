@@ -1,4 +1,4 @@
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
 import { Badge, badgeClasses, styled } from '@mui/material'
 import { useMemo } from 'react'
 
