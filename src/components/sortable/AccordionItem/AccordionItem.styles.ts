@@ -28,4 +28,4 @@ export const headerRowSx: SxProps<Theme> = {
 
 export const titleIconWrapperSx: SxProps<Theme> = { marginRight: '8px' }
 
-export const detailsSx: SxProps<Theme> = { p: 1 }
+export const detailsSx: SxProps<Theme> = { padding: '0 8px 8px' }

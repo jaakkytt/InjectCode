@@ -5,13 +5,13 @@ import CloudDoneIcon from '@mui/icons-material/CloudDone'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import CloudDotsIcon from '../../../CloudDotsIcon'
 import { Props } from './StatusIcon.types'
-import { containerSx, fadeStyle, iconWrapperSx } from './StatusIcon.styles'
+import { containerSx, fadeStyle, iconWrapperSx, svgIconSx } from './StatusIcon.styles'
 
 const icons = {
-    idle: <CloudDoneIcon />,
-    upToDate: <CloudDoneIcon />,
-    unsaved: <CloudDotsIcon />,
-    saved: <CloudUploadIcon />,
+    idle: <CloudDoneIcon sx={svgIconSx} />,
+    upToDate: <CloudDoneIcon sx={svgIconSx} />,
+    unsaved: <CloudDotsIcon width="16" height="16" />,
+    saved: <CloudUploadIcon sx={svgIconSx} />,
 }
 
 export default function StatusIcon({ status }: Props) {

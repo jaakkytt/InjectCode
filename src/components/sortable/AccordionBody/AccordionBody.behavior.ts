@@ -5,8 +5,11 @@ function isDirty(current: string, lastSaved: string): boolean {
     return current.trim() !== lastSaved.trim()
 }
 
-export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Props) {
-    const [inputValue, setInputValue] = useState(value)
+type EditorSource = { value: string; revision: number }
+
+export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omit<Props, 'language'>) {
+
+    const [editorSource, setEditorSource] = useState<EditorSource>({ value, revision: 0 })
     const [status, setStatus] = useState<Status>('idle')
 
     const lastSavedValueRef = useRef<string>(value)
@@ -15,14 +18,18 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Pro
     const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
     useEffect(() => {
-        setInputValue(value)
-        inputValueRef.current = value
-        lastSavedValueRef.current = value
-    }, [value])
+        if (value === lastSavedValueRef.current) {
+            return
+        }
 
-    useEffect(() => {
-        inputValueRef.current = inputValue
-    }, [inputValue])
+        lastSavedValueRef.current = value
+        inputValueRef.current = value
+
+        setEditorSource(prev => ({
+            value,
+            revision: prev.value === value ? prev.revision + 1 : prev.revision,
+        }))
+    }, [value])
 
     useEffect(() => () => {
         if (autoSaveTimerRef.current) {
@@ -33,9 +40,11 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Pro
     const doSave = useCallback(() => {
         if (isDirty(inputValueRef.current, lastSavedValueRef.current)) {
             const trimmed = inputValueRef.current.trim()
-            onChange(trimmed)
             lastSavedValueRef.current = trimmed
+
+            onChange(trimmed)
             setStatus('saved')
+
             setTimeout(() => {
                 setStatus(isFocusedRef.current ? 'upToDate' : 'idle')
             }, 1000)
@@ -65,27 +74,30 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Pro
     function handleBlur() {
         isFocusedRef.current = false
         stopAutoSave()
+
         if (isDirty(inputValueRef.current, lastSavedValueRef.current)) {
             doSave()
         } else {
             setStatus('idle')
         }
+
         onFocusChange?.(false)
     }
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        const newVal = e.target.value
-        setInputValue(newVal)
-        setStatus(isDirty(newVal, lastSavedValueRef.current) ? 'unsaved' : 'upToDate')
+    function handleUpdate(newVal: string) {
+        inputValueRef.current = newVal
+        if (isFocusedRef.current) {
+            setStatus(isDirty(newVal, lastSavedValueRef.current) ? 'unsaved' : 'upToDate')
+        }
     }
 
     return {
-        inputValue,
+        editorSource,
         status,
         handlers: {
             handleFocus,
             handleBlur,
-            handleChange,
+            handleUpdate,
             stopClickPropagation: (e: React.MouseEvent) => e.stopPropagation(),
         },
     }

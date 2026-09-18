@@ -21,6 +21,8 @@ import {
     AccordionSummary,
     TypeIconOverlay,
     expandIconSx,
+    accordionSx,
+    accordionDetailsSx,
     headerRowSx,
     dragHandleWrapperStyle,
     dragHandleButtonStyle,
@@ -52,6 +54,7 @@ export default function ScriptAccordion(
         >
             <Accordion
                 expanded={!isDragging && isExpanded} onChange={onAccordionChange(item.id)}
+                sx={accordionSx}
                 slotProps={{
                     transition: { unmountOnExit: true },
                 }}
@@ -124,9 +127,10 @@ export default function ScriptAccordion(
                         </Typography>
                     </Box>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails sx={accordionDetailsSx}>
                     <AccordionBody
                         value={item.content}
+                        language={item.type === 'css' ? 'css' : 'javascript'}
                         onChange={handlers.handleContentChange}
                         onFocusChange={handlers.setContentFocused}
                     />

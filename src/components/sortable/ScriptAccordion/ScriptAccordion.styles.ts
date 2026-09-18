@@ -30,6 +30,10 @@ export const TypeIconOverlay = styled('span')({
 
 export const expandIconSx: SxProps<Theme> = { marginLeft: '4px' }
 
+export const accordionSx: SxProps<Theme> = { '&.Mui-expanded': { margin: '8px 0' } }
+
+export const accordionDetailsSx: SxProps<Theme> = { padding: '0 8px 8px' }
+
 export const headerRowSx: SxProps<Theme> = { display: 'flex', alignItems: 'center', width: '100%' }
 
 export const dragHandleWrapperStyle: React.CSSProperties = { cursor: 'grab', marginRight: 8 }
