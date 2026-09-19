@@ -17,7 +17,7 @@ const ExpandingActionButton = () => {
 
     return (
         <>
-            <div onMouseLeave={handlers.onMouseLeave}>
+            <div onMouseEnter={handlers.onMouseEnter} onMouseLeave={handlers.onMouseLeave}>
                 <Fab
                     component="div"
                     size="small"

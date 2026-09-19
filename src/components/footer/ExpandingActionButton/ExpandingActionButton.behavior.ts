@@ -1,4 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+const CLOSE_DELAY_MS = 500
 
 export function useExpandingActionButtonBehavior() {
     const [open, setOpen] = useState(false)
@@ -7,13 +9,41 @@ export function useExpandingActionButtonBehavior() {
     const [isCssOpen, setCssOpen] = useState(false)
 
     const anchorRef = useRef<HTMLDivElement>(null)
+    const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    function cancelScheduledClose() {
+        if (closeTimerRef.current) {
+            clearTimeout(closeTimerRef.current)
+            closeTimerRef.current = null
+        }
+    }
+
+    function scheduleClose() {
+        cancelScheduledClose()
+        closeTimerRef.current = setTimeout(() => {
+            closeTimerRef.current = null
+            setOpen(false)
+        }, CLOSE_DELAY_MS)
+    }
+
+    function closeNow() {
+        cancelScheduledClose()
+        setOpen(false)
+    }
+
+    function toggle() {
+        cancelScheduledClose()
+        setOpen((prevOpen) => !prevOpen)
+    }
 
     function onClickAway(event: Event) {
         if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
             return
         }
-        setOpen(false)
+        closeNow()
     }
+
+    useEffect(() => cancelScheduledClose, [])
 
     return {
         open,
@@ -22,9 +52,10 @@ export function useExpandingActionButtonBehavior() {
         isCssOpen,
         anchorRef,
         handlers: {
-            toggle: () => setOpen((prevOpen) => !prevOpen),
-            onMouseLeave: () => setOpen(false),
+            toggle,
             onClickAway,
+            onMouseEnter: cancelScheduledClose,
+            onMouseLeave: scheduleClose,
             openUrlDialog: () => setUrlOpen(true),
             openJsDialog: () => setJsOpen(true),
             openCssDialog: () => setCssOpen(true),
