@@ -132,7 +132,6 @@ export function useUrlAccordionBehavior() {
             const item = items[container].find(i => i.id === activeId)
             if (item) {
                 setActiveItem(item)
-                setExpanded(false)
             }
         }
     }

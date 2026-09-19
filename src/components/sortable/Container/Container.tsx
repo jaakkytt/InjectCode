@@ -1,5 +1,5 @@
 import React from 'react'
-import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import Typography from '@mui/material/Typography'
 import ScriptAccordion from '../ScriptAccordion'
 import { Props } from './Container.types'
@@ -10,7 +10,7 @@ export default function Container({ id, expandedPanel, onAccordionChange }: Prop
     const { isOver, setNodeRef, items, itemIds } = useContainerBehavior(id)
 
     return (
-        <SortableContext id={id} items={itemIds} strategy={rectSortingStrategy}>
+        <SortableContext id={id} items={itemIds} strategy={verticalListSortingStrategy}>
             <div
                 ref={setNodeRef}
                 style={containerStyle(isOver)}

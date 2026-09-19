@@ -47,7 +47,7 @@ export function rootStyle(
     runMode: ScriptRunMode,
 ): React.CSSProperties {
     return {
-        transform: CSS.Transform.toString(transform),
+        transform: CSS.Translate.toString(transform),
         transition: [transition, 'opacity 200ms ease'].filter(Boolean).join(', '),
         opacity: isDragging ? 0.5 : (runMode !== 'disabled' ? 1 : 0.5),
     }
