@@ -27,7 +27,7 @@ export default function Container({ id, expandedPanel, onAccordionChange }: Prop
                     ))
                 ) : (
                     <Typography component="div">
-                        Drop scripts here
+                        Add scripts here
                     </Typography>
                 )}
             </div>
