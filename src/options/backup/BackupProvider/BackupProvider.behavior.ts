@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { SHARED_CODE, STORAGE_SCRIPTS } from '../../../constants'
 import { storage } from '../../../service/storageApi'
 import { downloadTextFile } from '../../../service/fileDownload'
+import { disableFilePatternScripts } from '../../../service/filePatternScripts'
 import {
     backupFileName,
     countScripts,
@@ -15,7 +16,7 @@ import { BackupValue, Notice } from './BackupProvider.types'
 
 const s = (count: number) => (count === 1 ? '' : 's')
 
-function describeImport({ added, overwritten, skipped }: ImportSummary): Notice {
+function describeImport({ added, overwritten, skipped }: ImportSummary, disabled: number): Notice {
     const details: string[] = []
     if (skipped > 0) {
         details.push(`${skipped} script${s(skipped)} already existed and ${skipped === 1 ? 'was' : 'were'} skipped.`)
@@ -28,8 +29,13 @@ function describeImport({ added, overwritten, skipped }: ImportSummary): Notice 
     const parts = [
         added > 0 ? `Imported ${added} new script${s(added)}.` : '',
         overwritten > 0 ? `Overwrote ${overwritten} existing script${s(overwritten)}.` : '',
+        disabled > 0
+            ? `${disabled} script${s(disabled)} on file URLs ${disabled === 1 ? 'was' : 'were'} disabled because `
+                + 'file URL access is off in the extension settings.'
+            : '',
     ]
-    return { severity: 'success', text: parts.filter(Boolean).join(' '), details }
+
+    return { severity: disabled > 0 ? 'warning' : 'success', text: parts.filter(Boolean).join(' '), details }
 }
 
 function describeFailure(error: unknown): string {
@@ -62,19 +68,24 @@ export function useBackupProviderBehavior(): BackupValue {
 
     async function importBackup(file: File) {
         try {
-            const parsed = await parseBackup(await file.text())
+            const parsed = parseBackup(await file.text())
+
             if (!parsed.ok) {
                 setNotice({
                     severity: 'error',
                     text: 'This file could not be imported. Nothing was changed.',
                     details: parsed.errors,
                 })
+
                 return
             }
 
-            const { scripts, summary } = mergeScripts(await readStoredScripts(), parsed.scripts)
+            const { scripts: incoming, disabled } = await disableFilePatternScripts(parsed.scripts)
+            const { scripts, summary } = mergeScripts(await readStoredScripts(), incoming)
+
             await storage.set(STORAGE_SCRIPTS, scripts)
-            setNotice(describeImport(summary))
+
+            setNotice(describeImport(summary, disabled))
         } catch (error) {
             setNotice({ severity: 'error', text: `Import failed: ${describeFailure(error)}`, details: [] })
         }

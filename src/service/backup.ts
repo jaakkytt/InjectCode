@@ -103,13 +103,9 @@ function parseItem(raw: unknown, where: string, errors: string[]): AccordionItem
     }
 }
 
-async function parseContainer(
-    pattern: string,
-    rawItems: unknown,
-    errors: string[],
-): Promise<AccordionItemData[] | undefined> {
+function parseContainer(pattern: string, rawItems: unknown, errors: string[]): AccordionItemData[] | undefined {
     if (pattern !== SHARED_CODE) {
-        const patternError = await urlPatternValidator(pattern, [], { checkFileAccess: false })
+        const patternError = urlPatternValidator(pattern, [])
         if (patternError) {
             errors.push(`"${pattern}": ${patternError}`)
             return undefined
@@ -153,7 +149,7 @@ function cappedErrors(errors: string[]): string[] {
     return [...errors.slice(0, MAX_REPORTED_ERRORS), `and ${hidden} more ${hidden === 1 ? 'problem' : 'problems'}`]
 }
 
-export async function parseBackup(text: string): Promise<ParsedBackup> {
+export function parseBackup(text: string): ParsedBackup {
     let raw: unknown
     try {
         raw = JSON.parse(text)
@@ -181,7 +177,7 @@ export async function parseBackup(text: string): Promise<ParsedBackup> {
     const scripts: ItemsDataState = {}
 
     for (const [pattern, rawItems] of Object.entries(raw.scripts)) {
-        const items = await parseContainer(pattern, rawItems, errors)
+        const items = parseContainer(pattern, rawItems, errors)
         if (items) {
             scripts[pattern] = items
         }

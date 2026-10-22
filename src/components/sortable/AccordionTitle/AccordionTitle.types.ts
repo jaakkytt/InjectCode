@@ -4,7 +4,7 @@ export interface Props {
     value: string
     allowEditing: boolean
     onChange: (newValue: string) => void
-    inputValidator?: (input: string) => Promise<string | undefined>
+    inputValidator?: (input: string) => string | undefined
     inputTransformer?: (input: string) => string
     children?: React.ReactNode
 }

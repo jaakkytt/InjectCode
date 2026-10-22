@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 
 export interface Notice {
-    severity: 'success' | 'info' | 'error'
+    severity: 'success' | 'info' | 'warning' | 'error'
     text: string
     details: string[]
 }

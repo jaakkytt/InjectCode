@@ -27,13 +27,13 @@ export function useAccordionTitleBehavior(
 
     useEffect(() => setInputValue(value), [value])
 
-    async function resolveSaveOutcome(): Promise<SaveOutcome> {
+    function resolveSaveOutcome(): SaveOutcome {
         const trimmed = inputValue.trim()
         if (trimmed === value.trim()) {
             return { type: 'unchanged' }
         }
 
-        const validationError = await inputValidator(trimmed)
+        const validationError = inputValidator(trimmed)
         if (validationError) {
             return { type: 'invalid', error: validationError }
         }
@@ -41,8 +41,8 @@ export function useAccordionTitleBehavior(
         return { type: 'saved', value: trimmed }
     }
 
-    async function save() {
-        const outcome = await resolveSaveOutcome()
+    function save() {
+        const outcome = resolveSaveOutcome()
 
         if (outcome.type === 'invalid') {
             setSaved(false)
@@ -63,13 +63,13 @@ export function useAccordionTitleBehavior(
         }
     }
 
-    async function change(e: React.ChangeEvent<HTMLInputElement>) {
+    function change(e: React.ChangeEvent<HTMLInputElement>) {
         const rawValue = e.target.value
         const transformedValue = inputTransformer ? inputTransformer(rawValue) : rawValue
         setInputValue(transformedValue)
 
         if (shouldValidateOnChange(transformedValue, value)) {
-            setError(await inputValidator(transformedValue))
+            setError(inputValidator(transformedValue))
         } else {
             setError(undefined)
         }

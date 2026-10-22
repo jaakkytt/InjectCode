@@ -10,7 +10,7 @@ export default function AccordionTitle({
     value,
     allowEditing,
     onChange,
-    inputValidator = (input: string) => Promise.resolve(input.trim() === '' ? 'This field cannot be empty' : undefined),
+    inputValidator = (input: string) => input.trim() === '' ? 'This field cannot be empty' : undefined,
     inputTransformer,
     children,
 }: Props) {

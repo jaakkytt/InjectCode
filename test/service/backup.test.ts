@@ -19,7 +19,7 @@ describe('backupFileName', () => {
 })
 
 describe('createBackup and serializeBackup', () => {
-    it('round trips through parseBackup unchanged', async () => {
+    it('round trips through parseBackup unchanged', () => {
         const scripts: ItemsDataState = {
             [SHARED_CODE]: [makeItem({ id: 's1', runMode: 'always' })],
             'https://github.com/*': [makeItem({ id: 'g1', type: 'css', secondaryText: 'note' })],
@@ -27,7 +27,7 @@ describe('createBackup and serializeBackup', () => {
 
         const text = serializeBackup(createBackup(scripts, new Date('2026-09-19T10:00:00Z')))
 
-        expect(await parseBackup(text)).toEqual({ ok: true, scripts })
+        expect(parseBackup(text)).toEqual({ ok: true, scripts })
     })
 })
 
@@ -38,84 +38,84 @@ describe('countScripts', () => {
 })
 
 describe('parseBackup', () => {
-    it('rejects text that is not JSON', async () => {
-        expect(await parseBackup('{nope')).toEqual({ ok: false, errors: ['The file is not valid JSON'] })
+    it('rejects text that is not JSON', () => {
+        expect(parseBackup('{nope')).toEqual({ ok: false, errors: ['The file is not valid JSON'] })
     })
 
-    it('rejects JSON that is not an InjectCode backup', async () => {
-        const result = await parseBackup(JSON.stringify({ hello: 'world' }))
+    it('rejects JSON that is not an InjectCode backup', () => {
+        const result = parseBackup(JSON.stringify({ hello: 'world' }))
 
         expect(result).toEqual({ ok: false, errors: ['The file is not an InjectCode backup'] })
     })
 
-    it('rejects a backup made by a newer version', async () => {
-        const result = await parseBackup(backupText({}, { version: BACKUP_VERSION + 1 }))
+    it('rejects a backup made by a newer version', () => {
+        const result = parseBackup(backupText({}, { version: BACKUP_VERSION + 1 }))
 
         expect(result).toEqual({ ok: false, errors: ['The backup was made by a newer version of InjectCode'] })
     })
 
-    it('rejects a backup without a scripts object', async () => {
-        const result = await parseBackup(backupText([]))
+    it('rejects a backup without a scripts object', () => {
+        const result = parseBackup(backupText([]))
 
         expect(result).toEqual({ ok: false, errors: ['The backup does not contain any scripts data'] })
     })
 
-    it('rejects a container whose pattern is invalid', async () => {
-        const result = await parseBackup(backupText({ 'not a pattern': [] }))
+    it('rejects a container whose pattern is invalid', () => {
+        const result = parseBackup(backupText({ 'not a pattern': [] }))
 
         expect(result.ok).toBe(false)
         expect(result.ok === false && result.errors[0]).toContain('"not a pattern"')
     })
 
-    it('rejects an item with a bad run mode and names its position', async () => {
+    it('rejects an item with a bad run mode and names its position', () => {
         const bad = { ...makeItem(), runMode: 'sometimes' }
-        const result = await parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'ok' }), bad] }))
+        const result = parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'ok' }), bad] }))
 
         expect(result.ok === false && result.errors).toEqual([
             '"https://a.com/*" script 2: runMode must be one of disabled, active, always',
         ])
     })
 
-    it('rejects an item that is missing required fields', async () => {
-        const result = await parseBackup(backupText({ 'https://a.com/*': [{ id: 'x' }] }))
+    it('rejects an item that is missing required fields', () => {
+        const result = parseBackup(backupText({ 'https://a.com/*': [{ id: 'x' }] }))
 
         expect(result.ok === false && result.errors[0]).toContain('title must be text')
     })
 
-    it('defaults a missing secondaryText to an empty string', async () => {
+    it('defaults a missing secondaryText to an empty string', () => {
         const { secondaryText, ...withoutSecondary } = makeItem({ id: 'x' })
-        const result = await parseBackup(backupText({ 'https://a.com/*': [withoutSecondary] }))
+        const result = parseBackup(backupText({ 'https://a.com/*': [withoutSecondary] }))
 
         expect(secondaryText).toBe('')
         expect(result.ok && result.scripts['https://a.com/*'][0].secondaryText).toBe('')
     })
 
-    it('drops unknown fields from items', async () => {
+    it('drops unknown fields from items', () => {
         const item = { ...makeItem({ id: 'x' }), extra: 'should not survive' }
-        const result = await parseBackup(backupText({ 'https://a.com/*': [item] }))
+        const result = parseBackup(backupText({ 'https://a.com/*': [item] }))
 
         expect(result.ok && result.scripts['https://a.com/*'][0]).toEqual(makeItem({ id: 'x' }))
     })
 
-    it('rejects an id that is used twice', async () => {
+    it('rejects an id that is used twice', () => {
         const scripts = { 'https://a.com/*': [makeItem({ id: 'dup' })], 'https://b.com/*': [makeItem({ id: 'dup' })] }
 
-        const result = await parseBackup(backupText(scripts))
+        const result = parseBackup(backupText(scripts))
 
         expect(result.ok === false && result.errors).toEqual(['script id "dup" is used more than once'])
     })
 
-    it('rejects an id that equals a container key', async () => {
-        const result = await parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'https://a.com/*' })] }))
+    it('rejects an id that equals a container key', () => {
+        const result = parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'https://a.com/*' })] }))
 
         expect(result.ok === false && result.errors).toEqual([
             'script id "https://a.com/*" is the same as a URL pattern; script ids must differ from all URL patterns',
         ])
     })
 
-    it('reports at most five problems and counts the rest', async () => {
+    it('reports at most five problems and counts the rest', () => {
         const items = Array.from({ length: 8 }, (_, index) => ({ id: `i${index}` }))
-        const result = await parseBackup(backupText({ 'https://a.com/*': items }))
+        const result = parseBackup(backupText({ 'https://a.com/*': items }))
 
         expect(result.ok === false && result.errors).toHaveLength(6)
         expect(result.ok === false && result.errors[5]).toBe('and 3 more problems')

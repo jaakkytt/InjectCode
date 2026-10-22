@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useUrlsDispatch } from '../../../providers/urlsContext'
 import { useExistingUrls } from '../../../providers/ExistingUrlsProvider'
 import { urlPatternValidator } from '../../../service/urlPatternValidator'
@@ -20,7 +20,6 @@ function getOriginPattern(url: URL): string {
 
 export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
     const [inputValue, setInputValue] = useState('')
-    const [placeholder, setPlaceholder] = useState<string | undefined>(undefined)
     const [error, setError] = useState<string | undefined>(undefined)
     const { tabIndex, setTabIndex } = useTab()
 
@@ -29,16 +28,14 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
     const existingUrls = useExistingUrls()
     const { setLastUrl } = useLastInteracted()
 
-    useEffect(() => {
-        const check = async () => {
-            if (!currentUrl) {
-                return undefined
-            }
-            const originPattern = getOriginPattern(currentUrl)
-            const urlError = await urlPatternValidator(originPattern, existingUrls)
-            return !urlError ? originPattern : undefined
+    const placeholder = useMemo(() => {
+        if (!currentUrl) {
+            return undefined
         }
-        check().then(setPlaceholder)
+
+        const originPattern = getOriginPattern(currentUrl)
+
+        return urlPatternValidator(originPattern, existingUrls) ? undefined : originPattern
     }, [existingUrls, currentUrl])
 
     function isSubmitDisabled() {
@@ -51,7 +48,7 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
         setError(undefined)
     }
 
-    async function change(event: React.ChangeEvent<HTMLInputElement>) {
+    function change(event: React.ChangeEvent<HTMLInputElement>) {
         let value = urlCharacterFilter(event.target.value).trim()
         setInputValue(value)
 
@@ -59,10 +56,10 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
             value = placeholder
         }
 
-        setError(await urlPatternValidator(value, existingUrls))
+        setError(urlPatternValidator(value, existingUrls))
     }
 
-    async function submit(event: React.FormEvent<HTMLFormElement>) {
+    function submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
         const formData = new FormData(event.currentTarget)
@@ -72,7 +69,7 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
             value = placeholder
         }
 
-        const urlError = await urlPatternValidator(value, existingUrls)
+        const urlError = urlPatternValidator(value, existingUrls)
         if (urlError) {
             setError(urlError)
             return

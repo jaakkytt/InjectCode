@@ -30,6 +30,7 @@ import {
     Setting,
     Settings,
     SettingText,
+    SettingWarning,
     SettingTitle,
     Topic,
     TopicHeading,
@@ -85,6 +86,10 @@ const Options = () => (
                                         patterns), enable "Allow access to file URLs" in the{' '}
                                         <ExtensionSettingsLink>extension settings</ExtensionSettingsLink>.
                                     </SettingText>
+                                    <SettingWarning severity="warning">
+                                        If you plan to use <code>file:///</code> patterns, you must enable this setting.
+                                        Otherwise running scripts on those patterns will fail with an error.
+                                    </SettingWarning>
                                 </div>
                             </Setting>
 
@@ -188,12 +193,6 @@ const Options = () => (
                                     </li>
                                     <li>
                                         <em>Always on</em>: runs automatically on every matching page,{' '}
-                                        {/*
-                                          TODO: Always on CSS is wrapped as JS that calls document.head.appendChild,
-                                          but document.head is still null at Document start, so Always on CSS throws
-                                          with that timing. Also, "All JavaScript runs before any CSS" under Execution
-                                          order only holds for manual runs, Always on keeps CSS in list order.
-                                        */}
                                         <AlwaysOnTimingText
                                             start={
                                                 <>before the page is built and before any of the page's own scripts
