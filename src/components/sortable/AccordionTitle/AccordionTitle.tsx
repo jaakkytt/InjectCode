@@ -41,7 +41,7 @@ export default function AccordionTitle({
                         component="span"
                         aria-label="Edit"
                         size="medium"
-                        onClick={handlers.handleEditClick}
+                        onClick={handlers.editClick}
                     >
                         <EditIcon />
                     </IconButton>
@@ -62,7 +62,7 @@ export default function AccordionTitle({
                     aria-label="Save"
                     size="medium"
                     onMouseDown={handlers.preventFocusLoss}
-                    onClick={handlers.handleSaveClick}
+                    onClick={handlers.saveClick}
                 >
                     <SaveIcon />
                 </IconButton>
@@ -76,10 +76,10 @@ export default function AccordionTitle({
                     size="medium"
                     value={inputValue}
                     onClick={handlers.stopClickPropagation}
-                    onChange={handlers.handleOnChange}
-                    onBlur={handlers.handleBlur}
+                    onChange={handlers.change}
+                    onBlur={handlers.blur}
                     inputRef={textFieldRef}
-                    onKeyDown={handlers.handleKeyDown}
+                    onKeyDown={handlers.keyDown}
                 />
             </Typography>
         </>

@@ -29,12 +29,12 @@ export function useScriptAccordionBehavior({ item, parentId }: Pick<Props, 'item
         play,
         contentFocused,
         handlers: {
-            handleTitleChange: (newTitle: string) => dispatch.update(item.id, { title: newTitle }),
-            handleRunModeChange: (runMode: ScriptRunMode) => dispatch.update(item.id, { runMode }),
-            handleContentChange: (newContent: string) => dispatch.update(item.id, { content: newContent }),
-            handleDelete: () => dispatch.remove(item.id),
             setContentFocused,
+            contentChange: (newContent: string) => dispatch.update(item.id, { content: newContent }),
+            remove: () => dispatch.remove(item.id),
+            runModeChange: (runMode: ScriptRunMode) => dispatch.update(item.id, { runMode }),
             stopClickPropagation: (e: React.MouseEvent) => e.stopPropagation(),
+            titleChange: (newTitle: string) => dispatch.update(item.id, { title: newTitle }),
         },
     }
 }

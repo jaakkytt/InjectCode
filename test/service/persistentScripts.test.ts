@@ -3,20 +3,10 @@ import { AccordionItemData, ItemsDataState } from '../../src/types'
 import { SHARED_CODE, USER_SCRIPT_ID } from '../../src/constants'
 import {
     computeDesiredRegistrations,
+    createSerializedPersistentScriptsSync,
     syncPersistentScripts,
     wrapCssAsUserScript,
 } from '../../src/service/persistentScripts'
-
-function makeItem(overrides: Partial<AccordionItemData> = {}): AccordionItemData {
-    return {
-        id: overrides.id ?? 'item-id',
-        title: overrides.title ?? 'item-title',
-        secondaryText: overrides.secondaryText ?? '',
-        content: overrides.content ?? '',
-        runMode: overrides.runMode ?? 'always',
-        type: overrides.type ?? 'js',
-    }
-}
 
 describe('wrapCssAsUserScript', () => {
     it('safely escapes css content containing quotes and backslashes into a JS string literal', () => {
@@ -39,6 +29,7 @@ describe('computeDesiredRegistrations', () => {
 
         expect(desired).toHaveLength(1)
         expect(desired[0].matches).toEqual(['https://github.com/*'])
+        expect(desired[0].runAt).toBe('document_idle')
         expect(desired[0].world).toBe('USER_SCRIPT')
         expect(desired[0].worldId).toBe(USER_SCRIPT_ID)
         expect(desired[0].js).toEqual([{ code: 'a();' }])
@@ -107,8 +98,42 @@ describe('computeDesiredRegistrations', () => {
         const second = computeDesiredRegistrations(scripts)
 
         const idFor = (list: typeof first, pattern: string) => list.find(r => r.matches?.[0] === pattern)?.id
+
         expect(idFor(first, 'https://github.com/*')).toBe(idFor(second, 'https://github.com/*'))
         expect(idFor(first, 'https://github.com/*')).not.toBe(idFor(first, 'https://example.com/*'))
+    })
+
+    it('registers every container with the given Always on timing', () => {
+        const scripts: ItemsDataState = {
+            'https://github.com/*': [makeItem({ id: 'a' })],
+            'https://example.com/*': [makeItem({ id: 'b' })],
+        }
+
+        const desired = computeDesiredRegistrations(scripts, 'document_start')
+
+        expect(desired.map(r => r.runAt)).toEqual(['document_start', 'document_start'])
+    })
+
+    it('builds short ids from safe characters only, whatever the pattern', () => {
+        const scripts: ItemsDataState = {
+            'https://*.example.com/some/very/long/path/with-🙂-and-%20/*': [makeItem()],
+        }
+
+        const [registration] = computeDesiredRegistrations(scripts)
+
+        expect(registration.id).toMatch(/^always-[0-9a-z]{1,11}$/)
+    })
+
+    it('gives distinct ids to patterns whose 32-bit string hashes collide', () => {
+        const scripts: ItemsDataState = {
+            'https://example.com/Aa': [makeItem({ id: 'a' })],
+            'https://example.com/BB': [makeItem({ id: 'b' })],
+        }
+
+        const ids = computeDesiredRegistrations(scripts).map(r => r.id)
+
+        expect(ids).toHaveLength(2)
+        expect(new Set(ids).size).toBe(2)
     })
 })
 
@@ -162,3 +187,115 @@ describe('syncPersistentScripts', () => {
         consoleError.mockRestore()
     })
 })
+
+describe('createSerializedPersistentScriptsSync', () => {
+    const olderSnapshot: ItemsDataState = {
+        'https://github.com/*': [makeItem({ content: 'old();' })],
+    }
+    const newerSnapshot: ItemsDataState = {
+        'https://github.com/*': [makeItem({ content: 'new();' })],
+        'https://example.com/*': [makeItem({ content: 'added();' })],
+    }
+
+    let fake: ReturnType<typeof createFakeUserScripts>
+    let consoleError: ReturnType<typeof vi.spyOn>
+
+    beforeEach(() => {
+        fake = createFakeUserScripts()
+        vi.stubGlobal('chrome', { userScripts: fake })
+        consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    })
+
+    afterEach(() => {
+        consoleError.mockRestore()
+        vi.unstubAllGlobals()
+    })
+
+    it('ends with the latest snapshot and no error when syncs overlap', async () => {
+        const readState = vi.fn()
+            .mockResolvedValueOnce({ scripts: olderSnapshot, runAt: 'document_idle' })
+            .mockResolvedValue({ scripts: newerSnapshot, runAt: 'document_end' })
+
+        const requestSync = createSerializedPersistentScriptsSync(readState)
+
+        await Promise.all([requestSync(), requestSync()])
+
+        expect(consoleError).not.toHaveBeenCalled()
+        expect([...fake.registered.values()]).toEqual(computeDesiredRegistrations(newerSnapshot, 'document_end'))
+    })
+
+    it('coalesces a burst of requests during a sync into one follow-up', async () => {
+        const readState = vi.fn().mockResolvedValue({ scripts: newerSnapshot, runAt: 'document_idle' })
+        const requestSync = createSerializedPersistentScriptsSync(readState)
+
+        await Promise.all([requestSync(), requestSync(), requestSync(), requestSync()])
+
+        expect(readState).toHaveBeenCalledTimes(2)
+    })
+
+    it('runs a fresh sync for a request made after the previous one settled', async () => {
+        const readState = vi.fn()
+            .mockResolvedValueOnce({ scripts: olderSnapshot, runAt: 'document_idle' })
+            .mockResolvedValue({ scripts: newerSnapshot, runAt: 'document_idle' })
+
+        const requestSync = createSerializedPersistentScriptsSync(readState)
+
+        await requestSync()
+        await requestSync()
+
+        expect(readState).toHaveBeenCalledTimes(2)
+        expect([...fake.registered.values()]).toEqual(computeDesiredRegistrations(newerSnapshot))
+    })
+
+    it('logs a failed read and keeps serving later requests', async () => {
+        const readState = vi.fn()
+            .mockRejectedValueOnce(new Error('storage unavailable'))
+            .mockResolvedValue({ scripts: newerSnapshot, runAt: 'document_idle' })
+
+        const requestSync = createSerializedPersistentScriptsSync(readState)
+
+        await expect(requestSync()).resolves.toBeUndefined()
+        await requestSync()
+
+        expect(consoleError).toHaveBeenCalledTimes(1)
+        expect([...fake.registered.values()]).toEqual(computeDesiredRegistrations(newerSnapshot))
+    })
+})
+
+function makeItem(overrides: Partial<AccordionItemData> = {}): AccordionItemData {
+    return {
+        id: overrides.id ?? 'item-id',
+        title: overrides.title ?? 'item-title',
+        secondaryText: overrides.secondaryText ?? '',
+        content: overrides.content ?? '',
+        runMode: overrides.runMode ?? 'always',
+        type: overrides.type ?? 'js',
+    }
+}
+
+function yieldToEventLoop(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 0))
+}
+
+function createFakeUserScripts() {
+    const registered = new Map<string, chrome.userScripts.RegisteredUserScript>()
+
+    async function register(scripts: chrome.userScripts.RegisteredUserScript[]) {
+        await yieldToEventLoop()
+
+        const ids = scripts.map(script => script.id)
+        const duplicate = ids.find((id, index) => registered.has(id) || ids.indexOf(id) !== index)
+        if (duplicate) {
+            throw new Error(`Duplicate script ID '${duplicate}'`)
+        }
+
+        scripts.forEach(script => registered.set(script.id, script))
+    }
+
+    async function unregister() {
+        await yieldToEventLoop()
+        registered.clear()
+    }
+
+    return { registered, register, unregister }
+}

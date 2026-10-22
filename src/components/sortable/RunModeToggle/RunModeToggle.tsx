@@ -16,10 +16,10 @@ export default function RunModeToggle({ mode, onModeChange, warning }: Props) {
             slotProps={tooltipSlotProps}
             arrow
             open={tooltipOpen}
-            onOpen={handlers.handleTooltipOpen}
-            onClose={handlers.handleTooltipClose}
+            onOpen={handlers.openTooltip}
+            onClose={handlers.closeTooltip}
         >
-            <Root onClick={handlers.handleClick}>
+            <Root onClick={handlers.click}>
                 <Track mode={mode} />
                 {MODES.map((markerMode) => (
                     <Marker key={markerMode} markerMode={markerMode} selected={markerMode === mode} />

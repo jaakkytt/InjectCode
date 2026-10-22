@@ -28,7 +28,7 @@ const NewScriptDialog = ({ isOpen, scriptType, onClose }: Props) => {
     return (
         <Dialog
             open={isOpen}
-            onClose={handlers.handleClose}
+            onClose={handlers.close}
             maxWidth={'md'}
             fullWidth={true}
             disableScrollLock={true}
@@ -36,7 +36,7 @@ const NewScriptDialog = ({ isOpen, scriptType, onClose }: Props) => {
         >
             <DialogTitle>New {scriptType.toUpperCase()} {scriptType === 'js' ? 'Script' : 'Style'}</DialogTitle>
             <DialogContent>
-                <form onSubmit={handlers.handleSubmit} id="newScriptForm">
+                <form onSubmit={handlers.submit} id="newScriptForm">
                     <TextField
                         autoFocus
                         required={true}
@@ -47,7 +47,7 @@ const NewScriptDialog = ({ isOpen, scriptType, onClose }: Props) => {
                         label={!error ? 'Title' : error}
                         type="text"
                         fullWidth
-                        onChange={handlers.handleChange}
+                        onChange={handlers.change}
                         variant="standard"
                         error={!!error}
                     />
@@ -58,7 +58,7 @@ const NewScriptDialog = ({ isOpen, scriptType, onClose }: Props) => {
                             id="save-script-under-url"
                             value={selectedUrl}
                             label="Save under URL"
-                            onChange={handlers.handleSelect}
+                            onChange={handlers.select}
                         >
                             {urls && Object.keys(urls).map((url) => (
                                 <MenuItem key={url} value={url}>{url}</MenuItem>
@@ -71,7 +71,7 @@ const NewScriptDialog = ({ isOpen, scriptType, onClose }: Props) => {
                 <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={handlers.handleClose}
+                    onClick={handlers.close}
                     startIcon={<CloseIcon/>}
                 >Cancel</Button>
                 <Button

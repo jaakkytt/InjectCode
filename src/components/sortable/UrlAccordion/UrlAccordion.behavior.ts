@@ -93,13 +93,7 @@ export function useUrlAccordionBehavior() {
         return () => window.removeEventListener('resize', suppressDuringDrag)
     }, [])
 
-    function handleAccordionChange(panel: string) {
-        return (_event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? panel : false)
-        }
-    }
-
-    function handleParentAccordionChange(panel: string) {
+    function parentAccordionChange(panel: string) {
         return (_event: React.SyntheticEvent, isExpanded: boolean) => {
             setClosedParents((prevState) => {
                 const newState = new Set(prevState)
@@ -114,12 +108,7 @@ export function useUrlAccordionBehavior() {
         }
     }
 
-    function renameParentAccordionKey(oldKey: string, newKey: string) {
-        dispatch({ name: 'renamed', id: oldKey, title: newKey })
-        setLastUrl(newKey)
-    }
-
-    function handleDragStart(event: DragStartEvent) {
+    function dragStart(event: DragStartEvent) {
         dragActiveRef.current = true
         dispatch({ name: 'dragStart' })
 
@@ -136,7 +125,7 @@ export function useUrlAccordionBehavior() {
         }
     }
 
-    function handleDragOver(event: DragOverEvent) {
+    function dragOver(event: DragOverEvent) {
         const { active, over } = event
         if (!over) {
             return
@@ -179,14 +168,14 @@ export function useUrlAccordionBehavior() {
         })
     }
 
-    function handleDragCancel() {
+    function dragCancel() {
         dragActiveRef.current = false
         setActiveItem(null)
         setTranslation(null)
         dispatch({ name: 'dragCancel' })
     }
 
-    function handleDragEnd(event: DragEndEvent) {
+    function dragEnd(event: DragEndEvent) {
         const { active, over } = event
         dragActiveRef.current = false
         setActiveItem(null)
@@ -233,14 +222,19 @@ export function useUrlAccordionBehavior() {
         sensors,
         dropAnimation,
         handlers: {
+            dragCancel,
+            dragEnd,
+            dragOver,
+            dragStart,
+            parentAccordionChange,
             removeContainer: (containerId: string) => dispatch({ name: 'deleted', id: containerId }),
-            handleAccordionChange,
-            handleParentAccordionChange,
-            renameParentAccordionKey,
-            handleDragStart,
-            handleDragOver,
-            handleDragEnd,
-            handleDragCancel,
+            accordionChange: (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+                setExpanded(isExpanded ? panel : false)
+            },
+            renameParentAccordionKey: (oldKey: string, newKey: string) => {
+                dispatch({ name: 'renamed', id: oldKey, title: newKey })
+                setLastUrl(newKey)
+            },
         },
     }
 }

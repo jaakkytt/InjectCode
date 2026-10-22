@@ -22,8 +22,8 @@ const ConfirmDeleteButton = ({ onConfirm, showDeleteTooltip, placement }: Props)
             <IconButton
                 color={isConfirming ? 'warning' : 'primary'}
                 sx={{ transition: 'background-color 0.3s ease, color 0.3s ease' }}
-                onClick={handlers.handleClick}
-                onMouseLeave={handlers.handleMouseLeave}
+                onClick={handlers.click}
+                onMouseLeave={handlers.mouseLeave}
             >
                 <DeleteIcon />
             </IconButton>

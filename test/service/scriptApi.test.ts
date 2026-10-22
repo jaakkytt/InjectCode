@@ -2,17 +2,6 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { AccordionItemData, ItemsDataState } from '../../src/types'
 import { buildInjectionPayload, ChromeScriptAPI, selectItemsForUrl } from '../../src/service/scriptApi'
 
-function makeItem(overrides: Partial<AccordionItemData>): AccordionItemData {
-    return {
-        id: overrides.id ?? 'item-id',
-        title: overrides.title ?? 'item-title',
-        secondaryText: overrides.secondaryText ?? '',
-        content: overrides.content ?? '',
-        runMode: overrides.runMode ?? 'active',
-        type: overrides.type ?? 'js',
-    }
-}
-
 describe('selectItemsForUrl', () => {
     it('returns items from containers whose pattern matches the given url', () => {
         const scripts: ItemsDataState = {
@@ -30,6 +19,7 @@ describe('selectItemsForUrl', () => {
         }
 
         const ids = selectItemsForUrl(scripts, 'https://github.com/foo').map(i => i.id).sort()
+
         expect(ids).toEqual(['exact', 'wildcard'])
     })
 
@@ -90,30 +80,79 @@ describe('ChromeScriptAPI', () => {
         vi.unstubAllGlobals()
     })
 
-    it('scope "global": injects into every tab matching each container pattern', async () => {
-        tabsQuery.mockResolvedValue([{ id: 1 }, { id: 2 }])
+    it('scope "global": injects into every tab matching any container pattern', async () => {
+        tabsQuery.mockResolvedValue([
+            { id: 1, url: 'https://github.com/foo' },
+            { id: 2, url: 'https://example.com/foo' },
+        ])
 
         const scripts: ItemsDataState = {
             'https://github.com/*': [makeItem({ type: 'js', content: 'own();' })],
         }
+
         const shared = [makeItem({ type: 'css', content: 'body{}' })]
 
         await new ChromeScriptAPI().run(scripts, shared, 'global')
 
-        expect(tabsQuery).toHaveBeenCalledWith({ url: 'https://github.com/*' })
-        expect(execute).toHaveBeenCalledTimes(2)
-        expect(insertCSS).toHaveBeenCalledTimes(2)
+        expect(tabsQuery).toHaveBeenCalledWith({})
+        expect(execute).toHaveBeenCalledTimes(1)
+        expect(insertCSS).toHaveBeenCalledTimes(1)
+
         expect(execute).toHaveBeenCalledWith(
             expect.objectContaining({ target: { tabId: 1 }, js: [{ code: 'own();' }] }),
         )
+        expect(insertCSS).toHaveBeenCalledWith(
+            expect.objectContaining({ target: { tabId: 1 }, css: 'body{}' }),
+        )
     })
 
-    it('scope "global": skips querying tabs for containers with nothing active to inject', async () => {
+    it('scope "global": injects Shared scripts once per tab even when it matches multiple patterns', async () => {
+        tabsQuery.mockResolvedValue([{ id: 1, url: 'https://github.com/foo' }])
+
+        const scripts: ItemsDataState = {
+            'https://*.github.com/*': [makeItem({ id: 'wildcard', type: 'js', content: 'wildcard();' })],
+            'https://github.com/*': [makeItem({ id: 'exact', type: 'js', content: 'exact();' })],
+        }
+
+        const shared = [makeItem({ type: 'js', content: 'shared();' })]
+
+        await new ChromeScriptAPI().run(scripts, shared, 'global')
+
+        expect(execute).toHaveBeenCalledTimes(1)
+
+        const [{ js }] = execute.mock.calls[0]
+        const codes = js.map((entry: { code: string }) => entry.code)
+
+        expect(codes[0]).toEqual('shared();')
+        expect(codes.sort()).toEqual(['exact();', 'shared();', 'wildcard();'].sort())
+    })
+
+    it('scope "global": runs Shared before the matching script in a single-tab injection', async () => {
+        tabsQuery.mockResolvedValue([{ id: 1, url: 'https://github.com/foo' }])
+
+        const scripts: ItemsDataState = {
+            'https://github.com/*': [makeItem({ type: 'js', content: 'own();' })],
+        }
+
+        const shared = [makeItem({ type: 'js', content: 'shared();' })]
+
+        await new ChromeScriptAPI().run(scripts, shared, 'global')
+
+        expect(execute).toHaveBeenCalledWith(
+            expect.objectContaining({ js: [{ code: 'shared();' }, { code: 'own();' }] }),
+        )
+    })
+
+    it('scope "global": does nothing when no tab matches any container', async () => {
+        tabsQuery.mockResolvedValue([{ id: 1, url: 'https://example.com/foo' }])
+
         const scripts: ItemsDataState = { 'https://github.com/*': [] }
 
         await new ChromeScriptAPI().run(scripts, [], 'global')
 
-        expect(tabsQuery).not.toHaveBeenCalled()
+        expect(tabsQuery).toHaveBeenCalledWith({})
+        expect(execute).not.toHaveBeenCalled()
+        expect(insertCSS).not.toHaveBeenCalled()
     })
 
     it('scope "current": only injects items whose container pattern matches the active tab url', async () => {
@@ -140,6 +179,37 @@ describe('ChromeScriptAPI', () => {
         }
 
         await new ChromeScriptAPI().run(scripts, [], 'current')
+
+        expect(execute).not.toHaveBeenCalled()
+        expect(insertCSS).not.toHaveBeenCalled()
+    })
+
+    it('scope "current": runs Shared before the matching script', async () => {
+        tabsQuery.mockResolvedValue([{ id: 7, url: 'https://github.com/foo', active: true }])
+
+        const scripts: ItemsDataState = {
+            'https://github.com/*': [makeItem({ type: 'js', content: 'own();' })],
+        }
+
+        const shared = [makeItem({ type: 'js', content: 'shared();' })]
+
+        await new ChromeScriptAPI().run(scripts, shared, 'current')
+
+        expect(execute).toHaveBeenCalledWith(
+            expect.objectContaining({ js: [{ code: 'shared();' }, { code: 'own();' }] }),
+        )
+    })
+
+    it('scope "current": does not run Shared scripts alone when the active tab matches no container', async () => {
+        tabsQuery.mockResolvedValue([{ id: 7, url: 'https://example.com/foo', active: true }])
+
+        const scripts: ItemsDataState = {
+            'https://github.com/*': [makeItem({ type: 'js', content: 'github();' })],
+        }
+
+        const shared = [makeItem({ type: 'css', content: 'body{}' })]
+
+        await new ChromeScriptAPI().run(scripts, shared, 'current')
 
         expect(execute).not.toHaveBeenCalled()
         expect(insertCSS).not.toHaveBeenCalled()
@@ -175,3 +245,14 @@ describe('ChromeScriptAPI', () => {
         consoleError.mockRestore()
     })
 })
+
+function makeItem(overrides: Partial<AccordionItemData>): AccordionItemData {
+    return {
+        id: overrides.id ?? 'item-id',
+        title: overrides.title ?? 'item-title',
+        secondaryText: overrides.secondaryText ?? '',
+        content: overrides.content ?? '',
+        runMode: overrides.runMode ?? 'active',
+        type: overrides.type ?? 'js',
+    }
+}

@@ -19,7 +19,7 @@ const UrlTabs = ({ curren, all, currentFooter, allFooter }: Props) => {
             <AppBar className="urlTabsButtons" position="static">
                 <Tabs
                     value={tabIndex}
-                    onChange={handlers.handleChange}
+                    onChange={handlers.change}
                     aria-label="URL tabs"
                     indicatorColor="secondary"
                     textColor="inherit"
@@ -39,7 +39,7 @@ const UrlTabs = ({ curren, all, currentFooter, allFooter }: Props) => {
                     />
                     <Link
                         href="#"
-                        onClick={handlers.handleSettingsClick}
+                        onClick={handlers.settingsClick}
                         target="_blank"
                         rel="noreferrer"
                         color="inherit"

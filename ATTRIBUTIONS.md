@@ -171,3 +171,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+---
+
+- cyrb53
+- Usage: Used for deriving short, stable IDs for persistently registered user scripts.
+- URL: https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+- License: Public domain (or MIT if needed)
+
+```
+cyrb53 (c) 2018 bryc (github.com/bryc)
+License: Public domain (or MIT if needed). Attribution appreciated.
+```

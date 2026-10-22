@@ -30,24 +30,13 @@ export function useNewScriptDialogBehavior({ scriptType, onClose }: Pick<Props, 
         return !!error || inputValue.trim() === ''
     }
 
-    function handleClose() {
+    function close() {
         onClose()
         setInputValue('')
         setError(undefined)
     }
 
-    function handleSelect(event: SelectChangeEvent) {
-        setSelectedUrl(event.target.value as string)
-        setLastUrl(event.target.value as string)
-    }
-
-    async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const value = event.target.value
-        setInputValue(value)
-        setError(value.trim() === '' ? 'Title cannot be empty' : undefined)
-    }
-
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    async function submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
         const formData = new FormData(event.currentTarget)
@@ -65,7 +54,7 @@ export function useNewScriptDialogBehavior({ scriptType, onClose }: Pick<Props, 
         }
 
         dispatch({ name: 'scriptAdd', containerId: firstContainer, type: scriptType, title: value })
-        handleClose()
+        close()
     }
 
     return {
@@ -75,10 +64,17 @@ export function useNewScriptDialogBehavior({ scriptType, onClose }: Pick<Props, 
         error,
         submitDisabled: isSubmitDisabled(),
         handlers: {
-            handleClose,
-            handleSelect,
-            handleChange,
-            handleSubmit,
+            close,
+            submit,
+            change: async (event: React.ChangeEvent<HTMLInputElement>) => {
+                const value = event.target.value
+                setInputValue(value)
+                setError(value.trim() === '' ? 'Title cannot be empty' : undefined)
+            },
+            select: (event: SelectChangeEvent) => {
+                setSelectedUrl(event.target.value as string)
+                setLastUrl(event.target.value as string)
+            },
         },
     }
 }

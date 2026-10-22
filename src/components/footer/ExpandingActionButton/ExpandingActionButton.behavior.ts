@@ -36,7 +36,7 @@ export function useExpandingActionButtonBehavior() {
         setOpen((prevOpen) => !prevOpen)
     }
 
-    function onClickAway(event: Event) {
+    function clickAway(event: Event) {
         if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
             return
         }
@@ -52,16 +52,16 @@ export function useExpandingActionButtonBehavior() {
         isCssOpen,
         anchorRef,
         handlers: {
+            clickAway,
+            mouseEnter: cancelScheduledClose,
+            mouseLeave: scheduleClose,
             toggle,
-            onClickAway,
-            onMouseEnter: cancelScheduledClose,
-            onMouseLeave: scheduleClose,
-            openUrlDialog: () => setUrlOpen(true),
-            openJsDialog: () => setJsOpen(true),
-            openCssDialog: () => setCssOpen(true),
-            closeUrlDialog: () => setUrlOpen(false),
-            closeJsDialog: () => setJsOpen(false),
             closeCssDialog: () => setCssOpen(false),
+            closeJsDialog: () => setJsOpen(false),
+            closeUrlDialog: () => setUrlOpen(false),
+            openCssDialog: () => setCssOpen(true),
+            openJsDialog: () => setJsOpen(true),
+            openUrlDialog: () => setUrlOpen(true),
         },
     }
 }

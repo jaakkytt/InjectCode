@@ -19,11 +19,11 @@ export function useFooterBehavior() {
         scope,
         play,
         handlers: {
-            handleChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                setScope(event.target.checked ? 'global' : 'current')
-            },
             selectCurrentScope: () => selectScope('current'),
             selectGlobalScope: () => selectScope('global'),
+            change: (event: React.ChangeEvent<HTMLInputElement>) => {
+                setScope(event.target.checked ? 'global' : 'current')
+            },
         },
     }
 }

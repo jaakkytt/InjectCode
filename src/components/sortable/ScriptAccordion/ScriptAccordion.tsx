@@ -70,7 +70,7 @@ export default function ScriptAccordion(
                         <AccordionTitle
                             value={item.title}
                             allowEditing={isExpanded}
-                            onChange={handlers.handleTitleChange}
+                            onChange={handlers.titleChange}
                         >
                             <Typography
                                 component="span"
@@ -110,7 +110,7 @@ export default function ScriptAccordion(
                         <Typography component="span">
                             <RunModeToggle
                                 mode={item.runMode}
-                                onModeChange={handlers.handleRunModeChange}
+                                onModeChange={handlers.runModeChange}
                                 warning={contentFocused && item.runMode === 'always'}
                             />
                         </Typography>
@@ -120,7 +120,7 @@ export default function ScriptAccordion(
                             sx={deleteButtonWrapperSx(isExpanded)}
                         >
                             <ConfirmDeleteButton
-                                onConfirm={handlers.handleDelete}
+                                onConfirm={handlers.remove}
                                 placement='top'
                                 showDeleteTooltip={true}
                             />
@@ -131,7 +131,7 @@ export default function ScriptAccordion(
                     <AccordionBody
                         value={item.content}
                         language={item.type === 'css' ? 'css' : 'javascript'}
-                        onChange={handlers.handleContentChange}
+                        onChange={handlers.contentChange}
                         onFocusChange={handlers.setContentFocused}
                     />
                 </AccordionDetails>

@@ -2,7 +2,7 @@ import React, { SyntheticEvent, useState } from 'react'
 import Tooltip, { TooltipProps } from '@mui/material/Tooltip'
 import { LOCAL_STORAGE_TOOLTIP_COUNTERS, LOCAL_STORAGE_TOOLTIP_DISABLED } from '../constants'
 
-const defaultCount = 20
+const defaultCount = 30
 
 const readTooltipCounters = (): Record<string, number> => {
     const stored = localStorage.getItem(LOCAL_STORAGE_TOOLTIP_COUNTERS)

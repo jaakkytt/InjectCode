@@ -1,15 +1,12 @@
 import { storage } from './service/storageApi'
-import { syncPersistentScripts } from './service/persistentScripts'
-import { SHARED_CODE, STORAGE_SCRIPTS } from './constants'
+import { createSerializedPersistentScriptsSync } from './service/persistentScripts'
+import { readAlwaysOnTiming } from './service/alwaysOnTiming'
+import { SHARED_CODE, STORAGE_ALWAYS_ON_TIMING, STORAGE_SCRIPTS } from './constants'
 
-async function resyncPersistentScripts() {
-    try {
-        const data = await storage.get(STORAGE_SCRIPTS, { [SHARED_CODE]: [] })
-        await syncPersistentScripts(data)
-    } catch (err) {
-        console.error('Failed to read scripts for persistent-script resync:', err)
-    }
-}
+const resyncPersistentScripts = createSerializedPersistentScriptsSync(async () => ({
+    scripts: await storage.get(STORAGE_SCRIPTS, { [SHARED_CODE]: [] }),
+    runAt: await readAlwaysOnTiming(),
+}))
 
 chrome.runtime.onInstalled.addListener(({ reason }) => {
     if (reason == chrome.runtime.OnInstalledReason.INSTALL) {
@@ -23,11 +20,7 @@ chrome.runtime.onStartup.addListener(() => {
 })
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && STORAGE_SCRIPTS in changes) {
+    if (areaName === 'local' && (STORAGE_SCRIPTS in changes || STORAGE_ALWAYS_ON_TIMING in changes)) {
         resyncPersistentScripts()
     }
-})
-
-chrome.action.onClicked.addListener(() => {
-    chrome.runtime.openOptionsPage()
 })

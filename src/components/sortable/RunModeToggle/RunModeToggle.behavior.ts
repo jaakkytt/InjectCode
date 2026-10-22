@@ -28,19 +28,17 @@ export function useRunModeToggleBehavior({ mode, onModeChange, warning }: Props)
         return MODES[(MODES.indexOf(mode) + 1) % MODES.length]
     }
 
-    function handleClick(e: React.MouseEvent) {
-        e.stopPropagation()
-        onModeChange(nextMode())
-    }
-
     return {
         Icon: ICON[mode],
         tooltipTitle: warning ? EDIT_DOWNGRADE_WARNING : LABEL[mode],
         tooltipOpen: warning || hoverOpen,
         handlers: {
-            handleClick,
-            handleTooltipOpen: () => setHoverOpen(true),
-            handleTooltipClose: () => setHoverOpen(false),
+            closeTooltip: () => setHoverOpen(false),
+            openTooltip: () => setHoverOpen(true),
+            click: (e: React.MouseEvent) => {
+                e.stopPropagation()
+                onModeChange(nextMode())
+            },
         },
     }
 }

@@ -48,7 +48,15 @@ const patchWildcardError = (value: string, originalError: string) => {
     return matcher.error.message.replaceAll('http:', '*:')
 }
 
-export const urlPatternValidator = async (value: string, existing: string[]) => {
+interface ValidatorOptions {
+    checkFileAccess?: boolean
+}
+
+export const urlPatternValidator = async (
+    value: string,
+    existing: string[],
+    { checkFileAccess = true }: ValidatorOptions = {},
+) => {
     if (value.trim() === '') {
         return 'Pattern must follow the structure <scheme>://<host>/<path>'
     }
@@ -79,7 +87,7 @@ export const urlPatternValidator = async (value: string, existing: string[]) => 
 
     const matcher = urlPatternMatcher(value)
     if (matcher.valid) {
-        if (value.startsWith('file:///')) {
+        if (checkFileAccess && value.startsWith('file:///')) {
             const isAllowed = await chrome.extension?.isAllowedFileSchemeAccess()
             if (!isAllowed) {
                 return 'File scheme access is not allowed. Please enable it in the extension settings.'

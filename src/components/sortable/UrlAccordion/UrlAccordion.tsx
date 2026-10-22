@@ -12,10 +12,10 @@ export default function UrlAccordion() {
         <DndContext
             sensors={sensors}
             collisionDetection={rectIntersection}
-            onDragStart={handlers.handleDragStart}
-            onDragOver={handlers.handleDragOver}
-            onDragEnd={handlers.handleDragEnd}
-            onDragCancel={handlers.handleDragCancel}
+            onDragStart={handlers.dragStart}
+            onDragOver={handlers.dragOver}
+            onDragEnd={handlers.dragEnd}
+            onDragCancel={handlers.dragCancel}
         >
             <div>
                 {Object.keys(items).map((containerId) => (
@@ -24,12 +24,12 @@ export default function UrlAccordion() {
                         containerId={containerId}
                         items={items[containerId]}
                         isExpanded={!closedParents.has(containerId)}
-                        onParentChange={handlers.handleParentAccordionChange(containerId)}
+                        onParentChange={handlers.parentAccordionChange(containerId)}
                         allowEditing={!closedParents.has(containerId) && containerId !== SHARED_CODE}
                         onRename={(newKey) => handlers.renameParentAccordionKey(containerId, newKey)}
                         onRemove={() => handlers.removeContainer(containerId)}
                         expandedPanel={expanded}
-                        onAccordionChange={handlers.handleAccordionChange}
+                        onAccordionChange={handlers.accordionChange}
                     />
                 ))}
             </div>

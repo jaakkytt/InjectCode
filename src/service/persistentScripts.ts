@@ -1,6 +1,13 @@
 import { AccordionItemData, ItemsDataState } from '../types'
 import { SHARED_CODE, USER_SCRIPT_ID } from '../constants'
 import { urlPatternMatcher } from './urlPatternMatcher'
+import { cyrb53 } from '../lib/hash/cyrb53'
+import { AlwaysOnTiming, DEFAULT_ALWAYS_ON_TIMING } from './alwaysOnTiming'
+
+export interface PersistentScriptsState {
+    scripts: ItemsDataState
+    runAt: AlwaysOnTiming
+}
 
 export function wrapCssAsUserScript(css: string): string {
     return `(() => {
@@ -17,14 +24,13 @@ function toScriptSources(items: AccordionItemData[]): chrome.userScripts.ScriptS
 }
 
 function idForPattern(pattern: string): string {
-    let hash = 0
-    for (let i = 0; i < pattern.length; i++) {
-        hash = (hash * 31 + pattern.charCodeAt(i)) | 0
-    }
-    return `always-${(hash >>> 0).toString(36)}`
+    return `always-${cyrb53(pattern).toString(36)}`
 }
 
-export function computeDesiredRegistrations(scripts: ItemsDataState): chrome.userScripts.RegisteredUserScript[] {
+export function computeDesiredRegistrations(
+    scripts: ItemsDataState,
+    runAt: AlwaysOnTiming = DEFAULT_ALWAYS_ON_TIMING,
+): chrome.userScripts.RegisteredUserScript[] {
     const sharedAlways = (scripts[SHARED_CODE] ?? []).filter(item => item.runMode === 'always')
 
     return Object.entries(scripts)
@@ -43,6 +49,7 @@ export function computeDesiredRegistrations(scripts: ItemsDataState): chrome.use
             return [{
                 id: idForPattern(pattern),
                 matches: [pattern],
+                runAt,
                 world: 'USER_SCRIPT',
                 worldId: USER_SCRIPT_ID,
                 js: toScriptSources([...sharedAlways, ...ownAlways]),
@@ -50,8 +57,11 @@ export function computeDesiredRegistrations(scripts: ItemsDataState): chrome.use
         })
 }
 
-export async function syncPersistentScripts(scripts: ItemsDataState): Promise<void> {
-    const desired = computeDesiredRegistrations(scripts)
+export async function syncPersistentScripts(
+    scripts: ItemsDataState,
+    runAt: AlwaysOnTiming = DEFAULT_ALWAYS_ON_TIMING,
+): Promise<void> {
+    const desired = computeDesiredRegistrations(scripts, runAt)
     try {
         await chrome.userScripts.unregister()
         if (desired.length > 0) {
@@ -59,5 +69,40 @@ export async function syncPersistentScripts(scripts: ItemsDataState): Promise<vo
         }
     } catch (err) {
         console.error('Failed to sync persistent (always on) scripts:', err)
+    }
+}
+
+export function createSerializedPersistentScriptsSync(
+    readState: () => Promise<PersistentScriptsState>,
+): () => Promise<void> {
+    let running: Promise<void> | null = null
+    let rerunRequested = false
+
+    async function syncLatest() {
+        try {
+            const { scripts, runAt } = await readState()
+            await syncPersistentScripts(scripts, runAt)
+        } catch (err) {
+            console.error('Failed to read scripts for persistent-script resync:', err)
+        }
+    }
+
+    async function drain() {
+        do {
+            rerunRequested = false
+            await syncLatest()
+        } while (rerunRequested)
+
+        running = null
+    }
+
+    return function requestSync() {
+        if (running) {
+            rerunRequested = true
+            return running
+        }
+
+        running = drain()
+        return running
     }
 }

@@ -45,13 +45,13 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
         return !!error || (inputValue.trim() === '' && !placeholder)
     }
 
-    function handleClose() {
+    function close() {
         onClose()
         setInputValue('')
         setError(undefined)
     }
 
-    async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    async function change(event: React.ChangeEvent<HTMLInputElement>) {
         let value = urlCharacterFilter(event.target.value).trim()
         setInputValue(value)
 
@@ -62,7 +62,7 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
         setError(await urlPatternValidator(value, existingUrls))
     }
 
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    async function submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
         const formData = new FormData(event.currentTarget)
@@ -81,7 +81,7 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
         urlsDispatch({ name: 'added', id: value })
         setLastUrl(value)
 
-        handleClose()
+        close()
 
         if (tabIndex === TabIndex.Current && currentUrl) {
             const matcher = urlPatternMatcher(value)
@@ -97,9 +97,9 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
         error,
         submitDisabled: isSubmitDisabled(),
         handlers: {
-            handleChange,
-            handleSubmit,
-            handleClose,
+            change,
+            close,
+            submit,
         },
     }
 }

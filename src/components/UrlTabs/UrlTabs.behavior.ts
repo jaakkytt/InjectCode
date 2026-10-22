@@ -11,16 +11,14 @@ export function a11yProps(index: number) {
 export function useUrlTabsBehavior() {
     const { tabIndex, setTabIndex } = useTab()
 
-    function handleSettingsClick(e: React.MouseEvent) {
-        e.preventDefault()
-        chrome.runtime.openOptionsPage()
-    }
-
     return {
         tabIndex,
         handlers: {
-            handleChange: (_event: React.SyntheticEvent, newValue: number) => setTabIndex(newValue),
-            handleSettingsClick,
+            change: (_event: React.SyntheticEvent, newValue: number) => setTabIndex(newValue),
+            settingsClick: (e: React.MouseEvent) => {
+                e.preventDefault()
+                chrome.runtime.openOptionsPage()
+            },
         },
     }
 }

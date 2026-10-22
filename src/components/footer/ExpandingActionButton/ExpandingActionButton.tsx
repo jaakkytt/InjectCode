@@ -17,7 +17,7 @@ const ExpandingActionButton = () => {
 
     return (
         <>
-            <div onMouseEnter={handlers.onMouseEnter} onMouseLeave={handlers.onMouseLeave}>
+            <div onMouseEnter={handlers.mouseEnter} onMouseLeave={handlers.mouseLeave}>
                 <Fab
                     component="div"
                     size="small"
@@ -39,7 +39,7 @@ const ExpandingActionButton = () => {
                     {({ TransitionProps }) => (
                         <Fade {...TransitionProps} >
                             <div>
-                                <ClickAwayListener onClickAway={handlers.onClickAway}>
+                                <ClickAwayListener onClickAway={handlers.clickAway}>
                                     <Stack spacing={2} direction="row" sx={stackSx}>
                                         <ActionFab label="URL" icon={LinkIcon} onClick={handlers.openUrlDialog} />
                                         <ActionFab label="Style" icon={CssIcon} onClick={handlers.openCssDialog} />

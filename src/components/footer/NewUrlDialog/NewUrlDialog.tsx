@@ -21,7 +21,7 @@ const NewUrlDialog = ({ isOpen, onClose }: Props) => {
     return (
         <Dialog
             open={isOpen}
-            onClose={handlers.handleClose}
+            onClose={handlers.close}
             maxWidth={'md'}
             fullWidth={true}
             disableScrollLock={true}
@@ -35,7 +35,7 @@ const NewUrlDialog = ({ isOpen, onClose }: Props) => {
                         Chrome Extensions Docs
                     </Link>.
                 </DialogContentText>
-                <form onSubmit={handlers.handleSubmit} id="newUrlForm">
+                <form onSubmit={handlers.submit} id="newUrlForm">
                     <TextField
                         autoFocus
                         required={!placeholder}
@@ -48,7 +48,7 @@ const NewUrlDialog = ({ isOpen, onClose }: Props) => {
                         type="text"
                         fullWidth
                         variant="standard"
-                        onChange={handlers.handleChange}
+                        onChange={handlers.change}
                         error={!!error}
                     />
                 </form>
@@ -57,7 +57,7 @@ const NewUrlDialog = ({ isOpen, onClose }: Props) => {
                 <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={handlers.handleClose}
+                    onClick={handlers.close}
                     startIcon={<CloseIcon/>}
                 >Cancel</Button>
                 <Button

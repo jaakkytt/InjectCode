@@ -42,7 +42,7 @@ export default function AccordionItem({
                     <AccordionTitle
                         value={containerId}
                         allowEditing={allowEditing}
-                        onChange={handlers.handleTitleChange}
+                        onChange={handlers.titleChange}
                         inputValidator={handlers.validateTitle}
                         inputTransformer={transformTitleInput}
                     >

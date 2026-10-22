@@ -27,10 +27,10 @@ export default function AccordionBody({ value, language, onChange, onFocusChange
                 key={editorSource.revision}
                 language={language}
                 value={editorSource.value}
-                onUpdate={handlers.handleUpdate}
+                onUpdate={handlers.update}
                 textareaProps={{
-                    onFocus: handlers.handleFocus,
-                    onBlur: handlers.handleBlur,
+                    onFocus: handlers.focus,
+                    onBlur: handlers.blur,
                     'aria-label': language === 'css' ? 'CSS code' : 'JavaScript code',
                 }}
             >

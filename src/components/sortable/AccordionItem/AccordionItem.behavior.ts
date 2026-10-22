@@ -14,7 +14,7 @@ export function useAccordionItemBehavior(
         play,
         transformTitleInput: urlCharacterFilter,
         handlers: {
-            handleTitleChange: (newKey: string) => onRename(newKey),
+            titleChange: (newKey: string) => onRename(newKey),
             validateTitle: (value: string) => urlPatternValidator(value, existingUrls),
         },
     }

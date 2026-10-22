@@ -56,14 +56,22 @@ async function injectIntoTab(tab: chrome.tabs.Tab, payload: InjectionPayload) {
     }
 }
 
-async function runOnTabsMatching(pattern: string, items: AccordionItemData[], shared: AccordionItemData[]) {
+async function injectMatchingItems(tab: chrome.tabs.Tab, scripts: ItemsDataState, shared: AccordionItemData[]) {
+    if (!tab.url) {
+        return
+    }
+
+    const items = selectItemsForUrl(scripts, tab.url)
+    if (items.length === 0) {
+        return
+    }
+
     const payload = buildInjectionPayload(items, shared)
     if (payload.js.length === 0 && payload.css.length === 0) {
         return
     }
 
-    const tabs = await chrome.tabs.query({ url: pattern })
-    await Promise.all(tabs.map(tab => injectIntoTab(tab, payload)))
+    await injectIntoTab(tab, payload)
 }
 
 async function runOnActiveTab(scripts: ItemsDataState, shared: AccordionItemData[]) {
@@ -73,21 +81,18 @@ async function runOnActiveTab(scripts: ItemsDataState, shared: AccordionItemData
         return
     }
 
-    const items = selectItemsForUrl(scripts, tab.url)
-    const payload = buildInjectionPayload(items, shared)
-    if (payload.js.length === 0 && payload.css.length === 0) {
-        return
-    }
+    await injectMatchingItems(tab, scripts, shared)
+}
 
-    await injectIntoTab(tab, payload)
+async function runOnAllTabs(scripts: ItemsDataState, shared: AccordionItemData[]) {
+    const tabs = await chrome.tabs.query({})
+    await Promise.all(tabs.map(tab => injectMatchingItems(tab, scripts, shared)))
 }
 
 export class ChromeScriptAPI implements ScriptApi {
     async run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope) {
         if (scope === 'global') {
-            await Promise.all(
-                Object.entries(scripts).map(([pattern, items]) => runOnTabsMatching(pattern, items, shared)),
-            )
+            await runOnAllTabs(scripts, shared)
             return
         }
 

@@ -25,7 +25,7 @@ const Footer = () => {
                         active={scope === 'current'}
                         onClick={handlers.selectCurrentScope}
                     />
-                    <IconSwitch checked={scope === 'global'} onChange={handlers.handleChange} />
+                    <IconSwitch checked={scope === 'global'} onChange={handlers.change} />
                     <TintedScopeButton
                         color="warning"
                         label="all tabs"

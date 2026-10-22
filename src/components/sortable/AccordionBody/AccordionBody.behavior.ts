@@ -64,14 +64,14 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omi
         }
     }
 
-    function handleFocus() {
+    function focus() {
         isFocusedRef.current = true
         setStatus(isDirty(inputValueRef.current, lastSavedValueRef.current) ? 'unsaved' : 'upToDate')
         startAutoSave()
         onFocusChange?.(true)
     }
 
-    function handleBlur() {
+    function blur() {
         isFocusedRef.current = false
         stopAutoSave()
 
@@ -84,7 +84,7 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omi
         onFocusChange?.(false)
     }
 
-    function handleUpdate(newVal: string) {
+    function update(newVal: string) {
         inputValueRef.current = newVal
         if (isFocusedRef.current) {
             setStatus(isDirty(newVal, lastSavedValueRef.current) ? 'unsaved' : 'upToDate')
@@ -95,9 +95,9 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omi
         editorSource,
         status,
         handlers: {
-            handleFocus,
-            handleBlur,
-            handleUpdate,
+            blur,
+            focus,
+            update,
             stopClickPropagation: (e: React.MouseEvent) => e.stopPropagation(),
         },
     }

@@ -13,7 +13,7 @@ export function useConfirmDeleteButtonBehavior(
         return isConfirming ? 'Confirm' : 'Delete'
     }
 
-    function handleClick(e: React.MouseEvent) {
+    function click(e: React.MouseEvent) {
         if (isConfirming) {
             onConfirm()
             setIsConfirming(false)
@@ -28,8 +28,8 @@ export function useConfirmDeleteButtonBehavior(
         tooltipTitle: resolveTooltipTitle(),
         tooltipOpen: showDeleteTooltip ? undefined : isConfirming,
         handlers: {
-            handleClick,
-            handleMouseLeave: () => setIsConfirming(false),
+            click,
+            mouseLeave: () => setIsConfirming(false),
         },
     }
 }

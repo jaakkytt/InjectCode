@@ -41,7 +41,7 @@ export function useAccordionTitleBehavior(
         return { type: 'saved', value: trimmed }
     }
 
-    async function handleSave() {
+    async function save() {
         const outcome = await resolveSaveOutcome()
 
         if (outcome.type === 'invalid') {
@@ -63,7 +63,7 @@ export function useAccordionTitleBehavior(
         }
     }
 
-    async function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+    async function change(e: React.ChangeEvent<HTMLInputElement>) {
         const rawValue = e.target.value
         const transformedValue = inputTransformer ? inputTransformer(rawValue) : rawValue
         setInputValue(transformedValue)
@@ -75,11 +75,11 @@ export function useAccordionTitleBehavior(
         }
     }
 
-    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    function keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
         if (event.key === 'Enter') {
             event.preventDefault()
             if (textFieldRef.current) {
-                handleSave()
+                save()
             }
         } else if (event.key === 'Escape') {
             event.preventDefault()
@@ -93,23 +93,12 @@ export function useAccordionTitleBehavior(
         }
     }
 
-    function handleBlur() {
+    function blur() {
         if (!isSaved) {
             setInputValue(value)
         }
         setError(undefined)
         setEditing(false)
-    }
-
-    function handleEditClick(e: React.MouseEvent) {
-        e.stopPropagation()
-        setEditing(true)
-        setSaved(false)
-    }
-
-    function handleSaveClick(e: React.MouseEvent) {
-        e.stopPropagation()
-        handleSave()
     }
 
     return {
@@ -118,13 +107,20 @@ export function useAccordionTitleBehavior(
         inputValue,
         textFieldRef,
         handlers: {
-            handleOnChange,
-            handleKeyDown,
-            handleBlur,
-            handleEditClick,
-            handleSaveClick,
+            blur,
+            change,
+            keyDown,
             preventFocusLoss: (e: React.MouseEvent) => e.preventDefault(),
             stopClickPropagation: (e: React.MouseEvent) => e.stopPropagation(),
+            editClick: (e: React.MouseEvent) => {
+                e.stopPropagation()
+                setEditing(true)
+                setSaved(false)
+            },
+            saveClick: (e: React.MouseEvent) => {
+                e.stopPropagation()
+                save()
+            },
         },
     }
 }
