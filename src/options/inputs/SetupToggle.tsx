@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Switch } from '@mui/material'
-import { isFileAccessEnabled, isUserScriptsEnabled } from '../../service/extensionSetup'
+import { isFileAccessEnabled, isUserScriptsEnabled } from '../service/extensionSetup'
 
 export type SetupCheck = 'userScripts' | 'fileAccess'
 

@@ -1,6 +1,10 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { InputAdornment, TextField } from '@mui/material'
-import { parseInjectionTimeout, readInjectionTimeout, saveInjectionTimeout } from '../../service/injectionTimeout'
+import {
+    parseInjectionTimeout,
+    readInjectionTimeout,
+    saveInjectionTimeout,
+} from '../../shared/service/settings/injectionTimeout'
 
 export interface Props {
     unit: ReactNode

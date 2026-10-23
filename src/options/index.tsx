@@ -1,4 +1,4 @@
-import '../styles/global.css'
+import '../shared/styles/global.css'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import Options from './Options'

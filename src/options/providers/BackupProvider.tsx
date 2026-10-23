@@ -1,9 +1,9 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react'
-import { SHARED_CODE, STORAGE_SCRIPTS } from '../../constants'
-import { FeedbackSeverity } from '../../types'
-import { storage } from '../../service/storageApi'
-import { downloadTextFile } from '../../service/fileDownload'
-import { disableFilePatternScripts } from '../../service/filePatternScripts'
+import { SHARED_CODE, STORAGE_SCRIPTS } from '../../shared/constants'
+import { FeedbackSeverity } from '../../shared/types'
+import { storage } from '../../shared/service/storageApi'
+import { downloadTextFile } from '../service/fileDownload'
+import { disableFilePatternScripts } from '../service/filePatternScripts'
 import {
     backupFileName,
     countScripts,
@@ -12,8 +12,8 @@ import {
     mergeScripts,
     parseBackup,
     serializeBackup,
-} from '../../service/backup'
-import { s } from '../../lib/text'
+} from '../service/backup'
+import { s } from '../../shared/lib/text'
 
 interface Notice {
     severity: FeedbackSeverity

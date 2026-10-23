@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material'
-import { parseAlwaysOnTiming } from '../../service/alwaysOnTiming'
+import { parseAlwaysOnTiming } from '../../shared/service/settings/alwaysOnTiming'
 import { useAlwaysOnTiming } from '../providers/AlwaysOnTimingProvider'
 
 export interface Props {

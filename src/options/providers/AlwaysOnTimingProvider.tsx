@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { AlwaysOnTiming, readAlwaysOnTiming, saveAlwaysOnTiming } from '../../service/alwaysOnTiming'
+import { AlwaysOnTiming, readAlwaysOnTiming, saveAlwaysOnTiming } from '../../shared/service/settings/alwaysOnTiming'
 
 interface AlwaysOnTimingValue {
     timing: AlwaysOnTiming | null

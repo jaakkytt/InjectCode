@@ -130,4 +130,14 @@ export default defineConfig([{
             message: 'No test-only hooks in source - adapt the test locator instead.',
         }],
     },
+}, {
+    files: ['webpack.config.js'],
+
+    languageOptions: {
+        sourceType: 'commonjs',
+    },
+
+    rules: {
+        '@typescript-eslint/no-require-imports': 'off',
+    },
 }])

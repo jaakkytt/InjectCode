@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Box, Link } from '@mui/material'
-import { resetTooltipCounters } from '../../service/tooltipPreferences'
+import { resetTooltipCounters } from '../../shared/service/settings/tooltipPreferences'
 
 const ResetTooltipsLink = () => {
     const [wasReset, setWasReset] = useState(false)

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from '@mui/material'
-import { openExtensionSettings } from '../../service/extensionSetup'
+import { openExtensionSettings } from '../service/extensionSetup'
 
 const ExtensionSettingsLink = () => (
     <Link
