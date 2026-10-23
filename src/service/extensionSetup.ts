@@ -18,3 +18,7 @@ export async function isFileAccessEnabled(): Promise<boolean> {
 export function openExtensionSettings() {
     return chrome.tabs.create({ url: `chrome://extensions/?id=${chrome.runtime.id}` })
 }
+
+export function openExtensionErrors() {
+    return chrome.tabs.create({ url: `chrome://extensions/?errors=${chrome.runtime.id}` })
+}

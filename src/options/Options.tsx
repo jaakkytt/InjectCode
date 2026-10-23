@@ -1,23 +1,28 @@
 import React from 'react'
-import { Alert, AppBar, Link, Toolbar } from '@mui/material'
+import Box from '@mui/material/Box'
+import { Alert, AppBar, Toolbar } from '@mui/material'
 import TuneIcon from '@mui/icons-material/Tune'
 import BackupIcon from '@mui/icons-material/Backup'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import BuildIcon from '@mui/icons-material/Build'
 import HistoryIcon from '@mui/icons-material/History'
+import NotificationsIcon from '@mui/icons-material/Notifications'
 import { CHANGELOG_URL, ISSUES_URL, MATCH_PATTERN_DOCS, RUN_AT_DOCS } from '../constants'
 import BuildInfo from '../components/BuildInfo'
-import SetupToggle from './setup/SetupToggle'
-import ExtensionSettingsLink from './setup/ExtensionSettingsLink'
-import { AlwaysOnTimingProvider } from './timing/AlwaysOnTimingProvider'
-import AlwaysOnTimingSelect from './timing/AlwaysOnTimingSelect'
-import AlwaysOnTimingText from './timing/AlwaysOnTimingText'
-import TooltipsToggle from './tooltips/TooltipsToggle'
-import ResetTooltipsButton from './tooltips/ResetTooltipsButton'
-import BackupProvider from './backup/BackupProvider'
+import SetupToggle from './inputs/SetupToggle'
+import ExtensionSettingsLink from './links/ExtensionSettingsLink'
+import { AlwaysOnTimingProvider } from './providers/AlwaysOnTimingProvider'
+import AlwaysOnTimingSelect from './inputs/AlwaysOnTimingSelect'
+import TooltipsToggle from './inputs/TooltipsToggle'
+import ResetTooltipsLink from './links/ResetTooltipsLink'
+import { BackupProvider } from './providers/BackupProvider'
 import ExportButton from './backup/ExportButton'
 import ImportButton from './backup/ImportButton'
 import BackupNotice from './backup/BackupNotice'
+import { FeedbackAutoHideProvider } from './providers/FeedbackAutoHideProvider'
+import AutoHideSelect from './inputs/AutoHideSelect'
+import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
+import ExternalLink from './links/ExternalLink'
 import {
     ButtonRow,
     Page,
@@ -30,7 +35,6 @@ import {
     Setting,
     Settings,
     SettingText,
-    SettingWarning,
     SettingTitle,
     Topic,
     TopicHeading,
@@ -39,6 +43,7 @@ import {
     TopicText,
     TopBarIcon,
 } from './Options.styles'
+import ExtensionErrorLink from './links/ExtensionErrorLink'
 
 const Options = () => (
     <>
@@ -71,8 +76,7 @@ const Options = () => (
                                     <SettingTitle>User Scripts</SettingTitle>
                                     <SettingText>
                                         In order to run the scripts you define, this extension requires "Allow User
-                                        Scripts" to be turned on in the{' '}
-                                        <ExtensionSettingsLink>extension settings</ExtensionSettingsLink>.
+                                        Scripts" to be turned on in the <ExtensionSettingsLink/>.
                                     </SettingText>
                                 </div>
                             </Setting>
@@ -83,36 +87,7 @@ const Options = () => (
                                     <SettingTitle>File URLs</SettingTitle>
                                     <SettingText>
                                         Only if you wish to run your scripts on local files (<code>file:///</code>{' '}
-                                        patterns), enable "Allow access to file URLs" in the{' '}
-                                        <ExtensionSettingsLink>extension settings</ExtensionSettingsLink>.
-                                    </SettingText>
-                                    <SettingWarning severity="warning">
-                                        If you plan to use <code>file:///</code> patterns, you must enable this setting.
-                                        Otherwise running scripts on those patterns will fail with an error.
-                                    </SettingWarning>
-                                </div>
-                            </Setting>
-
-                            <Setting>
-                                <AlwaysOnTimingSelect
-                                    start="Document start"
-                                    end="Document end"
-                                    idle="Document idle (default)"
-                                />
-                                <div>
-                                    <SettingTitle>Always on timing</SettingTitle>
-                                    <SettingText>
-                                        Choose when <em>Always on</em> scripts run during page load. Applies to
-                                        all <em>Always on</em> scripts.{' '}
-                                        <Link
-                                            href={RUN_AT_DOCS}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            underline="hover"
-                                            title="opens in new tab"
-                                        >
-                                            How the options differ
-                                        </Link>
+                                        patterns), enable "Allow access to file URLs" in the <ExtensionSettingsLink/>.
                                     </SettingText>
                                 </div>
                             </Setting>
@@ -123,18 +98,88 @@ const Options = () => (
                                     <SettingTitle>Tutorial Tooltips</SettingTitle>
                                     <SettingText>
                                         Show tooltip hints on buttons such as Run and Delete. Each hint stops appearing
-                                        after it has been shown a number of times.
+                                        after it has been shown a number of times. <ResetTooltipsLink/>
                                     </SettingText>
-                                    <ResetTooltipsButton
-                                        confirmation={
-                                            <>Done. Hints will show again the next time you open the popup.</>
-                                        }
-                                    >
-                                        Reset tooltip counters
-                                    </ResetTooltipsButton>
                                 </div>
                             </Setting>
+
+                            <Setting>
+                                <AlwaysOnTimingSelect start="Document start" end="Document end" idle="Document idle"/>
+                                <div>
+                                    <SettingTitle>Always on timing</SettingTitle>
+                                    <SettingText>
+                                        Choose when <em>Always on</em> scripts run during page load. Applies to all{' '}
+                                        <em>Always on</em> scripts. The preferred and default value is "Document idle".
+                                        {' '}<ExternalLink href={RUN_AT_DOCS}>How the options differ</ExternalLink>
+                                    </SettingText>
+                                </div>
+                            </Setting>
+
                         </Settings>
+                    </Section>
+
+                    <Section>
+                        <SectionHeading>
+                            <SectionIcon><NotificationsIcon /></SectionIcon>
+                            Run feedback
+                        </SectionHeading>
+                        <SectionText>
+                            After each run, the popup shows a message at the top saying how many tabs the scripts ran
+                            on. Its color shows how the run went, and you can choose how long each kind of message
+                            stays visible.
+                        </SectionText>
+                        <FeedbackAutoHideProvider>
+                            <Settings>
+                                <Setting>
+                                    <InjectionTimeoutInput unit="seconds" invalid="Enter a number above 0" />
+                                    <div>
+                                        <SettingTitle>Script timeout</SettingTitle>
+                                        <SettingText>
+                                            How long to wait for each tab before reporting that it did not respond.
+                                            Tabs that are asleep or showing a dialog, such as an alert, are skipped.
+                                        </SettingText>
+                                    </div>
+                                </Setting>
+
+                                <Setting>
+                                    <AutoHideSelect severity="success" />
+                                    <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+                                        <SettingTitle>
+                                            Success - shown when the scripts ran on every matching tab.
+                                        </SettingTitle>
+                                    </Alert>
+                                </Setting>
+
+                                <Setting>
+                                    <AutoHideSelect severity="info" />
+                                    <Alert severity="info" variant="filled" sx={{ width: '100%' }}>
+                                        <SettingTitle>Info - shown when no open tab matched your scripts.</SettingTitle>
+                                    </Alert>
+                                </Setting>
+
+                                <Setting>
+                                    <AutoHideSelect severity="warning" />
+                                    <Alert severity="warning" variant="filled" sx={{ width: '100%' }}>
+                                        <SettingTitle>
+                                            Warning - shown when some tabs did not respond within the script timeout.
+                                        </SettingTitle>
+                                    </Alert>
+                                </Setting>
+
+                                <Setting>
+                                    <AutoHideSelect severity="error" />
+                                    <Box sx={{ width: '100%' }}>
+                                        <Alert severity="error" variant="filled">
+                                            <SettingTitle>Error - shown when running failed on some tabs.</SettingTitle>
+                                        </Alert>
+                                        <SettingText>
+                                            The reason is logged in the extension's own console,
+                                            see <em>Finding errors</em> below.
+                                        </SettingText>
+                                    </Box>
+                                </Setting>
+                            </Settings>
+                        </FeedbackAutoHideProvider>
                     </Section>
 
                     <Section>
@@ -168,9 +213,7 @@ const Options = () => (
                                 <TopicText>
                                     Scripts are grouped by a URL match pattern such as{' '}
                                     <code>https://example.com/*</code>. The format is defined in the{' '}
-                                    <Link href={MATCH_PATTERN_DOCS} target="_blank" rel="noreferrer" underline="hover">
-                                        Chrome Extensions docs
-                                    </Link>.
+                                    <ExternalLink href={MATCH_PATTERN_DOCS}>Chrome Extensions docs</ExternalLink>.
                                 </TopicText>
                             </Topic>
 
@@ -187,26 +230,26 @@ const Options = () => (
                             <Topic>
                                 <TopicHeading>Run modes</TopicHeading>
                                 <TopicList>
-                                    <li><em>Disabled</em>: never runs.</li>
+                                    <li><em>Disabled:</em> never runs.</li>
                                     <li>
-                                        <em>Active</em>: runs when you press Play on the script or its URL, or Run all.
+                                        <em>Active:</em> runs when you press Play on the script or its URL, or Run all.
                                     </li>
                                     <li>
-                                        <em>Always on</em>: runs automatically on every matching page,{' '}
-                                        <AlwaysOnTimingText
-                                            start={
-                                                <>before the page is built and before any of the page's own scripts
-                                                    run.</>
-                                            }
-                                            end={
-                                                <>as soon as the page's content is ready, before images and other
-                                                    resources have finished loading.</>
-                                            }
-                                            idle={
-                                                <>once the page's content is ready, at a moment chosen by the browser,
-                                                    no later than when the page has fully loaded.</>
-                                            }
-                                        />
+                                        <em>Always on</em>: runs automatically on every matching page
+                                        <ul>
+                                            <li>
+                                                <em>start:</em> before the page is built and before any of
+                                                the page's own scripts run.
+                                            </li>
+                                            <li>
+                                                <em>end:</em> as soon as the page's content is ready, before
+                                                images and other resources have finished loading.
+                                            </li>
+                                            <li>
+                                                <em>idle:</em> once the page's content is ready, at a moment chosen
+                                                by the browser, no later than when the page has fully loaded.
+                                            </li>
+                                        </ul>
                                         <TopicText>
                                             Editing the code of an <em>Always on</em> script switches it back to{' '}
                                             <em>Active</em>, to prevent unfinished code from running.
@@ -219,11 +262,11 @@ const Options = () => (
                                 <TopicHeading>Run all scopes</TopicHeading>
                                 <TopicList>
                                     <li>
-                                        <em>Current tab</em>: scripts whose URL pattern matches are run only in the
+                                        <em>Current tab:</em> scripts whose URL pattern matches are run only in the
                                         current tab.
                                     </li>
                                     <li>
-                                        <em>All tabs</em>: scripts whose URL pattern matches are run in every open tab.
+                                        <em>All tabs:</em> scripts whose URL pattern matches are run in every open tab.
                                         Tabs that Memory Saver has put to sleep are skipped, as the extension can't
                                         reach them.
                                     </li>
@@ -313,10 +356,9 @@ const Options = () => (
                                 <TopicText>
                                     InjectCode doesn't show errors itself. Errors thrown by your scripts appear in the
                                     page's DevTools console (F12). If a script didn't run at all, for example because
-                                    the page is blocked or a permission is missing, the reason is logged in the
-                                    extension's own console: open the{' '}
-                                    <ExtensionSettingsLink>extension settings</ExtensionSettingsLink> and click
-                                    "service worker".
+                                    the page is blocked or a permission is missing, the reason is logged either on{' '}
+                                    the<ExtensionErrorLink/> page or in the extension's own console: open the{' '}
+                                    <ExtensionSettingsLink/> and click "service worker".
                                 </TopicText>
                             </Topic>
                         </Topics>
@@ -328,17 +370,11 @@ const Options = () => (
                             Changelog & issues
                         </SectionHeading>
                         <SectionText>
-                            See the{' '}
-                            <Link href={CHANGELOG_URL} target="_blank" rel="noreferrer" underline="hover">
-                                changelog
-                            </Link>{' '}
-                            to read about features removed since version 1.
+                            See the <ExternalLink href={CHANGELOG_URL}>changelog</ExternalLink> to read about features
+                            removed since version 1.
                         </SectionText>
                         <SectionText>
-                            Please report bugs in{' '}
-                            <Link href={ISSUES_URL} target="_blank" rel="noreferrer" underline="hover">
-                                GitHub issues
-                            </Link>.
+                            Please report bugs in <ExternalLink href={ISSUES_URL}>GitHub issues</ExternalLink>.
                         </SectionText>
                     </Section>
                 </Sections>

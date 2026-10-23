@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import { Button } from '@mui/material'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import { useBackup } from './BackupProvider'
+import { useBackup } from '../providers/BackupProvider'
 
 export interface Props {
     children: ReactNode

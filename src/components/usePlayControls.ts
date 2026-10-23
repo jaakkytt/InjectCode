@@ -1,10 +1,13 @@
 import * as React from 'react'
-import { ItemsDataState } from '../types'
+import { AccordionItemData, ItemsDataState, RunScope } from '../types'
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRunScope } from '../providers/RunScopeProvider'
 import { scriptApi } from '../service/scriptApi'
 import { SHARED_CODE } from '../constants'
 import { useUrls } from '../providers/urlsContext'
+import { useFeedbackDispatch } from '../providers/FeedbackProvider'
+import { Message } from '../types/Message'
+import { injectionTimeoutMs, readInjectionTimeout } from '../service/injectionTimeout'
 
 function deepCopyAndFilterRunnable(data: ItemsDataState): ItemsDataState {
     const result: ItemsDataState = {}
@@ -20,12 +23,19 @@ function deepCopyAndFilterRunnable(data: ItemsDataState): ItemsDataState {
     return result
 }
 
+async function runWithTimeout(active: ItemsDataState, shared: AccordionItemData[], scope: RunScope) {
+    const timeoutSeconds = await readInjectionTimeout()
+    const result = await scriptApi.run(active, shared, scope, injectionTimeoutMs(timeoutSeconds))
+    return { result, timeoutSeconds }
+}
+
 export function usePlayControls(urls: ItemsDataState) {
 
     const [loading, setLoading] = useState(false)
     const { scope } = useRunScope()
     const mountedRef = useRef(true)
     const urlsContext = useUrls()
+    const { show } = useFeedbackDispatch()
 
     useEffect(() => () => {
         mountedRef.current = false
@@ -49,16 +59,18 @@ export function usePlayControls(urls: ItemsDataState) {
 
             setLoading(true)
 
-            scriptApi.run(active, shared, scope).catch((err) => {
-                console.error('Error running scripts:', err)
-                // TODO: show some error message to the user
+            runWithTimeout(active, shared, scope).then(({ result, timeoutSeconds }) => {
+                show(new Message(result, timeoutSeconds))
+            }).catch((err) => {
+                console.error('Error running scripts:', JSON.stringify(err))
+                show(new Message('Error running scripts', 'error'))
             }).finally(() => {
                 if (mountedRef.current) {
                     setLoading(false)
                 }
             })
         },
-        [disabled, active, scope, urlsContext],
+        [disabled, active, scope, urlsContext, show],
     )
 
     const buttonProps = { disabled, onClick, loading } as const

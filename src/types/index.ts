@@ -4,6 +4,8 @@ export type RunScope = 'global' | 'current'
 
 export type ScriptRunMode = 'disabled' | 'active' | 'always'
 
+export type FeedbackSeverity = 'success' | 'info' | 'warning' | 'error'
+
 export enum TabIndex {
     Current = 0,
     All = 1,

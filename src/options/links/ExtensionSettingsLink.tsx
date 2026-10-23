@@ -1,12 +1,8 @@
-import React, { ReactNode } from 'react'
+import React from 'react'
 import { Link } from '@mui/material'
 import { openExtensionSettings } from '../../service/extensionSetup'
 
-export interface Props {
-    children: ReactNode
-}
-
-const ExtensionSettingsLink = ({ children }: Props) => (
+const ExtensionSettingsLink = () => (
     <Link
         component="button"
         underline="hover"
@@ -14,7 +10,7 @@ const ExtensionSettingsLink = ({ children }: Props) => (
         sx={{ verticalAlign: 'baseline' }}
         onClick={() => openExtensionSettings()}
     >
-        {children}
+        extension settings
     </Link>
 )
 

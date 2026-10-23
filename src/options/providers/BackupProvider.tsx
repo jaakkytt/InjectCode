@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { SHARED_CODE, STORAGE_SCRIPTS } from '../../../constants'
-import { storage } from '../../../service/storageApi'
-import { downloadTextFile } from '../../../service/fileDownload'
-import { disableFilePatternScripts } from '../../../service/filePatternScripts'
+import React, { createContext, ReactNode, useContext, useState } from 'react'
+import { SHARED_CODE, STORAGE_SCRIPTS } from '../../constants'
+import { FeedbackSeverity } from '../../types'
+import { storage } from '../../service/storageApi'
+import { downloadTextFile } from '../../service/fileDownload'
+import { disableFilePatternScripts } from '../../service/filePatternScripts'
 import {
     backupFileName,
     countScripts,
@@ -11,10 +12,37 @@ import {
     mergeScripts,
     parseBackup,
     serializeBackup,
-} from '../../../service/backup'
-import { BackupValue, Notice } from './BackupProvider.types'
+} from '../../service/backup'
+import { s } from '../../lib/text'
 
-const s = (count: number) => (count === 1 ? '' : 's')
+interface Notice {
+    severity: FeedbackSeverity
+    text: string
+    details: string[]
+}
+
+interface BackupValue {
+    notice: Notice | null
+    actions: {
+        exportBackup: () => Promise<void>
+        importBackup: (file: File) => Promise<void>
+        dismissNotice: () => void
+    }
+}
+
+interface BackupProviderProps {
+    children: ReactNode
+}
+
+const backupContext = createContext<BackupValue | undefined>(undefined)
+
+export function useBackup() {
+    const context = useContext(backupContext)
+    if (!context) {
+        throw new Error('useBackup must be used within <BackupProvider>')
+    }
+    return context
+}
 
 function describeImport({ added, overwritten, skipped }: ImportSummary, disabled: number): Notice {
     const details: string[] = []
@@ -46,7 +74,7 @@ async function readStoredScripts() {
     return storage.get(STORAGE_SCRIPTS, { [SHARED_CODE]: [] })
 }
 
-export function useBackupProviderBehavior(): BackupValue {
+function useBackupProviderBehavior(): BackupValue {
     const [notice, setNotice] = useState<Notice | null>(null)
 
     async function exportBackup() {
@@ -99,4 +127,14 @@ export function useBackupProviderBehavior(): BackupValue {
             dismissNotice: () => setNotice(null),
         },
     }
+}
+
+export const BackupProvider = ({ children }: BackupProviderProps) => {
+    const value = useBackupProviderBehavior()
+
+    return (
+        <backupContext.Provider value={value}>
+            {children}
+        </backupContext.Provider>
+    )
 }

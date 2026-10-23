@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import { parseAlwaysOnTiming } from '../../service/alwaysOnTiming'
-import { useAlwaysOnTiming } from './AlwaysOnTimingProvider'
+import { useAlwaysOnTiming } from '../providers/AlwaysOnTimingProvider'
 
 export interface Props {
     start: ReactNode
@@ -21,7 +21,7 @@ const AlwaysOnTimingSelect = ({ start, end, idle }: Props) => {
             size="small"
             value={timing ?? ''}
             disabled={timing === null}
-            sx={{ minWidth: 240 }}
+            sx={{ minWidth: 180 }}
             onChange={handleChange}
         >
             <MenuItem value="document_start">{start}</MenuItem>

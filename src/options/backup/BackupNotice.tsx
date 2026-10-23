@@ -1,7 +1,7 @@
 import React from 'react'
 import { Alert } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { useBackup } from './BackupProvider'
+import { useBackup } from '../providers/BackupProvider'
 
 const NoticeAlert = styled(Alert)(({ theme }) => ({
     marginTop: theme.spacing(2),

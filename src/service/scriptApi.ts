@@ -3,15 +3,23 @@ import { USER_SCRIPT_ID } from '../constants'
 import { urlPatternMatcher } from './urlPatternMatcher'
 
 export interface ScriptApi {
-    run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope): Promise<void>
+    run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope, timeoutMs: number): Promise<RunResult>
 }
 
-export interface InjectionPayload {
+export type TabRunOutcome = 'executed' | 'failed' | 'timedOut'
+
+export interface RunResult {
+    executed: number
+    failed: number
+    timedOut: number
+}
+
+interface InjectionPayload {
     js: string[]
     css: string[]
 }
 
-export function selectItemsForUrl(scripts: ItemsDataState, url: string): AccordionItemData[] {
+function selectItemsForUrl(scripts: ItemsDataState, url: string): AccordionItemData[] {
     return Object.entries(scripts)
         .filter(([pattern]) => {
             const matcher = urlPatternMatcher(pattern)
@@ -20,7 +28,7 @@ export function selectItemsForUrl(scripts: ItemsDataState, url: string): Accordi
         .flatMap(([, items]) => items)
 }
 
-export function buildInjectionPayload(items: AccordionItemData[], shared: AccordionItemData[]): InjectionPayload {
+function buildInjectionPayload(items: AccordionItemData[], shared: AccordionItemData[]): InjectionPayload {
     const ordered = [...shared, ...items]
     return {
         js: ordered.filter(item => item.type === 'js').map(item => item.content),
@@ -32,10 +40,18 @@ function describeTab(tab: chrome.tabs.Tab) {
     return `tab ${tab.id ?? 'unknown'} (${tab.url ?? 'unknown url'})`
 }
 
-async function injectIntoTab(tab: chrome.tabs.Tab, payload: InjectionPayload) {
+function countOutcomes(outcomes: (TabRunOutcome | null)[]): RunResult {
+    return {
+        executed: outcomes.filter(outcome => outcome === 'executed').length,
+        failed: outcomes.filter(outcome => outcome === 'failed').length,
+        timedOut: outcomes.filter(outcome => outcome === 'timedOut').length,
+    }
+}
+
+async function injectIntoTab(tab: chrome.tabs.Tab, payload: InjectionPayload): Promise<TabRunOutcome> {
     if (!tab.id) {
         console.error(`Skipped injection: tab ID is not available for ${describeTab(tab)}`)
-        return
+        return 'failed'
     }
 
     try {
@@ -51,59 +67,87 @@ async function injectIntoTab(tab: chrome.tabs.Tab, payload: InjectionPayload) {
         for (const css of payload.css) {
             await chrome.scripting.insertCSS({ target: { tabId: tab.id }, css })
         }
+
+        return 'executed'
     } catch (err) {
         console.error(`Failed to run scripts on ${describeTab(tab)}:`, err)
+        return 'failed'
     }
 }
 
-async function injectMatchingItems(tab: chrome.tabs.Tab, scripts: ItemsDataState, shared: AccordionItemData[]) {
+async function injectWithTimeout(
+    tab: chrome.tabs.Tab,
+    payload: InjectionPayload,
+    timeoutMs: number,
+): Promise<TabRunOutcome> {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const timeout = new Promise<TabRunOutcome>((resolve) => {
+        timer = setTimeout(() => {
+            console.warn(`Timed out after ${timeoutMs}ms on ${describeTab(tab)}`)
+            resolve('timedOut')
+        }, timeoutMs)
+    })
+
+    try {
+        return await Promise.race([injectIntoTab(tab, payload), timeout])
+    } finally {
+        clearTimeout(timer)
+    }
+}
+
+async function injectMatchingItems(
+    tab: chrome.tabs.Tab,
+    scripts: ItemsDataState,
+    shared: AccordionItemData[],
+    timeoutMs: number,
+): Promise<TabRunOutcome | null> {
     if (!tab.url) {
-        return
+        return null
     }
 
     const items = selectItemsForUrl(scripts, tab.url)
     if (items.length === 0) {
-        return
+        return null
     }
 
     const payload = buildInjectionPayload(items, shared)
     if (payload.js.length === 0 && payload.css.length === 0) {
-        return
+        return null
     }
 
-    await injectIntoTab(tab, payload)
+    return injectWithTimeout(tab, payload, timeoutMs)
 }
 
-async function runOnActiveTab(scripts: ItemsDataState, shared: AccordionItemData[]) {
+async function runOnActiveTab(scripts: ItemsDataState, shared: AccordionItemData[], timeoutMs: number) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
     if (!tab || !tab.id || !tab.url) {
         console.error('No active tab found.')
-        return
+        return countOutcomes([])
     }
 
-    await injectMatchingItems(tab, scripts, shared)
+    return countOutcomes([await injectMatchingItems(tab, scripts, shared, timeoutMs)])
 }
 
-async function runOnAllTabs(scripts: ItemsDataState, shared: AccordionItemData[]) {
-    const tabs = await chrome.tabs.query({})
-    await Promise.all(tabs.map(tab => injectMatchingItems(tab, scripts, shared)))
+async function runOnAllTabs(scripts: ItemsDataState, shared: AccordionItemData[], timeoutMs: number) {
+    const tabs = await chrome.tabs.query({ discarded: false, frozen: false })
+    return countOutcomes(await Promise.all(tabs.map(tab => injectMatchingItems(tab, scripts, shared, timeoutMs))))
 }
 
 export class ChromeScriptAPI implements ScriptApi {
-    async run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope) {
+    async run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope, timeoutMs: number) {
         if (scope === 'global') {
-            await runOnAllTabs(scripts, shared)
-            return
+            return runOnAllTabs(scripts, shared, timeoutMs)
         }
 
-        await runOnActiveTab(scripts, shared)
+        return runOnActiveTab(scripts, shared, timeoutMs)
     }
 }
 
 export class DummyScriptAPI implements ScriptApi {
-    async run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope) {
+    async run(scripts: ItemsDataState, shared: AccordionItemData[], scope: RunScope, timeoutMs: number) {
         await new Promise(resolve => setTimeout(resolve, 1000))
-        console.debug('DummyScriptAPI run', shared, scripts, scope)
+        console.debug('DummyScriptAPI run', shared, scripts, scope, timeoutMs)
+        return { executed: 1, failed: 0, timedOut: 0 }
     }
 }
 

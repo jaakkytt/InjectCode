@@ -1,4 +1,4 @@
-import { Alert, Container } from '@mui/material'
+import { Container } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import SettingsIcon from '@mui/icons-material/Settings'
 
@@ -76,10 +76,6 @@ export const SettingText = styled('p')(({ theme }) => ({
     ...theme.typography.body2,
     margin: 0,
     color: theme.palette.text.secondary,
-}))
-
-export const SettingWarning = styled(Alert)(({ theme }) => ({
-    marginTop: theme.spacing(1),
 }))
 
 export const ButtonRow = styled('div')(({ theme }) => ({

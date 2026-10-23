@@ -1,63 +1,8 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { AccordionItemData, ItemsDataState } from '../../src/types'
-import { buildInjectionPayload, ChromeScriptAPI, selectItemsForUrl } from '../../src/service/scriptApi'
+import { ChromeScriptAPI } from '../../src/service/scriptApi'
 
-describe('selectItemsForUrl', () => {
-    it('returns items from containers whose pattern matches the given url', () => {
-        const scripts: ItemsDataState = {
-            'https://github.com/*': [makeItem({ id: 'github-1', content: 'a' })],
-            'https://example.com/*': [makeItem({ id: 'example-1', content: 'b' })],
-        }
-
-        expect(selectItemsForUrl(scripts, 'https://github.com/foo').map(i => i.id)).toEqual(['github-1'])
-    })
-
-    it('returns items from every matching container when patterns overlap', () => {
-        const scripts: ItemsDataState = {
-            'https://*.github.com/*': [makeItem({ id: 'wildcard', content: 'a' })],
-            'https://github.com/*': [makeItem({ id: 'exact', content: 'b' })],
-        }
-
-        const ids = selectItemsForUrl(scripts, 'https://github.com/foo').map(i => i.id).sort()
-
-        expect(ids).toEqual(['exact', 'wildcard'])
-    })
-
-    it('returns nothing when no container pattern matches', () => {
-        const scripts: ItemsDataState = {
-            'https://github.com/*': [makeItem({ id: 'github-1' })],
-        }
-
-        expect(selectItemsForUrl(scripts, 'https://example.com/foo')).toEqual([])
-    })
-
-    it('ignores containers keyed by an invalid pattern instead of throwing', () => {
-        const scripts: ItemsDataState = {
-            'not-a-pattern': [makeItem({ id: 'invalid' })],
-        }
-
-        expect(selectItemsForUrl(scripts, 'https://example.com/foo')).toEqual([])
-    })
-})
-
-describe('buildInjectionPayload', () => {
-    it('splits js and css content and puts shared items first', () => {
-        const shared = [makeItem({ id: 'shared-js', type: 'js', content: 'shared();' })]
-        const items = [
-            makeItem({ id: 'own-css', type: 'css', content: 'body{}' }),
-            makeItem({ id: 'own-js', type: 'js', content: 'own();' }),
-        ]
-
-        const payload = buildInjectionPayload(items, shared)
-
-        expect(payload.js).toEqual(['shared();', 'own();'])
-        expect(payload.css).toEqual(['body{}'])
-    })
-
-    it('returns empty arrays when there is nothing active to inject', () => {
-        expect(buildInjectionPayload([], [])).toEqual({ js: [], css: [] })
-    })
-})
+const TIMEOUT_MS = 5000
 
 describe('ChromeScriptAPI', () => {
     let execute: ReturnType<typeof vi.fn>
@@ -78,6 +23,8 @@ describe('ChromeScriptAPI', () => {
 
     afterEach(() => {
         vi.unstubAllGlobals()
+        vi.restoreAllMocks()
+        vi.useRealTimers()
     })
 
     it('scope "global": injects into every tab matching any container pattern', async () => {
@@ -92,9 +39,9 @@ describe('ChromeScriptAPI', () => {
 
         const shared = [makeItem({ type: 'css', content: 'body{}' })]
 
-        await new ChromeScriptAPI().run(scripts, shared, 'global')
+        await new ChromeScriptAPI().run(scripts, shared, 'global', TIMEOUT_MS)
 
-        expect(tabsQuery).toHaveBeenCalledWith({})
+        expect(tabsQuery).toHaveBeenCalledWith({ discarded: false, frozen: false })
         expect(execute).toHaveBeenCalledTimes(1)
         expect(insertCSS).toHaveBeenCalledTimes(1)
 
@@ -116,7 +63,7 @@ describe('ChromeScriptAPI', () => {
 
         const shared = [makeItem({ type: 'js', content: 'shared();' })]
 
-        await new ChromeScriptAPI().run(scripts, shared, 'global')
+        await new ChromeScriptAPI().run(scripts, shared, 'global', TIMEOUT_MS)
 
         expect(execute).toHaveBeenCalledTimes(1)
 
@@ -136,11 +83,37 @@ describe('ChromeScriptAPI', () => {
 
         const shared = [makeItem({ type: 'js', content: 'shared();' })]
 
-        await new ChromeScriptAPI().run(scripts, shared, 'global')
+        await new ChromeScriptAPI().run(scripts, shared, 'global', TIMEOUT_MS)
 
         expect(execute).toHaveBeenCalledWith(
             expect.objectContaining({ js: [{ code: 'shared();' }, { code: 'own();' }] }),
         )
+    })
+
+    it('scope "global": ignores containers keyed by an invalid pattern', async () => {
+        tabsQuery.mockResolvedValue([{ id: 1, url: 'https://example.com/foo' }])
+
+        const scripts: ItemsDataState = {
+            'not-a-pattern': [makeItem({ type: 'js', content: 'invalid();' })],
+            'https://example.com/*': [makeItem({ type: 'js', content: 'valid();' })],
+        }
+
+        const result = await new ChromeScriptAPI().run(scripts, [], 'global', TIMEOUT_MS)
+
+        expect(result).toEqual({ executed: 1, failed: 0, timedOut: 0 })
+        expect(execute).toHaveBeenCalledWith(expect.objectContaining({ js: [{ code: 'valid();' }] }))
+    })
+
+    it('scope "global": skips a matching tab when its container has no scripts', async () => {
+        tabsQuery.mockResolvedValue([{ id: 1, url: 'https://github.com/foo' }])
+
+        const scripts: ItemsDataState = { 'https://github.com/*': [] }
+
+        const result = await new ChromeScriptAPI().run(scripts, [], 'global', TIMEOUT_MS)
+
+        expect(result).toEqual({ executed: 0, failed: 0, timedOut: 0 })
+        expect(execute).not.toHaveBeenCalled()
+        expect(insertCSS).not.toHaveBeenCalled()
     })
 
     it('scope "global": does nothing when no tab matches any container', async () => {
@@ -148,9 +121,9 @@ describe('ChromeScriptAPI', () => {
 
         const scripts: ItemsDataState = { 'https://github.com/*': [] }
 
-        await new ChromeScriptAPI().run(scripts, [], 'global')
+        await new ChromeScriptAPI().run(scripts, [], 'global', TIMEOUT_MS)
 
-        expect(tabsQuery).toHaveBeenCalledWith({})
+        expect(tabsQuery).toHaveBeenCalledWith({ discarded: false, frozen: false })
         expect(execute).not.toHaveBeenCalled()
         expect(insertCSS).not.toHaveBeenCalled()
     })
@@ -163,7 +136,7 @@ describe('ChromeScriptAPI', () => {
             'https://example.com/*': [makeItem({ type: 'js', content: 'example();' })],
         }
 
-        await new ChromeScriptAPI().run(scripts, [], 'current')
+        await new ChromeScriptAPI().run(scripts, [], 'current', TIMEOUT_MS)
 
         expect(execute).toHaveBeenCalledTimes(1)
         expect(execute).toHaveBeenCalledWith(
@@ -178,7 +151,7 @@ describe('ChromeScriptAPI', () => {
             'https://github.com/*': [makeItem({ type: 'js', content: 'github();' })],
         }
 
-        await new ChromeScriptAPI().run(scripts, [], 'current')
+        await new ChromeScriptAPI().run(scripts, [], 'current', TIMEOUT_MS)
 
         expect(execute).not.toHaveBeenCalled()
         expect(insertCSS).not.toHaveBeenCalled()
@@ -193,7 +166,7 @@ describe('ChromeScriptAPI', () => {
 
         const shared = [makeItem({ type: 'js', content: 'shared();' })]
 
-        await new ChromeScriptAPI().run(scripts, shared, 'current')
+        await new ChromeScriptAPI().run(scripts, shared, 'current', TIMEOUT_MS)
 
         expect(execute).toHaveBeenCalledWith(
             expect.objectContaining({ js: [{ code: 'shared();' }, { code: 'own();' }] }),
@@ -209,7 +182,7 @@ describe('ChromeScriptAPI', () => {
 
         const shared = [makeItem({ type: 'css', content: 'body{}' })]
 
-        await new ChromeScriptAPI().run(scripts, shared, 'current')
+        await new ChromeScriptAPI().run(scripts, shared, 'current', TIMEOUT_MS)
 
         expect(execute).not.toHaveBeenCalled()
         expect(insertCSS).not.toHaveBeenCalled()
@@ -234,7 +207,7 @@ describe('ChromeScriptAPI', () => {
             'https://*.example.com/*': [makeItem({ type: 'js', content: 'own();' })],
         }
 
-        await new ChromeScriptAPI().run(scripts, [], 'global')
+        await new ChromeScriptAPI().run(scripts, [], 'global', TIMEOUT_MS)
 
         expect(execute).toHaveBeenCalledTimes(2)
         expect(consoleError).toHaveBeenCalledWith(
@@ -243,6 +216,82 @@ describe('ChromeScriptAPI', () => {
         )
 
         consoleError.mockRestore()
+    })
+
+    it('scope "global": counts executed and failed tabs, ignoring unmatched ones', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+        tabsQuery.mockResolvedValue([
+            { id: 1, url: 'https://ok.example.com/' },
+            { id: 2, url: 'https://broken.example.com/' },
+            { id: 3, url: 'https://unrelated.org/' },
+        ])
+        execute.mockImplementation(({ target }) => (
+            target.tabId === 2 ? Promise.reject(new Error('boom')) : Promise.resolve(undefined)
+        ))
+
+        const scripts: ItemsDataState = {
+            'https://*.example.com/*': [makeItem({ type: 'js', content: 'own();' })],
+        }
+
+        const result = await new ChromeScriptAPI().run(scripts, [], 'global', TIMEOUT_MS)
+
+        expect(result).toEqual({ executed: 1, failed: 1, timedOut: 0 })
+    })
+
+    it('scope "global": a tab that never settles times out without blocking the others', async () => {
+        vi.useFakeTimers()
+        vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+        tabsQuery.mockResolvedValue([
+            { id: 1, url: 'https://frozen.example.com/' },
+            { id: 2, url: 'https://awake.example.com/' },
+        ])
+        execute.mockImplementation(({ target }) => (
+            target.tabId === 1 ? new Promise(() => undefined) : Promise.resolve(undefined)
+        ))
+
+        const scripts: ItemsDataState = {
+            'https://*.example.com/*': [makeItem({ type: 'js', content: 'own();' })],
+        }
+
+        const pending = new ChromeScriptAPI().run(scripts, [], 'global', TIMEOUT_MS)
+        await vi.advanceTimersByTimeAsync(TIMEOUT_MS)
+
+        await expect(pending).resolves.toEqual({ executed: 1, failed: 0, timedOut: 1 })
+
+        vi.useRealTimers()
+    })
+
+    it('scope "current": a hanging active tab times out', async () => {
+        vi.useFakeTimers()
+        vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+        tabsQuery.mockResolvedValue([{ id: 7, url: 'https://github.com/foo', active: true }])
+        execute.mockReturnValue(new Promise(() => undefined))
+
+        const scripts: ItemsDataState = {
+            'https://github.com/*': [makeItem({ type: 'js', content: 'github();' })],
+        }
+
+        const pending = new ChromeScriptAPI().run(scripts, [], 'current', TIMEOUT_MS)
+        await vi.advanceTimersByTimeAsync(TIMEOUT_MS)
+
+        await expect(pending).resolves.toEqual({ executed: 0, failed: 0, timedOut: 1 })
+
+        vi.useRealTimers()
+    })
+
+    it('scope "current": reports nothing when the active tab matches no container', async () => {
+        tabsQuery.mockResolvedValue([{ id: 7, url: 'https://example.com/foo', active: true }])
+
+        const scripts: ItemsDataState = {
+            'https://github.com/*': [makeItem({ type: 'js', content: 'github();' })],
+        }
+
+        const result = await new ChromeScriptAPI().run(scripts, [], 'current', TIMEOUT_MS)
+
+        expect(result).toEqual({ executed: 0, failed: 0, timedOut: 0 })
     })
 })
 
