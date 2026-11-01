@@ -5,10 +5,22 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ROBOTO_PKG_DIR = path.dirname(require.resolve('@fontsource/roboto/package.json'))
 
 const outputPath = path.resolve(__dirname, 'dist')
+const packageVersion = require('./package.json').version
+const manifestVersion = packageVersion.match(/^(\d+\.\d+\.\d+)(-.+)?$/)?.[1]
+if (!manifestVersion) {
+    throw new Error(`package.json version "${packageVersion}" must be nr.nr.nr, optionally followed by -text`)
+}
 
 const buildTimeDefine = new webpack.DefinePlugin({
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
 })
+
+function withVersions(content) {
+    const manifest = JSON.parse(content.toString())
+    manifest.version = manifestVersion
+    manifest.version_name = packageVersion
+    return JSON.stringify(manifest, null, 4)
+}
 
 const tsRule = {
     test: /\.tsx?$/,
@@ -102,11 +114,18 @@ const pagesConfig = {
     plugins: [
         buildTimeDefine,
         new CopyPlugin({
-            patterns: [{
-                from: 'public',
-                to: '.',
-                globOptions: { ignore: ['**/popup.html', '**/options.html'] },
-            }],
+            patterns: [
+                {
+                    from: 'public',
+                    to: '.',
+                    globOptions: { ignore: ['**/popup.html', '**/options.html', '**/manifest.json'] },
+                },
+                {
+                    from: 'public/manifest.json',
+                    to: 'manifest.json',
+                    transform: withVersions,
+                },
+            ],
         }),
         new HtmlWebpackPlugin({
             template: 'public/popup.html',

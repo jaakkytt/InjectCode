@@ -3,7 +3,6 @@
     "name": "InjectCode",
     "description": "Store and inject code to browser pages made super easy.",
     "minimum_chrome_version": "138",
-    "version": "2.0.0",
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
