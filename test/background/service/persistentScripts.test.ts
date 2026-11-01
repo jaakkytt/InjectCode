@@ -17,6 +17,23 @@ describe('wrapCssAsUserScript', () => {
         expect(code).toContain(JSON.stringify(css))
         expect(() => new Function(code)).not.toThrow()
     })
+
+    it('appends the style to <head> when the page has one', () => {
+        const page = fakeDocument({ withHead: true })
+
+        new Function('document', wrapCssAsUserScript('body{}'))(page.document)
+
+        expect(page.head.appendChild).toHaveBeenCalledWith({ textContent: 'body{}' })
+        expect(page.root.appendChild).not.toHaveBeenCalled()
+    })
+
+    it('falls back to <html> before <head> exists, as at Document start', () => {
+        const page = fakeDocument({ withHead: false })
+
+        new Function('document', wrapCssAsUserScript('body{}'))(page.document)
+
+        expect(page.root.appendChild).toHaveBeenCalledWith({ textContent: 'body{}' })
+    })
 })
 
 describe('computeDesiredRegistrations', () => {
@@ -298,4 +315,16 @@ function createFakeUserScripts() {
     }
 
     return { registered, register, unregister }
+}
+
+function fakeDocument({ withHead }: { withHead: boolean }) {
+    const head = { appendChild: vi.fn() }
+    const root = { appendChild: vi.fn() }
+    const document = {
+        head: withHead ? head : null,
+        documentElement: root,
+        createElement: () => ({}),
+    }
+
+    return { document, head, root }
 }

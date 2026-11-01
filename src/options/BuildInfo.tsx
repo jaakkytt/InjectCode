@@ -3,7 +3,8 @@ import Typography from '@mui/material/Typography'
 
 export default function BuildInfo() {
     const builtAt = new Date(__BUILD_TIME__)
-    const label = Number.isNaN(builtAt.getTime()) ? __BUILD_TIME__ : builtAt.toLocaleString()
+    const builtLabel = Number.isNaN(builtAt.getTime()) ? __BUILD_TIME__ : builtAt.toLocaleString()
+    const { version } = chrome.runtime.getManifest()
 
     return (
         <Typography
@@ -11,7 +12,7 @@ export default function BuildInfo() {
             align="center"
             sx={{ fontSize: 10, color: 'text.disabled', py: 0.5 }}
         >
-            Built {label}
+            Version {version}, built {builtLabel}
         </Typography>
     )
 }

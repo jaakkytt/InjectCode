@@ -1,9 +1,79 @@
 import { Container } from '@mui/material'
-import { styled } from '@mui/material/styles'
-import SettingsIcon from '@mui/icons-material/Settings'
+import { CSSObject, styled } from '@mui/material/styles'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew'
+import AdsClickIcon from '@mui/icons-material/AdsClick'
+import BoltIcon from '@mui/icons-material/Bolt'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
+import PublicIcon from '@mui/icons-material/Public'
 
-export const TopBarIcon = styled(SettingsIcon)(({ theme }) => ({
+function thumbIcon(backgroundColor: string, color: string): CSSObject {
+    return {
+        fontSize: 22,
+        padding: 3,
+        boxSizing: 'border-box',
+        borderRadius: '50%',
+        backgroundColor,
+        color,
+        verticalAlign: 'middle',
+    }
+}
+
+export const Warning = styled('b')(({ theme }) => ({
+    color: theme.palette.warning.main,
+    fontStyle: 'italic',
+}))
+
+export const Primary = styled('b')(({ theme }) => ({
+    color: theme.palette.primary.main,
+    fontStyle: 'italic',
+}))
+
+export const Disabled = styled('b')(({ theme }) => ({
+    color: theme.palette.action.active,
+    fontStyle: 'italic',
+}))
+
+export const Success = styled('b')(({ theme }) => ({
+    color: theme.palette.success.main,
+    fontStyle: 'italic',
+}))
+
+export const TopBarLogo = styled('img')(({ theme }) => ({
+    width: 24,
+    height: 24,
+    filter: 'invert(100%)',
     marginRight: theme.spacing(1.5),
+}))
+
+export const RunIcon = styled(PlayCircleOutlineIcon)(({ theme }) => ({
+    verticalAlign: 'middle',
+    color: theme.palette.primary.main,
+}))
+
+export const DisabledModeIcon = styled(PowerSettingsNewIcon)(({ theme }) => ({
+    ...thumbIcon(theme.palette.grey[50], theme.palette.action.active),
+    boxShadow: theme.shadows[1],
+}))
+
+export const ActiveModeIcon = styled(AdsClickIcon)(({ theme }) => ({
+    ...thumbIcon(theme.palette.primary.main, theme.palette.primary.contrastText),
+    boxShadow: theme.shadows[1],
+}))
+
+export const AlwaysOnModeIcon = styled(BoltIcon)(({ theme }) => ({
+    ...thumbIcon(theme.palette.warning.main, theme.palette.warning.contrastText),
+    boxShadow: theme.shadows[1],
+}))
+
+export const CurrentTabScopeIcon = styled(LocationOnIcon)(({ theme }) => ({
+    ...thumbIcon(theme.palette.success.main, theme.palette.common.white),
+    boxShadow: theme.shadows[1],
+}))
+
+export const AllTabsScopeIcon = styled(PublicIcon)(({ theme }) => ({
+    ...thumbIcon(theme.palette.warning.main, theme.palette.common.white),
+    boxShadow: theme.shadows[1],
 }))
 
 export const PageTitle = styled('h1')(({ theme }) => ({

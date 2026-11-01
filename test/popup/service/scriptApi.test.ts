@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { Script, ScriptsByPattern } from '../../../src/shared/types'
 import { ChromeScriptAPI } from '../../../src/popup/service/scriptApi'
+import { NO_INJECTION_TIMEOUT } from '../../../src/shared/service/settings/injectionTimeout'
 
 const TIMEOUT_MS = 5000
 
@@ -186,6 +187,71 @@ describe('ChromeScriptAPI', () => {
 
         expect(execute).not.toHaveBeenCalled()
         expect(insertCSS).not.toHaveBeenCalled()
+    })
+
+    it('scope "global": skips tabs that are not loaded', async () => {
+        tabsQuery.mockResolvedValue([
+            { id: 1, url: 'https://github.com/restored', status: 'unloaded' },
+            { id: 2, url: 'https://github.com/open', status: 'complete' },
+        ])
+
+        const scripts: ScriptsByPattern = {
+            'https://github.com/*': [makeItem({ type: 'js', content: 'own();' })],
+        }
+
+        const result = await new ChromeScriptAPI().run(scripts, [], 'global', TIMEOUT_MS)
+
+        expect(result).toEqual({ executed: 1, failed: 0, timedOut: 0 })
+        expect(execute).toHaveBeenCalledTimes(1)
+        expect(execute).toHaveBeenCalledWith(expect.objectContaining({ target: { tabId: 2 } }))
+    })
+
+    it('injects JS and CSS in list order, batching consecutive JS', async () => {
+        const calls: string[] = []
+        execute.mockImplementation(({ js }) => {
+            calls.push(`js:${js.map((entry: { code: string }) => entry.code).join('+')}`)
+            return Promise.resolve(undefined)
+        })
+        insertCSS.mockImplementation(({ css }) => {
+            calls.push(`css:${css}`)
+            return Promise.resolve(undefined)
+        })
+        tabsQuery.mockResolvedValue([{ id: 7, url: 'https://github.com/foo', active: true }])
+
+        const scripts: ScriptsByPattern = {
+            'https://github.com/*': [
+                makeItem({ type: 'js', content: 'first();' }),
+                makeItem({ type: 'js', content: 'second();' }),
+                makeItem({ type: 'css', content: 'body{}' }),
+                makeItem({ type: 'js', content: 'third();' }),
+            ],
+        }
+
+        const shared = [makeItem({ type: 'css', content: 'html{}' })]
+
+        await new ChromeScriptAPI().run(scripts, shared, 'current', TIMEOUT_MS)
+
+        expect(calls).toEqual(['css:html{}', 'js:first();+second();', 'css:body{}', 'js:third();'])
+    })
+
+    it('waits for a slow tab without timing out when the timeout is off', async () => {
+        vi.useFakeTimers()
+
+        let finish: () => void = () => undefined
+        execute.mockReturnValue(new Promise<void>(resolve => finish = resolve))
+        tabsQuery.mockResolvedValue([{ id: 7, url: 'https://github.com/foo', active: true }])
+
+        const scripts: ScriptsByPattern = {
+            'https://github.com/*': [makeItem({ type: 'js', content: 'github();' })],
+        }
+
+        const pending = new ChromeScriptAPI().run(scripts, [], 'current', NO_INJECTION_TIMEOUT)
+        await vi.advanceTimersByTimeAsync(60 * 60 * 1000)
+        finish()
+
+        await expect(pending).resolves.toEqual({ executed: 1, failed: 0, timedOut: 0 })
+
+        vi.useRealTimers()
     })
 
     it('a throwing tab does not block the others, and gets logged with its id/url', async () => {

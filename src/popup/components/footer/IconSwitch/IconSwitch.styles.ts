@@ -9,9 +9,11 @@ export const Thumb = styled('span', {
     backgroundColor: checked ? theme.palette.warning.main : theme.palette.success.main,
     display: 'grid',
     placeItems: 'center',
+    boxShadow: theme.shadows[1],
     '& .MuiSvgIcon-root': {
         fontSize: 18,
         color: '#fff',
+        marginLeft: checked ? 0 : '-1px',
     },
 }))
 

@@ -13,7 +13,7 @@ export function wrapCssAsUserScript(css: string): string {
     return `(() => {
         const s = document.createElement('style');
         s.textContent = ${JSON.stringify(css)};
-        document.head.appendChild(s);
+        (document.head ?? document.documentElement).appendChild(s);
     })();`
 }
 

@@ -12,7 +12,10 @@ const buildTimeDefine = new webpack.DefinePlugin({
 
 const tsRule = {
     test: /\.tsx?$/,
-    use: 'ts-loader',
+    use: {
+        loader: 'ts-loader',
+        options: { transpileOnly: true },
+    },
     exclude: /node_modules/,
 }
 
@@ -85,6 +88,13 @@ const pagesConfig = {
                     enforce: true,
                     priority: 10,
                     reuseExistingChunk: true,
+                },
+                shared: {
+                    test: /[\\/]src[\\/]shared[\\/]/,
+                    name: 'shared',
+                    minChunks: 2,
+                    enforce: true,
+                    priority: 5,
                 },
             },
         },

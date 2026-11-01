@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
+    "rootDir": ".",
     "types": ["chrome"]
   },
   "include": ["src", "test"]

@@ -3,11 +3,13 @@ import { storage } from '../storageApi'
 
 export const DEFAULT_INJECTION_TIMEOUT_SECONDS = 5
 
+export const NO_INJECTION_TIMEOUT = 0
+
 const MAX_TIMER_MS = 2_147_483_647
 
 export function parseInjectionTimeout(value: unknown): number | null {
     const seconds = typeof value === 'string' && value.trim() !== '' ? Number(value) : value
-    return typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0 ? seconds : null
+    return typeof seconds === 'number' && Number.isFinite(seconds) && seconds >= 0 ? seconds : null
 }
 
 export function injectionTimeoutMs(seconds: number): number {

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { injectionTimeoutMs, parseInjectionTimeout } from '../../../../src/shared/service/settings/injectionTimeout'
+import {
+    injectionTimeoutMs,
+    NO_INJECTION_TIMEOUT,
+    parseInjectionTimeout,
+} from '../../../../src/shared/service/settings/injectionTimeout'
 
 describe('parseInjectionTimeout', () => {
     it('accepts positive numbers and numeric strings', () => {
@@ -8,8 +12,12 @@ describe('parseInjectionTimeout', () => {
         expect(parseInjectionTimeout('3600')).toBe(3600)
     })
 
-    it('rejects zero, negatives and anything not a number', () => {
-        expect(parseInjectionTimeout(0)).toBeNull()
+    it('accepts zero as no timeout', () => {
+        expect(parseInjectionTimeout(0)).toBe(NO_INJECTION_TIMEOUT)
+        expect(parseInjectionTimeout('0')).toBe(NO_INJECTION_TIMEOUT)
+    })
+
+    it('rejects negatives and anything not a number', () => {
         expect(parseInjectionTimeout('-1')).toBeNull()
         expect(parseInjectionTimeout('')).toBeNull()
         expect(parseInjectionTimeout('abc')).toBeNull()

@@ -2,6 +2,7 @@ import { Script, ScriptsByPattern } from '../../shared/types'
 import { RunScope } from '../types'
 import { USER_SCRIPT_ID } from '../../shared/constants'
 import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
+import { NO_INJECTION_TIMEOUT } from '../../shared/service/settings/injectionTimeout'
 
 export interface ScriptApi {
     run(scripts: ScriptsByPattern, shared: Script[], scope: RunScope, timeoutMs: number): Promise<RunResult>
@@ -15,10 +16,9 @@ export interface RunResult {
     timedOut: number
 }
 
-interface InjectionPayload {
-    js: string[]
-    css: string[]
-}
+type InjectionStep =
+    | { type: 'js', code: [string, ...string[]] }
+    | { type: 'css', css: string }
 
 function selectItemsForUrl(scripts: ScriptsByPattern, url: string): Script[] {
     return Object.entries(scripts)
@@ -29,12 +29,22 @@ function selectItemsForUrl(scripts: ScriptsByPattern, url: string): Script[] {
         .flatMap(([, items]) => items)
 }
 
-function buildInjectionPayload(items: Script[], shared: Script[]): InjectionPayload {
-    const ordered = [...shared, ...items]
-    return {
-        js: ordered.filter(item => item.type === 'js').map(item => item.content),
-        css: ordered.filter(item => item.type === 'css').map(item => item.content),
+function buildInjectionSteps(items: Script[], shared: Script[]): InjectionStep[] {
+    const steps: InjectionStep[] = []
+
+    for (const item of [...shared, ...items]) {
+        const previous = steps[steps.length - 1]
+
+        if (item.type === 'css') {
+            steps.push({ type: 'css', css: item.content })
+        } else if (previous?.type === 'js') {
+            previous.code.push(item.content)
+        } else {
+            steps.push({ type: 'js', code: [item.content] })
+        }
     }
+
+    return steps
 }
 
 function describeTab(tab: chrome.tabs.Tab) {
@@ -49,24 +59,24 @@ function countOutcomes(outcomes: (TabRunOutcome | null)[]): RunResult {
     }
 }
 
-async function injectIntoTab(tab: chrome.tabs.Tab, payload: InjectionPayload): Promise<TabRunOutcome> {
+async function injectIntoTab(tab: chrome.tabs.Tab, steps: InjectionStep[]): Promise<TabRunOutcome> {
     if (!tab.id) {
         console.error(`Skipped injection: tab ID is not available for ${describeTab(tab)}`)
         return 'failed'
     }
 
     try {
-        if (payload.js.length > 0) {
-            const [firstCode, ...restCode] = payload.js
-            await chrome.userScripts.execute({
-                target: { tabId: tab.id },
-                worldId: USER_SCRIPT_ID,
-                js: [{ code: firstCode }, ...restCode.map(code => ({ code }))],
-            })
-        }
-
-        for (const css of payload.css) {
-            await chrome.scripting.insertCSS({ target: { tabId: tab.id }, css })
+        for (const step of steps) {
+            if (step.type === 'js') {
+                const [firstCode, ...restCode] = step.code
+                await chrome.userScripts.execute({
+                    target: { tabId: tab.id },
+                    worldId: USER_SCRIPT_ID,
+                    js: [{ code: firstCode }, ...restCode.map(code => ({ code }))],
+                })
+            } else {
+                await chrome.scripting.insertCSS({ target: { tabId: tab.id }, css: step.css })
+            }
         }
 
         return 'executed'
@@ -78,10 +88,15 @@ async function injectIntoTab(tab: chrome.tabs.Tab, payload: InjectionPayload): P
 
 async function injectWithTimeout(
     tab: chrome.tabs.Tab,
-    payload: InjectionPayload,
+    steps: InjectionStep[],
     timeoutMs: number,
 ): Promise<TabRunOutcome> {
+    if (timeoutMs === NO_INJECTION_TIMEOUT) {
+        return injectIntoTab(tab, steps)
+    }
+
     let timer: ReturnType<typeof setTimeout> | undefined
+
     const timeout = new Promise<TabRunOutcome>((resolve) => {
         timer = setTimeout(() => {
             console.warn(`Timed out after ${timeoutMs}ms on ${describeTab(tab)}`)
@@ -90,7 +105,7 @@ async function injectWithTimeout(
     })
 
     try {
-        return await Promise.race([injectIntoTab(tab, payload), timeout])
+        return await Promise.race([injectIntoTab(tab, steps), timeout])
     } finally {
         clearTimeout(timer)
     }
@@ -111,12 +126,12 @@ async function injectMatchingItems(
         return null
     }
 
-    const payload = buildInjectionPayload(items, shared)
-    if (payload.js.length === 0 && payload.css.length === 0) {
+    const steps = buildInjectionSteps(items, shared)
+    if (steps.length === 0) {
         return null
     }
 
-    return injectWithTimeout(tab, payload, timeoutMs)
+    return injectWithTimeout(tab, steps, timeoutMs)
 }
 
 async function runOnActiveTab(scripts: ScriptsByPattern, shared: Script[], timeoutMs: number) {
@@ -131,7 +146,12 @@ async function runOnActiveTab(scripts: ScriptsByPattern, shared: Script[], timeo
 
 async function runOnAllTabs(scripts: ScriptsByPattern, shared: Script[], timeoutMs: number) {
     const tabs = await chrome.tabs.query({ discarded: false, frozen: false })
-    return countOutcomes(await Promise.all(tabs.map(tab => injectMatchingItems(tab, scripts, shared, timeoutMs))))
+
+    const loadedTabs = tabs.filter(tab => tab.status !== 'unloaded')
+
+    const outcomes = await Promise.all(loadedTabs.map(tab => injectMatchingItems(tab, scripts, shared, timeoutMs)))
+
+    return countOutcomes(outcomes)
 }
 
 export class ChromeScriptAPI implements ScriptApi {

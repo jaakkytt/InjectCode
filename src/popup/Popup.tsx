@@ -12,7 +12,6 @@ import { ExistingUrlsProvider } from './providers/ExistingUrlsProvider'
 import AccordionSkeleton from './components/sortable/AccordionSkeleton'
 import { TabProvider } from './providers/TabProvider'
 import { LastInteractedProvider } from './providers/LastInteractedProvider'
-import BuildInfo from '../shared/components/BuildInfo'
 
 const SAVES_TO_IGNORE_BECAUSE_OF_HYDRATION = 2
 
@@ -74,7 +73,6 @@ const Popup = () => {
                 </LastInteractedProvider>
             </TabProvider>
         </ExistingUrlsProvider>
-        <BuildInfo/>
     </UrlsProvider>
 }
 
