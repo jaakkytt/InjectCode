@@ -6,7 +6,7 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import SettingsIcon from '@mui/icons-material/Settings'
 
-const PluginDisabledWarning = () => {
+const ExtensionDisabledWarning = () => {
 
     const openSettings = () => {
         chrome.runtime.openOptionsPage()
@@ -16,7 +16,7 @@ const PluginDisabledWarning = () => {
         <Card sx={{ width: 450, marginTop: '80px', marginBottom: '80px', marginLeft: 'auto', marginRight: 'auto' }}>
             <CardContent>
                 <Typography variant="h5" component="div">
-                    Please finish the plugin setup
+                    Please finish the extension setup
                 </Typography>
                 <Typography variant="body2">
                     InjectCode needs "Allow User Scripts" turned on in order to work.
@@ -29,4 +29,4 @@ const PluginDisabledWarning = () => {
     )
 }
 
-export default PluginDisabledWarning
+export default ExtensionDisabledWarning

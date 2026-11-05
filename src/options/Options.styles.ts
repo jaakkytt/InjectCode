@@ -1,4 +1,4 @@
-import { Container } from '@mui/material'
+import { Accordion, accordionClasses, AccordionSummary, accordionSummaryClasses, Container } from '@mui/material'
 import { CSSObject, styled } from '@mui/material/styles'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew'
@@ -185,5 +185,96 @@ export const TopicList = styled('ul')(({ theme }) => ({
     },
     '& li + li': {
         marginTop: theme.spacing(0.5),
+    },
+}))
+
+export const TroubleshootingTopics = styled('div')(({ theme }) => ({
+    borderTop: `1px solid ${theme.palette.divider}`,
+}))
+
+export const TroubleshootingTopic = styled(Accordion)(({ theme }) => ({
+    backgroundColor: 'transparent',
+    color: 'inherit',
+    boxShadow: 'none',
+    borderRadius: 0,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    '&::before': {
+        display: 'none',
+    },
+    [`&.${accordionClasses.expanded}`]: {
+        margin: 0,
+    },
+    [`& .${accordionClasses.region}`]: {
+        paddingBottom: theme.spacing(2),
+    },
+}))
+
+export const TroubleshootingHeading = styled(AccordionSummary)(({ theme }) => ({
+    ...theme.typography.subtitle2,
+    minHeight: 0,
+    padding: 0,
+    [`&.${accordionSummaryClasses.expanded}`]: {
+        minHeight: 0,
+    },
+    [`& .${accordionSummaryClasses.content}`]: {
+        display: 'block',
+        margin: theme.spacing(1.5, 0),
+    },
+    [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
+        margin: theme.spacing(1.5, 0),
+    },
+}))
+
+export const Collapsible = styled(Accordion)(({ theme }) => ({
+    backgroundColor: 'transparent',
+    color: 'inherit',
+    boxShadow: 'none',
+    '&::before': {
+        display: 'none',
+    },
+    paddingTop: theme.spacing(0.5),
+    [`&.${accordionClasses.expanded}`]: {
+        margin: 0,
+    },
+    [`& .${accordionClasses.region}`]: {
+        marginTop: theme.spacing(0.5),
+        marginLeft: theme.spacing(1.25),
+        paddingLeft: theme.spacing(1.5),
+        borderLeft: `1px solid ${theme.palette.divider}`,
+    },
+    [`& .${accordionClasses.region} > ul`]: {
+        margin: 0,
+        paddingLeft: theme.spacing(2.5),
+    },
+}))
+
+export const CollapsibleSummary = styled(AccordionSummary)(({ theme }) => ({
+    ...theme.typography.body2,
+    minHeight: 0,
+    padding: 0,
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-end',
+    gap: theme.spacing(0.5),
+    color: theme.palette.text.secondary,
+    fontStyle: 'italic',
+    [`&.${accordionSummaryClasses.expanded}`]: {
+        minHeight: 0,
+    },
+    [`& .${accordionSummaryClasses.content}`]: {
+        margin: 0,
+        flexGrow: 0,
+    },
+    [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
+        margin: 0,
+    },
+    [`& .${accordionSummaryClasses.expandIconWrapper}`]: {
+        fontSize: 20,
+        color: theme.palette.action.active,
+    },
+    [`& .${accordionSummaryClasses.expandIconWrapper} svg`]: {
+        fontSize: 'inherit',
+    },
+    [`& .${accordionSummaryClasses.expandIconWrapper}.${accordionSummaryClasses.expanded}`]: {
+        transform: 'rotate(90deg)',
     },
 }))

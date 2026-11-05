@@ -7,6 +7,8 @@ import MenuBookIcon from '@mui/icons-material/MenuBook'
 import BuildIcon from '@mui/icons-material/Build'
 import HistoryIcon from '@mui/icons-material/History'
 import NotificationsIcon from '@mui/icons-material/Notifications'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { CHANGELOG_URL, ISSUES_URL, MATCH_PATTERN_DOCS, RUN_AT_DOCS } from '../shared/constants'
 import BuildInfo from './BuildInfo'
 import SetupToggle from './inputs/SetupToggle'
@@ -25,12 +27,14 @@ import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
 import SiteAccessSelect from './inputs/SiteAccessSelect'
 import ExternalLink from './links/ExternalLink'
 import ExtensionErrorLink from './links/ExtensionErrorLink'
-import ApplyAlwaysOnLink from './links/ApplyAlwaysOnLink'
+import ReregisterAlwaysOnLink from './links/ReregisterAlwaysOnLink'
 import {
     ActiveModeIcon,
     AllTabsScopeIcon,
     AlwaysOnModeIcon,
     ButtonRow,
+    Collapsible,
+    CollapsibleSummary,
     CurrentTabScopeIcon,
     Disabled,
     DisabledModeIcon,
@@ -54,6 +58,9 @@ import {
     TopicList,
     Topics,
     TopicText,
+    TroubleshootingHeading,
+    TroubleshootingTopic,
+    TroubleshootingTopics,
     Warning,
 } from './Options.styles'
 
@@ -88,7 +95,7 @@ const Options = () => (
                                     <SettingTitle>User scripts</SettingTitle>
                                     <SettingText>
                                         In order to run the scripts you define, this extension <b>requires</b> "Allow
-                                        User Scripts" to be turned on in the <ExtensionSettingsLink/>.
+                                        User Scripts" to be turned on in the <ExtensionSettingsLink />.
                                     </SettingText>
                                 </div>
                             </Setting>
@@ -99,7 +106,7 @@ const Options = () => (
                                     <SettingTitle>File URLs</SettingTitle>
                                     <SettingText>
                                         Only if you wish to run your scripts on local files (<code>file:///</code>{' '}
-                                        patterns), enable "Allow access to file URLs" in the <ExtensionSettingsLink/>.
+                                        patterns), enable "Allow access to file URLs" in the <ExtensionSettingsLink />.
                                     </SettingText>
                                 </div>
                             </Setting>
@@ -110,7 +117,7 @@ const Options = () => (
                                     <SettingTitle>Tutorial tooltips</SettingTitle>
                                     <SettingText>
                                         Show tooltip hints on buttons such as Run and Delete. Each hint stops appearing
-                                        after it has been shown a number of times. <ResetTooltipsLink/>
+                                        after it has been shown a number of times. <ResetTooltipsLink />
                                     </SettingText>
                                 </div>
                             </Setting>
@@ -127,10 +134,10 @@ const Options = () => (
                                         For <RunIcon /> <Primary>Run all</Primary> on <AllTabsScopeIcon />{' '}
                                         <Warning>All tabs</Warning> and <AlwaysOnModeIcon />{' '}
                                         <Warning>Always on</Warning> scripts to work seamlessly, it is recommended to
-                                        set "Site access" in the <ExtensionSettingsLink/> to "On all sites" for broader
+                                        set "Site access" in the <ExtensionSettingsLink /> to "On all sites" for broader
                                         usage, or to "On specific sites" and add the sites you plan to use InjectCode
-                                        on. See <em>Site access</em> below for why "On click" may introduce unintuitive
-                                        behavior and extra clicks.
+                                        on. See <em>On click caveats</em> under <em>Site access</em> below for why "On
+                                        click" may introduce unintuitive behavior and extra clicks.
                                     </SettingText>
                                 </div>
                             </Setting>
@@ -276,19 +283,19 @@ const Options = () => (
                                     </li>
                                     <li>
                                         <AlwaysOnModeIcon /> <Warning>Always on</Warning><em>:</em> runs
-                                        automatically on every matching page
+                                        automatically on every matching page, at the chosen <em>Always on timing</em>:
                                         <ul>
                                             <li>
-                                                <em>start:</em> before the page is built and before any of
+                                                <em>Document start:</em> before the page is built and before any of
                                                 the page's own scripts run.
                                             </li>
                                             <li>
-                                                <em>end:</em> as soon as the page's content is ready, before
+                                                <em>Document end:</em> as soon as the page's content is ready, before
                                                 images and other resources have finished loading.
                                             </li>
                                             <li>
-                                                <em>idle:</em> once the page's content is ready, at a moment chosen
-                                                by the browser, no later than when the page has fully loaded.
+                                                <em>Document idle:</em> once the page's content is ready, at a moment
+                                                chosen by the browser, no later than when the page has fully loaded.
                                             </li>
                                         </ul>
                                         <TopicText>
@@ -322,7 +329,7 @@ const Options = () => (
                                 <TopicHeading>Site access</TopicHeading>
                                 <TopicText>
                                     Chrome lets you limit which sites InjectCode can access, under "Site access" in
-                                    the <ExtensionSettingsLink/>:
+                                    the <ExtensionSettingsLink />:
                                 </TopicText>
                                 <TopicList>
                                     <li>
@@ -335,31 +342,37 @@ const Options = () => (
                                     <li>
                                         <em>On click:</em> InjectCode can only access a tab after you click its icon on
                                         that tab. The access lasts until the tab navigates to a different site.
-                                        This is primarily useful only when you want to execute scripts on a single tab;
-                                        for broader use this access is restrictive and you have to account for the
-                                        following:
-                                        <ul>
-                                            <li>
-                                                <AlwaysOnModeIcon /> <Warning>Always on</Warning> scripts don't run in
-                                                new tabs, and Chrome gives no sign that they were skipped. To run them
-                                                on a tab, click the InjectCode icon on that tab first, then reload the
-                                                page. Reloading without clicking the icon first doesn't help.
-                                            </li>
-                                            <li>
-                                                Scripts run using <RunIcon /> <Primary>Run all</Primary> with{' '}
-                                                <AllTabsScopeIcon /> <Warning>All tabs</Warning> are held back by Chrome
-                                                on tabs without access, and the InjectCode icon shows "wants to access
-                                                this page" on hover. They run when you click that icon on a given tab,
-                                                which may be long after you pressed <RunIcon /> <Primary>Run</Primary>.
-                                                Every press adds another held run, so a single InjectCode icon click can
-                                                release and run several of your waiting scripts.
-                                            </li>
-                                            <li>
-                                                The <em>Script timeout</em> only stops the popup from waiting; it
-                                                doesn't cancel held runs. Set it to 0 to keep waiting until you've
-                                                clicked every held tab.
-                                            </li>
-                                        </ul>
+                                        This is mainly useful when you want to run scripts on a single tab; for broader
+                                        use it's restrictive.
+                                        <Collapsible slots={{ heading: 'div' }}>
+                                            <CollapsibleSummary expandIcon={<ChevronRightIcon />}>
+                                                On click caveats
+                                            </CollapsibleSummary>
+                                            <ul>
+                                                <li>
+                                                    <AlwaysOnModeIcon /> <Warning>Always on</Warning> scripts don't run
+                                                    in new tabs, and Chrome gives no sign that they were skipped. To run
+                                                    them on a tab, click the InjectCode icon on that tab first, then
+                                                    reload the page. Reloading without clicking the icon first doesn't
+                                                    help.
+                                                </li>
+                                                <li>
+                                                    Scripts run using <RunIcon /> <Primary>Run all</Primary> with{' '}
+                                                    <AllTabsScopeIcon /> <Warning>All tabs</Warning> are held back by
+                                                    Chrome on tabs without access, and the InjectCode icon shows "wants
+                                                    to access this page" on hover. They run when you click that icon on
+                                                    a given tab, which may be long after you pressed <RunIcon />{' '}
+                                                    <Primary>Run</Primary>. Every press adds another held run, so a
+                                                    single InjectCode icon click can release and run several of your
+                                                    waiting scripts.
+                                                </li>
+                                                <li>
+                                                    The <em>Script timeout</em> only stops the popup from waiting; it
+                                                    doesn't cancel held runs. Set it to 0 to keep waiting until you've
+                                                    clicked every held tab.
+                                                </li>
+                                            </ul>
+                                        </Collapsible>
                                     </li>
                                 </TopicList>
                             </Topic>
@@ -385,17 +398,16 @@ const Options = () => (
                                 <TopicHeading>What your JavaScript can see</TopicHeading>
                                 <TopicText>
                                     JavaScript runs in an isolated user script world. It can read and change the page,
-                                    but it cannot see the page's own JavaScript variables and functions.
+                                    including its <code>localStorage</code>, but it cannot see the page's own
+                                    JavaScript variables and functions.
                                 </TopicText>
                                 <TopicText>
-                                    All your scripts share that one world for as long as the page is open. This is
-                                    what lets a Shared script define functions that later scripts can call. It also
-                                    means that running a script a second time on the same page fails if it declares{' '}
-                                    <code>const</code>, <code>let</code> or <code>class</code> at the top level
-                                    ("Identifier has already been declared"). This includes running an{' '}
-                                    <AlwaysOnModeIcon /> <Warning>Always on</Warning> script manually after it already
-                                    ran on page load. Wrap your code in a block <code>{'{ … }'}</code> or a function,
-                                    or use <code>var</code>, unless you intend to share it.
+                                    Each tab gets its own world, which lasts until the tab reloads or loads a new
+                                    page. All your scripts that run in that tab share it, but scripts in different
+                                    tabs can't see each other's variables, even on the same site. To keep data across
+                                    tabs or reloads, store it in <code>localStorage</code>, which every tab with the
+                                    same origin shares. The page's own scripts and other extensions can read and change
+                                    it too, so don't store anything sensitive there.
                                 </TopicText>
                             </Topic>
                         </Topics>
@@ -406,21 +418,66 @@ const Options = () => (
                             <SectionIcon><BuildIcon /></SectionIcon>
                             Troubleshooting
                         </SectionHeading>
-                        <Topics>
-                            <Topic>
-                                <TopicHeading>Running a script again</TopicHeading>
+                        <TroubleshootingTopics>
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
+                                    Finding errors
+                                </TroubleshootingHeading>
                                 <TopicText>
-                                    There is no undo. Whatever a script changes on the page, including added styles
-                                    and event listeners, stays until you reload the page, and running it again applies
-                                    it again on top. To get rid of a script's effects, set it to <DisabledModeIcon />
-                                    {' '}<Disabled>Disabled</Disabled> and reload the page.
+                                    InjectCode doesn't show errors itself. Errors thrown by your scripts appear in the
+                                    page's DevTools console (F12). If a script didn't run at all, for example because
+                                    the page is blocked or a permission is missing, the reason is logged either on{' '}
+                                    the <ExtensionErrorLink /> page or in the extension's own console: open the{' '}
+                                    <ExtensionSettingsLink /> and click "service worker".
                                 </TopicText>
-                            </Topic>
-
-                            <Topic>
-                                <TopicHeading>Script ran late or not at all</TopicHeading>
                                 <TopicText>
-                                    A tab that doesn't respond to <RunIcon/> <Primary>Run</Primary> or <RunIcon/>{' '}
+                                    Chrome only lists errors on the <ExtensionErrorLink /> page if "Collect errors" is
+                                    turned on in the <ExtensionSettingsLink />.
+                                </TopicText>
+                            </TroubleshootingTopic>
+
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
+                                    Script runs more than once on a page
+                                </TroubleshootingHeading>
+                                <TopicText>
+                                    Nothing a script does is undone until you reload the page. Its changes to the page,
+                                    including added styles and event listeners, stay, and so do its top-level
+                                    declarations in the shared world. Running it again on the same page applies its
+                                    changes again on top, and fails with "Identifier has already been declared" if it
+                                    declares <code>const</code>, <code>let</code> or <code>class</code> at the top
+                                    level. A script runs again when:
+                                </TopicText>
+                                <TopicList>
+                                    <li>
+                                        you press <RunIcon /> <Primary>Run</Primary> or <RunIcon />{' '}
+                                        <Primary>Run all</Primary> again.
+                                    </li>
+                                    <li>
+                                        you run an <AlwaysOnModeIcon /> <Warning>Always on</Warning> script manually
+                                        after it already ran on page load.
+                                    </li>
+                                    <li>
+                                        a page matches more than one URL pattern with <AlwaysOnModeIcon />{' '}
+                                        <Warning>Always on</Warning> scripts. Shared <AlwaysOnModeIcon />{' '}
+                                        <Warning>Always on</Warning> scripts then run once for each of those
+                                        patterns.
+                                    </li>
+                                </TopicList>
+                                <TopicText>
+                                    Wrap your code in a block <code>{'{ … }'}</code> or a function, and use{' '}
+                                    <code>var</code> for anything later scripts should be able to call. To get rid of
+                                    a script's effects, set it to <DisabledModeIcon /> <Disabled>Disabled</Disabled> and
+                                    reload the page.
+                                </TopicText>
+                            </TroubleshootingTopic>
+
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
+                                    Script ran late or not at all
+                                </TroubleshootingHeading>
+                                <TopicText>
+                                    A tab that doesn't respond to <RunIcon /> <Primary>Run</Primary> or <RunIcon />{' '}
                                     <Primary>Run all</Primary> keeps the script waiting inside Chrome, even after the
                                     popup reports a timeout or is closed. This happens while the tab shows a dialog,
                                     such as an alert, or with <em>On click</em> site access until you click the
@@ -429,19 +486,19 @@ const Options = () => (
                                 <TopicList>
                                     <li>
                                         The script runs once the tab responds, which may be long after you pressed{' '}
-                                        <RunIcon/> <Primary>Run</Primary>.
+                                        <RunIcon /> <Primary>Run</Primary>.
                                     </li>
                                     <li>
                                         If you close the tab or Chrome before then, the waiting script never runs.
                                     </li>
                                 </TopicList>
-                            </Topic>
+                            </TroubleshootingTopic>
 
-                            <Topic>
-                                <TopicHeading>
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
                                     <AlwaysOnModeIcon /> <Warning>Always on</Warning> script finds nothing at
                                     Document start
-                                </TopicHeading>
+                                </TroubleshootingHeading>
                                 <TopicText>
                                     With <AlwaysOnModeIcon /> <Warning>Always on</Warning> <em>timing</em> set to{' '}
                                     <em>Document start</em>, your script runs before the browser has read the page's
@@ -451,12 +508,12 @@ const Options = () => (
                                     <code>document.addEventListener('DOMContentLoaded', …)</code> or pick a later
                                     timing.
                                 </TopicText>
-                            </Topic>
+                            </TroubleshootingTopic>
 
-                            <Topic>
-                                <TopicHeading>
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
                                     <AlwaysOnModeIcon /> <Warning>Always on</Warning> script didn't run on an open tab
-                                </TopicHeading>
+                                </TroubleshootingHeading>
                                 <TopicText>
                                     <AlwaysOnModeIcon /> <Warning>Always on</Warning> scripts run when a page loads,
                                     never into a page that's already open.
@@ -465,7 +522,7 @@ const Options = () => (
                                     <li>
                                         Switching a script to <AlwaysOnModeIcon /> <Warning>Always on</Warning> only
                                         affects pages that load from then on. Reload the pages you want it on, or
-                                        press <RunIcon/> <Primary>Run</Primary> or <RunIcon/>{' '}
+                                        press <RunIcon /> <Primary>Run</Primary> or <RunIcon />{' '}
                                         <Primary>Run all</Primary>.
                                     </li>
                                     <li>
@@ -478,56 +535,34 @@ const Options = () => (
                                         may miss their script. Check that what you expected actually ran.
                                     </li>
                                 </TopicList>
-                            </Topic>
+                            </TroubleshootingTopic>
 
-                            <Topic>
-                                <TopicHeading>
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
                                     <AlwaysOnModeIcon /> <Warning>Always on</Warning> scripts don't run after allowing
                                     user scripts
-                                </TopicHeading>
+                                </TroubleshootingHeading>
                                 <TopicText>
                                     If you added, imported or changed <AlwaysOnModeIcon /> <Warning>Always on</Warning>
-                                    {' '}scripts while "Allow User Scripts" was off, they won't run automatically after
-                                    you turn it on. To apply them, click <ApplyAlwaysOnLink/>.
+                                    {' '}scripts while "Allow User Scripts" was off, Chrome doesn't know about them
+                                    yet, so they won't run automatically after you turn it on. Click{' '}
+                                    <ReregisterAlwaysOnLink>Re-register Always on scripts</ReregisterAlwaysOnLink>,
+                                    then reload the pages you want them on.
                                 </TopicText>
-                            </Topic>
+                            </TroubleshootingTopic>
 
-                            <Topic>
-                                <TopicHeading>Shared scripts run more than once</TopicHeading>
-                                <TopicText>
-                                    If a page matches more than one URL pattern with <AlwaysOnModeIcon />{' '}
-                                    <Warning>Always on</Warning> scripts, the Shared <AlwaysOnModeIcon />{' '}
-                                    <Warning>Always on</Warning> scripts run once for each of those patterns.
-                                    Write Shared scripts so that running twice is harmless, for example with{' '}
-                                    <code>var</code> instead of <code>const</code>/<code>let</code>.
-                                </TopicText>
-                            </Topic>
-
-                            <Topic>
-                                <TopicHeading>Where scripts don't run</TopicHeading>
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
+                                    Where scripts don't run
+                                </TroubleshootingHeading>
                                 <TopicText>
                                     Scripts only run in the top-level page, never inside iframes. Chrome also doesn't
                                     let extensions run on its own pages (<code>chrome://…</code>), the Chrome Web
                                     Store, other extensions' pages or the built-in PDF viewer. Local files{' '}
                                     (<code>file:///…</code>) only work with the File URLs setting enabled.
                                 </TopicText>
-                            </Topic>
-
-                            <Topic>
-                                <TopicHeading>Finding errors</TopicHeading>
-                                <TopicText>
-                                    InjectCode doesn't show errors itself. Errors thrown by your scripts appear in the
-                                    page's DevTools console (F12). If a script didn't run at all, for example because
-                                    the page is blocked or a permission is missing, the reason is logged either on{' '}
-                                    the <ExtensionErrorLink/> page or in the extension's own console: open the{' '}
-                                    <ExtensionSettingsLink/> and click "service worker".
-                                </TopicText>
-                                <TopicText>
-                                    Chrome only lists errors on the <ExtensionErrorLink/> page if "Collect errors" is
-                                    turned on in the <ExtensionSettingsLink/>.
-                                </TopicText>
-                            </Topic>
-                        </Topics>
+                            </TroubleshootingTopic>
+                        </TroubleshootingTopics>
                     </Section>
 
                     <Section>
