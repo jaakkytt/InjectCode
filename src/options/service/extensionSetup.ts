@@ -1,12 +1,13 @@
-import { ALL_URL } from '../../shared/constants'
+import { ALL_URL, MESSAGE_RESYNC_ALWAYS_ON } from '../../shared/constants'
+import { isUserScriptsEnabled } from '../../shared/service/userScripts'
 
-export async function isUserScriptsEnabled(): Promise<boolean> {
-    try {
-        await chrome.userScripts.getScripts()
-        return true
-    } catch {
+export async function requestAlwaysOnResync(): Promise<boolean> {
+    if (!await isUserScriptsEnabled()) {
         return false
     }
+
+    await chrome.runtime.sendMessage(MESSAGE_RESYNC_ALWAYS_ON)
+    return true
 }
 
 export async function isFileAccessEnabled(): Promise<boolean> {

@@ -4,7 +4,6 @@ import { SHARED_CODE, USER_SCRIPT_ID } from '../../../src/shared/constants'
 import {
     computeDesiredRegistrations,
     createSerializedPersistentScriptsSync,
-    syncPersistentScripts,
     wrapCssAsUserScript,
 } from '../../../src/background/service/persistentScripts'
 
@@ -154,57 +153,6 @@ describe('computeDesiredRegistrations', () => {
     })
 })
 
-describe('syncPersistentScripts', () => {
-    let register: ReturnType<typeof vi.fn>
-    let unregister: ReturnType<typeof vi.fn>
-
-    beforeEach(() => {
-        register = vi.fn().mockResolvedValue(undefined)
-        unregister = vi.fn().mockResolvedValue(undefined)
-        vi.stubGlobal('chrome', { userScripts: { register, unregister } })
-    })
-
-    afterEach(() => {
-        vi.unstubAllGlobals()
-    })
-
-    it('unregisters everything, then registers the desired set', async () => {
-        const scripts: ScriptsByPattern = {
-            'https://github.com/*': [makeItem({ runMode: 'always', content: 'a();' })],
-        }
-
-        await syncPersistentScripts(scripts)
-
-        expect(unregister).toHaveBeenCalledWith()
-        expect(register).toHaveBeenCalledWith(computeDesiredRegistrations(scripts))
-    })
-
-    it('only unregisters, without calling register, when nothing should be persistently registered', async () => {
-        const scripts: ScriptsByPattern = {
-            'https://github.com/*': [makeItem({ runMode: 'active' })],
-        }
-
-        await syncPersistentScripts(scripts)
-
-        expect(unregister).toHaveBeenCalledWith()
-        expect(register).not.toHaveBeenCalled()
-    })
-
-    it('logs and swallows errors instead of throwing', async () => {
-        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-        register.mockRejectedValue(new Error('Allow User Scripts is not enabled'))
-
-        const scripts: ScriptsByPattern = {
-            'https://github.com/*': [makeItem({ runMode: 'always' })],
-        }
-
-        await expect(syncPersistentScripts(scripts)).resolves.toBeUndefined()
-        expect(consoleError).toHaveBeenCalled()
-
-        consoleError.mockRestore()
-    })
-})
-
 describe('createSerializedPersistentScriptsSync', () => {
     const olderSnapshot: ScriptsByPattern = {
         'https://github.com/*': [makeItem({ content: 'old();' })],
@@ -314,7 +262,11 @@ function createFakeUserScripts() {
         registered.clear()
     }
 
-    return { registered, register, unregister }
+    async function getScripts() {
+        return [...registered.values()]
+    }
+
+    return { registered, register, unregister, getScripts }
 }
 
 function fakeDocument({ withHead }: { withHead: boolean }) {

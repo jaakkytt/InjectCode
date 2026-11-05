@@ -3,6 +3,7 @@ import { SHARED_CODE, USER_SCRIPT_ID } from '../../shared/constants'
 import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
 import { cyrb53 } from '../lib/hash/cyrb53'
 import { AlwaysOnTiming, DEFAULT_ALWAYS_ON_TIMING } from '../../shared/service/settings/alwaysOnTiming'
+import { isUserScriptsEnabled } from '../../shared/service/userScripts'
 
 export interface PersistentScriptsState {
     scripts: ScriptsByPattern
@@ -61,6 +62,11 @@ export async function syncPersistentScripts(
     scripts: ScriptsByPattern,
     runAt: AlwaysOnTiming = DEFAULT_ALWAYS_ON_TIMING,
 ): Promise<void> {
+    if (!await isUserScriptsEnabled()) {
+        console.warn('Skipped syncing Always on scripts: "Allow User Scripts" is turned off.')
+        return
+    }
+
     const desired = computeDesiredRegistrations(scripts, runAt)
     try {
         await chrome.userScripts.unregister()

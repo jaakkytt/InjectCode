@@ -34,23 +34,18 @@ export class LocalStorageAPI implements StorageApi {
 
 export class ChromeStorageAPI implements StorageApi {
     async get(key: string, defaultValue?: ScriptsByPattern) {
-        console.debug('ChromeStorageAPI get', key)
         return chrome.storage.local.get({ [key]: defaultValue }).then(result => result[key] as ScriptsByPattern)
     }
     async set(key: string, value: ScriptsByPattern) {
-        console.debug('ChromeStorageAPI set', key, value)
         return chrome.storage.local.set({ [key]: value })
     }
     async remove(key: string) {
-        console.debug('ChromeStorageAPI remove', key)
         return chrome.storage.local.remove([key])
     }
     async getValue<T>(key: string, defaultValue: T) {
-        console.debug('ChromeStorageAPI getValue', key)
         return chrome.storage.local.get({ [key]: defaultValue }).then(result => result[key] as T)
     }
     async setValue<T>(key: string, value: T) {
-        console.debug('ChromeStorageAPI setValue', key, value)
         return chrome.storage.local.set({ [key]: value })
     }
 }

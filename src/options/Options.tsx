@@ -25,6 +25,7 @@ import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
 import SiteAccessSelect from './inputs/SiteAccessSelect'
 import ExternalLink from './links/ExternalLink'
 import ExtensionErrorLink from './links/ExtensionErrorLink'
+import ApplyAlwaysOnLink from './links/ApplyAlwaysOnLink'
 import {
     ActiveModeIcon,
     AllTabsScopeIcon,
@@ -477,6 +478,18 @@ const Options = () => (
                                         may miss their script. Check that what you expected actually ran.
                                     </li>
                                 </TopicList>
+                            </Topic>
+
+                            <Topic>
+                                <TopicHeading>
+                                    <AlwaysOnModeIcon /> <Warning>Always on</Warning> scripts don't run after allowing
+                                    user scripts
+                                </TopicHeading>
+                                <TopicText>
+                                    If you added, imported or changed <AlwaysOnModeIcon /> <Warning>Always on</Warning>
+                                    {' '}scripts while "Allow User Scripts" was off, they won't run automatically after
+                                    you turn it on. To apply them, click <ApplyAlwaysOnLink/>.
+                                </TopicText>
                             </Topic>
 
                             <Topic>

@@ -2,3 +2,17 @@ storeDir: /pnpm-store
 nodeLinker: hoisted
 allowBuilds:
   unrs-resolver: false
+audit:
+  ignorePrune: true
+  ignore:
+    - GHSA-g3hv-75wg-m249 # minimatch: lint-only, trusted globs
+overrides:
+  '@vitest/mocker@>=5.0.0-beta.1 <5.0.3': ^5.0.3
+  '@vitest/mocker@>=5.0.0-rc.2 <5.0.3': ^5.0.3
+  fast-uri@>=3.0.0 <3.1.9: ^3.1.9
+  fast-uri@>=3.1.3 <3.1.9: ^3.1.9
+  js-yaml@>=5.0.0 <=5.4.0: ^5.4.1
+  serialize-javascript@<7.1.3: ^7.1.3
+  serialize-javascript@>=7.1.1 <7.1.2: ^7.1.2
+  source-map-js@>=1.0.0 <1.2.2: ^1.2.2
+  vite@>=8.2.0 <=8.2.3: ^8.2.4

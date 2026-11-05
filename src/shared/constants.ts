@@ -19,3 +19,5 @@ export const STORAGE_SCRIPTS = 'scripts'
 export const STORAGE_ALWAYS_ON_TIMING = 'alwaysOnTiming'
 export const STORAGE_FEEDBACK_AUTO_HIDE = 'feedbackAutoHide'
 export const STORAGE_INJECTION_TIMEOUT = 'injectionTimeout'
+
+export const MESSAGE_RESYNC_ALWAYS_ON = 'resyncAlwaysOn'

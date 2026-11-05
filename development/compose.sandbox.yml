@@ -67,6 +67,14 @@ services:
     environment:
       - pnpm_config_verify_deps_before_run=warn
 
+  validate:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+    environment:
+      - pnpm_config_verify_deps_before_run=warn
+
 volumes:
   node_modules-sandbox:
   pnpm-store-sandbox:
