@@ -1,9 +1,9 @@
 import { useCallback, useRef } from 'react'
-import { PrismEditor } from 'prism-react-editor'
+import { InputSelection, PrismEditor } from 'prism-react-editor'
 import { setSelection } from 'prism-react-editor/utils'
 import { useInteractions } from '../providers/InteractionsProvider'
 import { useRestoreRegistry } from '../providers/restoreRegistryContext'
-import { EditorViewState } from '../service/interactions/interaction.types'
+import { EditorHandle } from '../service/viewRestore/restoreRegistry'
 
 interface Options {
     scriptId: string
@@ -23,18 +23,18 @@ export function useEditorRestore({ scriptId, urlBlockId }: Options) {
         editorRef.current = editor
         const container = editor.container
 
-        const unregister = registry.registerEditor(scriptId, state => restoreEditor(editor, state))
+        const unregister = registry.registerEditor(scriptId, editorHandleOf(editor))
 
         const removeSelectionListener = editor.on('selectionChange', (selection) => {
             if (editor.focused) {
-                interactions.publish({ kind: 'editorChanged', scriptId, change: { selection } })
+                interactions.publish({ kind: 'editorSelectionChanged', scriptId, selection })
             }
         })
 
         const trackScroll = () => interactions.publish({
-            kind: 'editorChanged',
+            kind: 'editorScrolled',
             scriptId,
-            change: { scrollTop: container?.scrollTop ?? 0 },
+            scrollTop: container?.scrollTop ?? 0,
         })
 
         container?.addEventListener('scroll', trackScroll)
@@ -54,7 +54,7 @@ export function useEditorRestore({ scriptId, urlBlockId }: Options) {
     function focus() {
         const editor = editorRef.current
         if (editor) {
-            interactions.publish({ kind: 'editorFocused', scriptId, urlBlockId, editor: editorStateOf(editor) })
+            interactions.publish({ kind: 'editorFocused', scriptId, urlBlockId, selection: editor.getSelection() })
         }
     }
 
@@ -65,18 +65,22 @@ export function useEditorRestore({ scriptId, urlBlockId }: Options) {
     return { editorRef: attachEditor, focus, blur }
 }
 
-function editorStateOf(editor: PrismEditor): EditorViewState {
-    return { selection: editor.getSelection(), scrollTop: editor.container?.scrollTop ?? 0 }
-}
-
-function restoreEditor(editor: PrismEditor, { selection, scrollTop }: EditorViewState) {
-    const length = editor.value.length
-    const [start, end, direction] = selection
-
-    setSelection(editor, Math.min(start, length), Math.min(end, length), direction)
-    editor.textarea?.focus({ preventScroll: true })
-
-    if (editor.container) {
-        editor.container.scrollTop = scrollTop
+function editorHandleOf(editor: PrismEditor): EditorHandle {
+    function scrollTo(scrollTop: number) {
+        if (editor.container) {
+            editor.container.scrollTop = scrollTop
+        }
     }
+
+    function focusAt([start, end, direction]: InputSelection) {
+        const length = editor.value.length
+        const scrollTop = editor.container?.scrollTop ?? 0
+
+        setSelection(editor, Math.min(start, length), Math.min(end, length), direction)
+        editor.textarea?.focus({ preventScroll: true })
+
+        scrollTo(scrollTop)
+    }
+
+    return { focusAt, scrollTo }
 }

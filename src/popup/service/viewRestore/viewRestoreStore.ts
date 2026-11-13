@@ -1,6 +1,15 @@
 import { ViewRestoreMode } from '../../../shared/service/settings/viewRestoreMode'
 import { BrowserTabLocation, ViewRestoreCache, ViewRestoreChange, ViewRestoreEntry } from './viewRestore.types'
-import { cacheKeyFor, emptyCache, findEntry, parseViewRestoreCache, withEntry, withLastUsed } from './viewRestoreCache'
+import {
+    cacheKeyFor,
+    editorScrollTopOf,
+    emptyCache,
+    findEntry,
+    parseViewRestoreCache,
+    withEditorScroll,
+    withEntry,
+    withLastUsed,
+} from './viewRestoreCache'
 
 const DEFERRED_WRITE_DELAY_MS = 200
 
@@ -13,8 +22,10 @@ export interface ViewRestorePorts {
 
 export interface ViewRestoreStore {
     readonly entry: ViewRestoreEntry
+    editorScrollTop(scriptId: string): number
     update(change: ViewRestoreChange): void
     updateDeferred(change: ViewRestoreChange): void
+    updateEditorScrollDeferred(scriptId: string, scrollTop: number): void
     flush(): void
 }
 
@@ -51,6 +62,10 @@ function createViewRestoreStore(
         hasPendingLastUsed ||= 'view' in change || 'accordions' in change
     }
 
+    function scheduleFlush() {
+        deferredTimer ??= setTimeout(flush, DEFERRED_WRITE_DELAY_MS)
+    }
+
     function flush() {
         clearTimeout(deferredTimer)
         deferredTimer = undefined
@@ -76,13 +91,20 @@ function createViewRestoreStore(
         get entry() {
             return entry
         },
+        editorScrollTop: (scriptId: string) => editorScrollTopOf(cache, scriptId),
         update: (change: ViewRestoreChange) => {
             apply(change)
             flush()
         },
         updateDeferred: (change: ViewRestoreChange) => {
             apply(change)
-            deferredTimer ??= setTimeout(flush, DEFERRED_WRITE_DELAY_MS)
+            scheduleFlush()
+        },
+        updateEditorScrollDeferred: (scriptId: string, scrollTop: number) => {
+            cache = withEditorScroll(cache, scriptId, scrollTop)
+            hasPendingWrite = true
+
+            scheduleFlush()
         },
         flush,
     }

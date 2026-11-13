@@ -1,9 +1,9 @@
+import type { InputSelection } from 'prism-react-editor'
 import { ViewRestoreMode } from '../../../shared/service/settings/viewRestoreMode'
 import { AccordionState } from '../../lib/accordionState'
-import { EditorViewState } from '../interactions/interaction.types'
 import { TabIndex } from '../../types'
 
-export type { AccordionState, EditorViewState }
+export type { AccordionState }
 
 export type LastInteractionKind = 'editor' | 'codeBlock' | 'urlBlock'
 
@@ -20,7 +20,7 @@ export interface LastInteraction {
     id: string
     urlBlockId: string
     top: number
-    editor: EditorViewState | null
+    selection: InputSelection | null
 }
 
 export interface LastUsedState {
@@ -33,10 +33,16 @@ export interface ViewRestoreEntry extends LastUsedState {
     lastInteraction: LastInteraction | null
 }
 
+export interface EditorScroll {
+    scriptId: string
+    scrollTop: number
+}
+
 export interface ViewRestoreCache {
     mode: ViewRestoreMode
     sessionId: string
     lastUsed: LastUsedState
+    editorScrolls: EditorScroll[]
     entries: ViewRestoreEntry[]
 }
 

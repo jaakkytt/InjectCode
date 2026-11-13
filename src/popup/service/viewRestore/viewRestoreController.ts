@@ -1,16 +1,11 @@
+import type { InputSelection } from 'prism-react-editor'
 import { withCodeBlockOpen, withUrlBlockOpen } from '../../lib/accordionState'
 import { Interaction } from '../interactions/interaction.types'
 import { createRestoreRegistry, RestoreRegistry } from './restoreRegistry'
 import { anchorKindOf, restoreLastInteraction } from './restoreLastInteraction'
 import { renameUrlBlockInEntry } from './viewRestoreCache'
 import { ViewRestoreStore } from './viewRestoreStore'
-import {
-    AnchorKind,
-    EditorViewState,
-    InteractionTarget,
-    ViewRestoreChange,
-    ViewRestoreEntry,
-} from './viewRestore.types'
+import { AnchorKind, InteractionTarget, ViewRestoreChange, ViewRestoreEntry } from './viewRestore.types'
 
 export interface ViewRestoreController {
     readonly registry: RestoreRegistry
@@ -31,7 +26,7 @@ export function createViewRestoreController(
     store: ViewRestoreStore,
     environment: ViewRestoreEnvironment,
 ): ViewRestoreController {
-    const registry = createRestoreRegistry()
+    const registry = createRestoreRegistry((scriptId, editor) => editor.scrollTo(store.editorScrollTop(scriptId)))
     let isRestored = false
 
     function commit(change: ViewRestoreChange, isDeferred = false) {
@@ -61,30 +56,34 @@ export function createViewRestoreController(
     }
 
     function recordInteraction(target: InteractionTarget) {
-        commit({ lastInteraction: { ...target, top: anchorTop(target.kind, target.id) ?? 0, editor: null } })
+        commit({ lastInteraction: { ...target, top: anchorTop(target.kind, target.id) ?? 0, selection: null } })
 
         environment.requestFrame(refreshTop)
     }
 
-    function editorFocused(scriptId: string, urlBlockId: string, editor: EditorViewState) {
+    function editorFocused(scriptId: string, urlBlockId: string, selection: InputSelection) {
         if (!isRestored) {
             return
         }
 
         const top = anchorTop('codeBlock', scriptId) ?? 0
 
-        commit({ lastInteraction: { kind: 'editor', id: scriptId, urlBlockId, top, editor } })
+        commit({ lastInteraction: { kind: 'editor', id: scriptId, urlBlockId, top, selection } })
     }
 
-    function editorChanged(scriptId: string, change: Partial<EditorViewState>) {
+    function editorSelectionChanged(scriptId: string, selection: InputSelection) {
         const lastInteraction = store.entry.lastInteraction
         if (!isRestored || lastInteraction?.kind !== 'editor' || lastInteraction.id !== scriptId) {
             return
         }
 
-        const editor = lastInteraction.editor && { ...lastInteraction.editor, ...change }
+        commit({ lastInteraction: { ...lastInteraction, selection } }, true)
+    }
 
-        commit({ lastInteraction: { ...lastInteraction, editor } }, true)
+    function editorScrolled(scriptId: string, scrollTop: number) {
+        if (isRestored) {
+            store.updateEditorScrollDeferred(scriptId, scrollTop)
+        }
     }
 
     function editorBlurred(scriptId: string) {
@@ -132,10 +131,13 @@ export function createViewRestoreController(
                 recordInteraction({ kind: 'codeBlock', id: interaction.scriptId, urlBlockId: interaction.urlBlockId })
                 break
             case 'editorFocused':
-                editorFocused(interaction.scriptId, interaction.urlBlockId, interaction.editor)
+                editorFocused(interaction.scriptId, interaction.urlBlockId, interaction.selection)
                 break
-            case 'editorChanged':
-                editorChanged(interaction.scriptId, interaction.change)
+            case 'editorSelectionChanged':
+                editorSelectionChanged(interaction.scriptId, interaction.selection)
+                break
+            case 'editorScrolled':
+                editorScrolled(interaction.scriptId, interaction.scrollTop)
                 break
             case 'editorBlurred':
                 editorBlurred(interaction.scriptId)

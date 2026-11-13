@@ -5,7 +5,7 @@ import { TabIndex } from '../../types'
 import {
     AccordionState,
     BrowserTabLocation,
-    EditorViewState,
+    EditorScroll,
     LastInteraction,
     LastUsedState,
     ViewRestoreCache,
@@ -13,6 +13,7 @@ import {
 } from './viewRestore.types'
 
 export const MAX_CACHE_ENTRIES = 20
+export const MAX_EDITOR_SCROLLS = 50
 
 export const DEFAULT_LAST_USED: LastUsedState = {
     view: TabIndex.Current,
@@ -33,7 +34,7 @@ export function cacheKeyFor(mode: ViewRestoreMode, { browserTabId, pageUrl }: Br
 }
 
 export function emptyCache(mode: ViewRestoreMode, sessionId: string): ViewRestoreCache {
-    return { mode, sessionId, lastUsed: DEFAULT_LAST_USED, entries: [] }
+    return { mode, sessionId, lastUsed: DEFAULT_LAST_USED, editorScrolls: [], entries: [] }
 }
 
 export function parseViewRestoreCache(raw: unknown, mode: ViewRestoreMode, sessionId: string): ViewRestoreCache {
@@ -42,10 +43,17 @@ export function parseViewRestoreCache(raw: unknown, mode: ViewRestoreMode, sessi
     }
 
     const lastUsed = isLastUsedState(raw.lastUsed) ? raw.lastUsed : DEFAULT_LAST_USED
+    const editorScrolls = Array.isArray(raw.editorScrolls) ? raw.editorScrolls.filter(isEditorScroll) : []
     const isSameContext = raw.mode === mode && raw.sessionId === sessionId
     const entries = isSameContext && Array.isArray(raw.entries) ? raw.entries.filter(isViewRestoreEntry) : []
 
-    return { mode, sessionId, lastUsed, entries: entries.slice(0, MAX_CACHE_ENTRIES) }
+    return {
+        mode,
+        sessionId,
+        lastUsed,
+        editorScrolls: editorScrolls.slice(0, MAX_EDITOR_SCROLLS),
+        entries: entries.slice(0, MAX_CACHE_ENTRIES),
+    }
 }
 
 export function findEntry(cache: ViewRestoreCache, key: string | null): ViewRestoreEntry {
@@ -62,6 +70,17 @@ export function withEntry(cache: ViewRestoreCache, entry: ViewRestoreEntry): Vie
 
 export function withLastUsed(cache: ViewRestoreCache, { view, accordions }: LastUsedState): ViewRestoreCache {
     return { ...cache, lastUsed: { view, accordions } }
+}
+
+export function editorScrollTopOf(cache: ViewRestoreCache, scriptId: string): number {
+    return cache.editorScrolls.find(scroll => scroll.scriptId === scriptId)?.scrollTop ?? 0
+}
+
+export function withEditorScroll(cache: ViewRestoreCache, scriptId: string, scrollTop: number): ViewRestoreCache {
+    const others = cache.editorScrolls.filter(scroll => scroll.scriptId !== scriptId)
+    const editorScrolls = scrollTop > 0 ? [{ scriptId, scrollTop }, ...others] : others
+
+    return { ...cache, editorScrolls: editorScrolls.slice(0, MAX_EDITOR_SCROLLS) }
 }
 
 export function renameUrlBlockInEntry(entry: ViewRestoreEntry, oldId: string, newId: string): ViewRestoreEntry {
@@ -105,11 +124,11 @@ function isLastInteraction(value: unknown): value is LastInteraction {
         && typeof value.id === 'string'
         && typeof value.urlBlockId === 'string'
         && typeof value.top === 'number'
-        && (value.editor === null || isEditorViewState(value.editor))
+        && (value.selection === null || isSelection(value.selection))
 }
 
-function isEditorViewState(value: unknown): value is EditorViewState {
-    return isRecord(value) && typeof value.scrollTop === 'number' && isSelection(value.selection)
+function isEditorScroll(value: unknown): value is EditorScroll {
+    return isRecord(value) && typeof value.scriptId === 'string' && typeof value.scrollTop === 'number'
 }
 
 function isSelection(value: unknown): value is InputSelection {

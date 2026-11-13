@@ -1,5 +1,5 @@
 import { expect, test } from '../fixtures/extension'
-import { SCRIPTS, TAB_A } from '../fixtures/scripts'
+import { SCRIPTS, TAB_A, TAB_C } from '../fixtures/scripts'
 import type { ViewName } from '../pages/PopupPage'
 
 const VIEWS: ViewName[] = ['All Scripts', 'Currently Matching']
@@ -34,7 +34,7 @@ test.describe('editor restore, sameHost', () => {
         })
     }
 
-    test('editor left by clicking inside the popup comes back unfocused', async ({ extension }) => {
+    test('editor left by clicking inside the popup comes back unfocused at its scroll', async ({ extension }) => {
         await extension.seedScripts(SCRIPTS)
         await extension.setRestoreMode('sameHost')
 
@@ -42,6 +42,7 @@ test.describe('editor restore, sameHost', () => {
         await popup.selectView('All Scripts')
         await popup.openCodeBlock('Beta')
         await popup.focusEditorEnd('Beta')
+        await popup.scrollEditor('Beta', EDITOR_SCROLL_TOP)
         await popup.viewTab('All Scripts').click()
         await expect(popup.codeBlockEditor('Beta')).not.toBeFocused()
         await popup.scrollPage(PAGE_SCROLL_Y)
@@ -52,6 +53,39 @@ test.describe('editor restore, sameHost', () => {
         const reopened = await extension.openPopup(TAB_A)
         await expect(reopened.codeBlockEditor('Beta')).toBeVisible()
         await expect(reopened.codeBlockEditor('Beta')).not.toBeFocused()
+        expect((await reopened.editorState('Beta')).scrollTop).toBe(EDITOR_SCROLL_TOP)
         expect(await reopened.headerTop(reopened.codeBlockHeader('Beta'))).toBe(savedTop)
+    })
+
+    test('code block reopened in the same popup comes back at its editor scroll', async ({ extension }) => {
+        await extension.seedScripts(SCRIPTS)
+        await extension.setRestoreMode('sameHost')
+
+        const popup = await extension.openPopup(TAB_A)
+        await popup.selectView('All Scripts')
+        await popup.openCodeBlock('Beta')
+        await popup.scrollEditor('Beta', EDITOR_SCROLL_TOP)
+        await popup.openCodeBlock('Alpha')
+        await expect(popup.codeBlockEditor('Beta')).toBeHidden()
+        await popup.openCodeBlock('Beta')
+
+        expect((await popup.editorState('Beta')).scrollTop).toBe(EDITOR_SCROLL_TOP)
+    })
+})
+
+test.describe('editor restore, off', () => {
+    test('editor scroll is remembered on another host', async ({ extension }) => {
+        await extension.seedScripts(SCRIPTS)
+        await extension.setRestoreMode('off')
+
+        const popup = await extension.openPopup(TAB_A)
+        await popup.selectView('All Scripts')
+        await popup.openCodeBlock('Beta')
+        await popup.scrollEditor('Beta', EDITOR_SCROLL_TOP)
+        await popup.close()
+
+        const reopened = await extension.openPopup(TAB_C)
+        await expect(reopened.codeBlockEditor('Beta')).toBeVisible()
+        expect((await reopened.editorState('Beta')).scrollTop).toBe(EDITOR_SCROLL_TOP)
     })
 })

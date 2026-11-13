@@ -1,11 +1,6 @@
 import type { InputSelection } from 'prism-react-editor'
 import { TabIndex } from '../../types'
 
-export interface EditorViewState {
-    selection: InputSelection
-    scrollTop: number
-}
-
 export type Interaction =
     | { kind: 'viewSelected'; view: TabIndex }
     | { kind: 'urlBlockToggled'; urlBlockId: string; isOpen: boolean }
@@ -15,8 +10,9 @@ export type Interaction =
     | { kind: 'codeBlockToggled'; scriptId: string; urlBlockId: string; isOpen: boolean }
     | { kind: 'codeBlockCreated'; scriptId: string; urlBlockId: string }
     | { kind: 'codeBlockDragged'; scriptId: string; urlBlockId: string }
-    | { kind: 'editorFocused'; scriptId: string; urlBlockId: string; editor: EditorViewState }
-    | { kind: 'editorChanged'; scriptId: string; change: Partial<EditorViewState> }
+    | { kind: 'editorFocused'; scriptId: string; urlBlockId: string; selection: InputSelection }
+    | { kind: 'editorSelectionChanged'; scriptId: string; selection: InputSelection }
+    | { kind: 'editorScrolled'; scriptId: string; scrollTop: number }
     | { kind: 'editorBlurred'; scriptId: string }
 
 export type InteractionListener = (interaction: Interaction) => void

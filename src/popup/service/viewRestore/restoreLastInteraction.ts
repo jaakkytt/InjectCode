@@ -3,7 +3,7 @@ import { AnchorKind, LastInteraction, LastInteractionKind } from './viewRestore.
 
 export interface RestoreTarget {
     anchor: Anchor
-    restoreEditor?: () => void
+    focusEditor?: () => void
 }
 
 export function anchorKindOf(kind: LastInteractionKind): AnchorKind {
@@ -14,13 +14,13 @@ export function resolveRestoreTarget(
     lastInteraction: LastInteraction,
     registry: RestoreRegistry,
 ): RestoreTarget | null {
-    const { kind, id, urlBlockId, editor } = lastInteraction
+    const { kind, id, urlBlockId, selection } = lastInteraction
     const anchor = registry.anchor(anchorKindOf(kind), id)
 
-    if (anchor && kind === 'editor' && editor) {
-        const restore = registry.editor(id)
-        if (restore) {
-            return { anchor, restoreEditor: () => restore(editor) }
+    if (anchor && kind === 'editor' && selection) {
+        const editor = registry.editor(id)
+        if (editor) {
+            return { anchor, focusEditor: () => editor.focusAt(selection) }
         }
     }
 
@@ -43,6 +43,6 @@ export function restoreLastInteraction(
         return
     }
 
-    target.restoreEditor?.()
+    target.focusEditor?.()
     scrollPageBy(target.anchor.getBoundingClientRect().top - lastInteraction.top)
 }

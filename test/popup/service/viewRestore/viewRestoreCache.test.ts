@@ -3,8 +3,11 @@ import { TabIndex } from '../../../../src/popup/types'
 import { LastUsedState, ViewRestoreEntry } from '../../../../src/popup/service/viewRestore/viewRestore.types'
 import {
     cacheKeyFor,
+    editorScrollTopOf,
     MAX_CACHE_ENTRIES,
+    MAX_EDITOR_SCROLLS,
     parseViewRestoreCache,
+    withEditorScroll,
     withEntry,
 } from '../../../../src/popup/service/viewRestore/viewRestoreCache'
 
@@ -33,6 +36,39 @@ describe('parseViewRestoreCache', () => {
         expect(parseViewRestoreCache(raw, 'sameHost', SESSION).entries).toEqual([entry('host:a')])
         expect(parseViewRestoreCache('nope', 'sameHost', SESSION).entries).toEqual([])
     })
+
+    it('keeps editor scrolls when the mode and session change', () => {
+        const editorScrolls = [{ scriptId: 'js-1', scrollTop: 120 }]
+        const entries = [entry('host:a')]
+        const raw = { mode: 'sameHost', sessionId: SESSION, lastUsed: LAST_USED, editorScrolls, entries }
+
+        const cache = parseViewRestoreCache(raw, 'off', 'session-2')
+
+        expect(cache.entries).toEqual([])
+        expect(editorScrollTopOf(cache, 'js-1')).toBe(120)
+    })
+})
+
+describe('withEditorScroll', () => {
+    it('remembers one scroll per code block and forgets it at the top', () => {
+        let cache = parseViewRestoreCache({}, 'sameHost', SESSION)
+        cache = withEditorScroll(cache, 'js-1', 120)
+        cache = withEditorScroll(cache, 'js-2', 40)
+        cache = withEditorScroll(cache, 'js-1', 0)
+
+        expect(cache.editorScrolls).toEqual([{ scriptId: 'js-2', scrollTop: 40 }])
+        expect(editorScrollTopOf(cache, 'js-1')).toBe(0)
+    })
+
+    it('evicts the least recently scrolled code block', () => {
+        let cache = parseViewRestoreCache({}, 'sameHost', SESSION)
+        for (let index = 0; index <= MAX_EDITOR_SCROLLS; index++) {
+            cache = withEditorScroll(cache, `js-${index}`, 10)
+        }
+
+        expect(cache.editorScrolls).toHaveLength(MAX_EDITOR_SCROLLS)
+        expect(editorScrollTopOf(cache, 'js-0')).toBe(0)
+    })
 })
 
 describe('withEntry', () => {
@@ -55,6 +91,6 @@ function entry(key: string): ViewRestoreEntry {
         key,
         view: TabIndex.Current,
         accordions: { openCodeBlock: null, closedUrlBlocks: [] },
-        lastInteraction: { kind: 'codeBlock', id: 'js-1', urlBlockId: '*://a/*', top: 42, editor: null },
+        lastInteraction: { kind: 'codeBlock', id: 'js-1', urlBlockId: '*://a/*', top: 42, selection: null },
     }
 }

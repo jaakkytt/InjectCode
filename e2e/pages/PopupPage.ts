@@ -149,7 +149,10 @@ export class PopupPage {
     async scrollEditor(title: string, scrollTop: number): Promise<void> {
         await this.codeBlockBody(title)
             .locator('.prism-code-editor')
-            .evaluate((container, top) => { container.scrollTop = top }, scrollTop)
+            .evaluate((container, top) => new Promise<void>(resolve => {
+                container.addEventListener('scroll', () => resolve(), { once: true })
+                container.scrollTop = top
+            }), scrollTop)
     }
 
     async scrollToMiddle(header: Locator): Promise<void> {
