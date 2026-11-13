@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Props, Status } from './AccordionBody.types'
 import { useEditorRestore } from '../../../hooks/useEditorRestore'
+import { useEditorSettings } from '../../../providers/EditorSettingsProvider'
 
 function isDirty(current: string, lastSaved: string): boolean {
     return current.trim() !== lastSaved.trim()
@@ -14,6 +15,7 @@ export function useAccordionBodyBehavior(
 
     const [editorSource, setEditorSource] = useState<EditorSource>({ value, revision: 0 })
     const [status, setStatus] = useState<Status>('idle')
+    const editorSettings = useEditorSettings()
 
     const lastSavedValueRef = useRef<string>(value)
     const inputValueRef = useRef<string>(value)
@@ -100,6 +102,7 @@ export function useAccordionBodyBehavior(
     return {
         editorSource,
         status,
+        editorSettings,
         editorRef: editorRestore.editorRef,
         handlers: {
             blur,

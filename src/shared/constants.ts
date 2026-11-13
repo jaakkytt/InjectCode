@@ -19,5 +19,6 @@ export const STORAGE_FEEDBACK_AUTO_HIDE = 'feedbackAutoHide'
 export const STORAGE_VIEW_RESTORE_MODE = 'viewRestoreMode'
 export const SESSION_STORAGE_BROWSER_SESSION_ID = 'browserSessionId'
 export const STORAGE_INJECTION_TIMEOUT = 'injectionTimeout'
+export const STORAGE_EDITOR_SETTINGS = 'editorSettings'
 
 export const MESSAGE_RESYNC_ALWAYS_ON = 'resyncAlwaysOn'

@@ -7,6 +7,7 @@ import { isUserScriptsEnabled } from '../shared/service/userScripts'
 import { CurrentUrlProvider } from './providers/CurrentUrlProvider'
 import { RunScopeProvider } from './providers/RunScopeProvider'
 import { FeedbackProvider } from './providers/FeedbackProvider'
+import { EditorSettingsProvider } from './providers/EditorSettingsProvider'
 import FeedbackSnackbar from './components/FeedbackSnackbar'
 import ExtensionDisabledWarning from './components/ExtensionDisabledWarning'
 
@@ -17,7 +18,9 @@ isUserScriptsEnabled().then(enabled => root.render(enabled ? (
     <CurrentUrlProvider>
         <RunScopeProvider>
             <FeedbackProvider>
-                <Popup/>
+                <EditorSettingsProvider>
+                    <Popup/>
+                </EditorSettingsProvider>
                 <FeedbackSnackbar/>
             </FeedbackProvider>
         </RunScopeProvider>

@@ -1,6 +1,5 @@
 import React from 'react'
 import { Editor } from 'prism-react-editor'
-import { BasicSetup } from 'prism-react-editor/setups'
 import 'prism-react-editor/prism/languages/javascript'
 import 'prism-react-editor/prism/languages/css'
 import 'prism-react-editor/languages/clike'
@@ -11,12 +10,13 @@ import 'prism-react-editor/search.css'
 import 'prism-react-editor/invisibles.css'
 
 import StatusIcon from './StatusIcon'
+import EditorSetup from './EditorSetup'
 import { Props } from './AccordionBody.types'
 import { useAccordionBodyBehavior } from './AccordionBody.behavior'
 import { EditorFrame, StatusSlot } from './AccordionBody.styles'
 
 export default function AccordionBody({ scriptId, urlBlockId, value, language, onChange, onFocusChange }: Props) {
-    const { editorSource, status, editorRef, handlers } = useAccordionBodyBehavior({
+    const { editorSource, status, editorSettings, editorRef, handlers } = useAccordionBodyBehavior({
         scriptId,
         urlBlockId,
         value,
@@ -34,6 +34,8 @@ export default function AccordionBody({ scriptId, urlBlockId, value, language, o
                 ref={editorRef}
                 language={language}
                 value={editorSource.value}
+                tabSize={editorSettings.tabSize}
+                insertSpaces={editorSettings.insertSpaces}
                 onUpdate={handlers.update}
                 textareaProps={{
                     onFocus: handlers.focus,
@@ -41,7 +43,7 @@ export default function AccordionBody({ scriptId, urlBlockId, value, language, o
                     'aria-label': language === 'css' ? 'CSS code' : 'JavaScript code',
                 }}
             >
-                <BasicSetup />
+                <EditorSetup hotkeys={editorSettings.hotkeys} />
             </Editor>
         </EditorFrame>
     )

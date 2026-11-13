@@ -7,6 +7,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook'
 import BuildIcon from '@mui/icons-material/Build'
 import HistoryIcon from '@mui/icons-material/History'
 import NotificationsIcon from '@mui/icons-material/Notifications'
+import CodeIcon from '@mui/icons-material/Code'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { CHANGELOG_URL, ISSUES_URL, MATCH_PATTERN_DOCS, RUN_AT_DOCS } from '../shared/constants'
@@ -26,6 +27,10 @@ import AutoHideSelect from './inputs/AutoHideSelect'
 import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
 import { ViewRestoreModeProvider } from './providers/ViewRestoreModeProvider'
 import ViewRestoreModeSelect from './inputs/ViewRestoreModeSelect'
+import { EditorSettingsProvider } from './providers/EditorSettingsProvider'
+import TabSizeSelect from './inputs/TabSizeSelect'
+import InsertSpacesToggle from './inputs/InsertSpacesToggle'
+import HotkeyInput from './inputs/HotkeyInput'
 import SiteAccessSelect from './inputs/SiteAccessSelect'
 import ExternalLink from './links/ExternalLink'
 import ExtensionErrorLink from './links/ExtensionErrorLink'
@@ -172,6 +177,52 @@ const Options = () => (
                             </Setting>
 
                         </Settings>
+                    </Section>
+
+                    <Section>
+                        <SectionHeading>
+                            <SectionIcon><CodeIcon /></SectionIcon>
+                            Editor
+                        </SectionHeading>
+                        <SectionText>
+                            To change keybindings, click the field and press the new key combination, or press{' '}
+                            <kbd>Escape</kbd> to keep the current one.<br/>
+                            <kbd>Shift</kbd> <b>is not</b> saved with punctuation keys.
+                        </SectionText>
+                        <EditorSettingsProvider>
+                            <Settings>
+                                <Setting>
+                                    <HotkeyInput command="toggleComment" />
+                                    <div>
+                                        <SettingTitle>Toggle comments keybinding</SettingTitle>
+                                        <SettingText>
+                                            Comments out the selected lines, or removes their comments.
+                                        </SettingText>
+                                    </div>
+                                </Setting>
+
+                                <Setting>
+                                    <TabSizeSelect />
+                                    <div>
+                                        <SettingTitle>Tab size</SettingTitle>
+                                        <SettingText>
+                                            How many spaces one indentation level takes in the code editors.
+                                        </SettingText>
+                                    </div>
+                                </Setting>
+
+                                <Setting>
+                                    <InsertSpacesToggle />
+                                    <div>
+                                        <SettingTitle>Indent with spaces</SettingTitle>
+                                        <SettingText>
+                                            Pressing Tab inserts spaces. Turn this off to insert tab characters
+                                            instead, shown as wide as the tab size.
+                                        </SettingText>
+                                    </div>
+                                </Setting>
+                            </Settings>
+                        </EditorSettingsProvider>
                     </Section>
 
                     <Section>

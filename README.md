@@ -55,5 +55,5 @@ anywhere. Uninstalling the extension deletes them, so export a backup first if y
 
 ## Issues and license
 
-Report bugs in [GitHub issues](https://github.com/jaakkytt/InjectCode/issues). InjectCode is released under the
-[MIT License](LICENSE), third-party attributions are listed in [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+Report bugs in [GitHub issues](https://github.com/jaakkytt/InjectCode/issues). InjectCode is released under the [MIT License](LICENSE),
+third-party attributions are listed in [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
