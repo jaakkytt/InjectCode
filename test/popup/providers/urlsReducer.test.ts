@@ -92,6 +92,7 @@ function stateWith(item: Script): StoreState {
         committed: { 'https://example.com/*': [item] },
         working: null,
         isDirty: false,
+        isHydrated: true,
     }
 }
 

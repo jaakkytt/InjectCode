@@ -131,6 +131,12 @@ export default defineConfig([{
         }],
     },
 }, {
+    files: ['e2e/fixtures/**/*.ts'],
+
+    rules: {
+        'no-empty-pattern': 'off',
+    },
+}, {
     files: ['webpack.config.js'],
 
     languageOptions: {

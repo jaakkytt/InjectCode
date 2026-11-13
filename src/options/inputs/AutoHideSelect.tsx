@@ -29,7 +29,6 @@ const AutoHideSelect = ({ severity }: Props) => {
             size="small"
             value={autoHide ? String(autoHide[severity]) : ''}
             disabled={autoHide === null}
-            sx={{ minWidth: 180 }}
             onChange={handleChange}
         >
             {OPTIONS.map(({ ms, label }) => (

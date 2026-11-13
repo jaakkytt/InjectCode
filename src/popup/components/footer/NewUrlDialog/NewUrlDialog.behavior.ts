@@ -4,9 +4,9 @@ import { useExistingUrls } from '../../../providers/ExistingUrlsProvider'
 import { urlPatternValidator } from '../../../../shared/service/urlPatternValidator'
 import { urlCharacterFilter } from '../../../service/urlCharacterFilter'
 import { useCurrentUrl } from '../../../providers/CurrentUrlProvider'
-import { useTab } from '../../../providers/TabProvider'
+import { useView, useViewDispatch } from '../../../providers/ViewProvider'
+import { useInteractions } from '../../../providers/InteractionsProvider'
 import { TabIndex } from '../../../types'
-import { useLastInteracted } from '../../../providers/LastInteractedProvider'
 import { urlPatternMatcher } from '../../../../shared/service/urlPatternMatcher'
 import { Props } from './NewUrlDialog.types'
 
@@ -21,12 +21,13 @@ function getOriginPattern(url: URL): string {
 export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
     const [inputValue, setInputValue] = useState('')
     const [error, setError] = useState<string | undefined>(undefined)
-    const { tabIndex, setTabIndex } = useTab()
+    const view = useView()
+    const { selectView } = useViewDispatch()
+    const interactions = useInteractions()
 
     const currentUrl = useCurrentUrl()
     const urlsDispatch = useUrlsDispatch()
     const existingUrls = useExistingUrls()
-    const { setLastUrl } = useLastInteracted()
 
     const placeholder = useMemo(() => {
         if (!currentUrl) {
@@ -76,14 +77,14 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
         }
 
         urlsDispatch({ name: 'added', id: value })
-        setLastUrl(value)
+        interactions.publish({ kind: 'urlBlockCreated', urlBlockId: value })
 
         close()
 
-        if (tabIndex === TabIndex.Current && currentUrl) {
+        if (view === TabIndex.Current && currentUrl) {
             const matcher = urlPatternMatcher(value)
             if (!matcher.valid || !matcher.match(currentUrl.href)) {
-                setTabIndex(TabIndex.All)
+                selectView(TabIndex.All)
             }
         }
     }

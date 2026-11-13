@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Props, Status } from './AccordionBody.types'
+import { useEditorRestore } from '../../../hooks/useEditorRestore'
 
 function isDirty(current: string, lastSaved: string): boolean {
     return current.trim() !== lastSaved.trim()
@@ -7,7 +8,9 @@ function isDirty(current: string, lastSaved: string): boolean {
 
 type EditorSource = { value: string; revision: number }
 
-export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omit<Props, 'language'>) {
+export function useAccordionBodyBehavior(
+    { scriptId, urlBlockId, value, onChange, onFocusChange }: Omit<Props, 'language'>,
+) {
 
     const [editorSource, setEditorSource] = useState<EditorSource>({ value, revision: 0 })
     const [status, setStatus] = useState<Status>('idle')
@@ -16,6 +19,7 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omi
     const inputValueRef = useRef<string>(value)
     const isFocusedRef = useRef<boolean>(false)
     const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+    const editorRestore = useEditorRestore({ scriptId, urlBlockId })
 
     useEffect(() => {
         if (value === lastSavedValueRef.current) {
@@ -69,6 +73,7 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omi
         setStatus(isDirty(inputValueRef.current, lastSavedValueRef.current) ? 'unsaved' : 'upToDate')
         startAutoSave()
         onFocusChange?.(true)
+        editorRestore.focus()
     }
 
     function blur() {
@@ -82,6 +87,7 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omi
         }
 
         onFocusChange?.(false)
+        editorRestore.blur()
     }
 
     function update(newVal: string) {
@@ -94,6 +100,7 @@ export function useAccordionBodyBehavior({ value, onChange, onFocusChange }: Omi
     return {
         editorSource,
         status,
+        editorRef: editorRestore.editorRef,
         handlers: {
             blur,
             focus,

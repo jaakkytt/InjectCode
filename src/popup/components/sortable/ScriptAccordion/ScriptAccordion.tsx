@@ -42,6 +42,7 @@ export default function ScriptAccordion(
         isDragging,
         play,
         contentFocused,
+        restoreAnchorRef,
         handlers,
     } = useScriptAccordionBehavior({ item, parentId })
 
@@ -60,6 +61,7 @@ export default function ScriptAccordion(
                 }}
             >
                 <AccordionSummary
+                    ref={restoreAnchorRef}
                     expandIcon={<ExpandMoreIcon sx={expandIconSx} color="primary" />}
                     aria-controls={`${item.id}-content`}
                     id={`${item.id}-header`}
@@ -129,6 +131,8 @@ export default function ScriptAccordion(
                 </AccordionSummary>
                 <AccordionDetails sx={accordionDetailsSx}>
                     <AccordionBody
+                        scriptId={item.id}
+                        urlBlockId={parentId}
                         value={item.content}
                         language={item.type === 'css' ? 'css' : 'javascript'}
                         onChange={handlers.contentChange}

@@ -1,6 +1,6 @@
 import React, { Dispatch } from 'react'
 import { Action, StoreState } from '../types'
-import { UrlsContext, UrlsDispatchContext } from './urlsContext'
+import { UrlsContext, UrlsDispatchContext, UrlsHydratedContext } from './urlsContext'
 
 interface Props {
     state: StoreState
@@ -14,7 +14,9 @@ export function UrlsProvider({ state, dispatch, children } : Props) {
     return (
         <UrlsContext.Provider value={view}>
             <UrlsDispatchContext.Provider value={dispatch}>
-                {children}
+                <UrlsHydratedContext.Provider value={state.isHydrated}>
+                    {children}
+                </UrlsHydratedContext.Provider>
             </UrlsDispatchContext.Provider>
         </UrlsContext.Provider>
     )

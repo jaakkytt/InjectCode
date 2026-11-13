@@ -24,6 +24,8 @@ import BackupNotice from './backup/BackupNotice'
 import { FeedbackAutoHideProvider } from './providers/FeedbackAutoHideProvider'
 import AutoHideSelect from './inputs/AutoHideSelect'
 import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
+import { ViewRestoreModeProvider } from './providers/ViewRestoreModeProvider'
+import ViewRestoreModeSelect from './inputs/ViewRestoreModeSelect'
 import SiteAccessSelect from './inputs/SiteAccessSelect'
 import ExternalLink from './links/ExternalLink'
 import ExtensionErrorLink from './links/ExtensionErrorLink'
@@ -150,6 +152,21 @@ const Options = () => (
                                         Choose when all <AlwaysOnModeIcon /> <Warning>Always on</Warning> scripts run
                                         during page load. The preferred and default value is "Document idle". See{' '}
                                         <ExternalLink href={RUN_AT_DOCS}>how the options differ</ExternalLink>.
+                                    </SettingText>
+                                </div>
+                            </Setting>
+
+                            <Setting>
+                                <ViewRestoreModeProvider>
+                                    <ViewRestoreModeSelect sameHost="Same host" sameTab="Same tab" off="Off" />
+                                </ViewRestoreModeProvider>
+                                <div>
+                                    <SettingTitle>Reopen where you left off</SettingTitle>
+                                    <SettingText>
+                                        Choose whether the popup reopens where you left it. "Same host" remembers
+                                        your place per site, shared by all its tabs. "Same tab" remembers it per
+                                        browser tab. "Off" always opens at the top. Restarting the browser or
+                                        changing this setting starts fresh.
                                     </SettingText>
                                 </div>
                             </Setting>

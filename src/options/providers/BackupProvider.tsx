@@ -14,6 +14,7 @@ import {
     serializeBackup,
 } from '../service/backup'
 import { s } from '../../shared/lib/text'
+import { requireContext } from '../../shared/lib/requireContext'
 
 interface Notice {
     severity: FeedbackSeverity
@@ -37,11 +38,7 @@ interface BackupProviderProps {
 const backupContext = createContext<BackupValue | undefined>(undefined)
 
 export function useBackup() {
-    const context = useContext(backupContext)
-    if (!context) {
-        throw new Error('useBackup must be used within <BackupProvider>')
-    }
-    return context
+    return requireContext(useContext(backupContext), 'BackupProvider')
 }
 
 function describeImport({ added, overwritten, skipped }: ImportSummary, disabled: number): Notice {

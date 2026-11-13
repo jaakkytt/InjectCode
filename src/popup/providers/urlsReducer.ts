@@ -20,10 +20,8 @@ function downgradeRunModeOnEdit(item: Script, patch: ScriptPatch): ScriptPatch {
 function applyScriptAction(state: ScriptsByPattern, action: Action): ScriptsByPattern {
     switch (action.name) {
         case 'scriptAdd': {
-            const dateTimeStringAsTitle = new Date().toLocaleString()
-            const newItemId = `${action.type}-${dateTimeStringAsTitle}-${Math.random().toString(36).substring(2, 10)}`
             const script: Script = {
-                id: newItemId,
+                id: action.id,
                 title: action.title,
                 secondaryText: '',
                 content: '',
@@ -53,7 +51,7 @@ function applyScriptAction(state: ScriptsByPattern, action: Action): ScriptsByPa
 function ensureWorking(state: StoreState): StoreState {
     return state.working
         ? state
-        : { committed: state.committed, working: { ...state.committed }, isDirty: true }
+        : { ...state, working: { ...state.committed }, isDirty: true }
 }
 
 function applyNormalAction(state: ScriptsByPattern, action: Action): ScriptsByPattern {
@@ -93,14 +91,14 @@ export function urlsRootReducer(state: StoreState, action: Action): StoreState {
             if (state.isDirty) {
                 return state
             }
-            return { ...state, committed: action.payload }
+            return { ...state, committed: action.payload, isHydrated: true }
         }
 
         case 'dragStart': {
             if (state.isDirty) {
                 return state
             }
-            return { committed: state.committed, working: { ...state.committed }, isDirty: true }
+            return { ...state, working: { ...state.committed }, isDirty: true }
         }
         case 'dragWithinContainer': {
             const s = ensureWorking(state)
@@ -133,10 +131,10 @@ export function urlsRootReducer(state: StoreState, action: Action): StoreState {
         }
         case 'dragDrop': {
             if (!state.working) return { ...state, isDirty: false }
-            return { committed: state.working, working: null, isDirty: false }
+            return { ...state, committed: state.working, working: null, isDirty: false }
         }
         case 'dragCancel': {
-            return { committed: state.committed, working: null, isDirty: false }
+            return { ...state, working: null, isDirty: false }
         }
 
         case 'added':

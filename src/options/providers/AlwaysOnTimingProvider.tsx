@@ -1,5 +1,6 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { AlwaysOnTiming, readAlwaysOnTiming, saveAlwaysOnTiming } from '../../shared/service/settings/alwaysOnTiming'
+import { requireContext } from '../../shared/lib/requireContext'
 
 interface AlwaysOnTimingValue {
     timing: AlwaysOnTiming | null
@@ -13,11 +14,7 @@ interface AlwaysOnTimingProviderProps {
 const alwaysOnTimingContext = createContext<AlwaysOnTimingValue | undefined>(undefined)
 
 export function useAlwaysOnTiming() {
-    const context = useContext(alwaysOnTimingContext)
-    if (!context) {
-        throw new Error('useAlwaysOnTiming must be used within <AlwaysOnTimingProvider>')
-    }
-    return context
+    return requireContext(useContext(alwaysOnTimingContext), 'AlwaysOnTimingProvider')
 }
 
 function useAlwaysOnTimingProviderBehavior(): AlwaysOnTimingValue {

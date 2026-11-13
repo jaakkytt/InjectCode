@@ -21,7 +21,6 @@ const AlwaysOnTimingSelect = ({ start, end, idle }: Props) => {
             size="small"
             value={timing ?? ''}
             disabled={timing === null}
-            sx={{ minWidth: 180 }}
             onChange={handleChange}
         >
             <MenuItem value="document_start">{start}</MenuItem>

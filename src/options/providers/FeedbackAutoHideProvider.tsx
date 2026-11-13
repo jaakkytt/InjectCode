@@ -6,6 +6,7 @@ import {
     readFeedbackAutoHide,
     saveFeedbackAutoHide,
 } from '../../shared/service/settings/feedbackAutoHide'
+import { requireContext } from '../../shared/lib/requireContext'
 
 interface FeedbackAutoHideValue {
     autoHide: FeedbackAutoHideBySeverity | null
@@ -19,11 +20,7 @@ interface FeedbackAutoHideProviderProps {
 const feedbackAutoHideContext = createContext<FeedbackAutoHideValue | undefined>(undefined)
 
 export function useFeedbackAutoHide() {
-    const context = useContext(feedbackAutoHideContext)
-    if (!context) {
-        throw new Error('useFeedbackAutoHide must be used within <FeedbackAutoHideProvider>')
-    }
-    return context
+    return requireContext(useContext(feedbackAutoHideContext), 'FeedbackAutoHideProvider')
 }
 
 function useFeedbackAutoHideProviderBehavior(): FeedbackAutoHideValue {

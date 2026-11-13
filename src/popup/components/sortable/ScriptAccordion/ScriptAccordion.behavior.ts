@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { ScriptRunMode } from '../../../../shared/types'
 import { useScriptsDispatch } from '../../../providers/scriptsContext'
 import { usePlayControls } from '../../../hooks/usePlayControls'
+import { useRestoreAnchor } from '../../../hooks/useRestoreAnchor'
 import { Props } from './ScriptAccordion.types'
 
 export function useScriptAccordionBehavior({ item, parentId }: Pick<Props, 'item' | 'parentId'>) {
@@ -18,6 +19,7 @@ export function useScriptAccordionBehavior({ item, parentId }: Pick<Props, 'item
     const dispatch = useScriptsDispatch()
     const play = usePlayControls({ [parentId]: [item] })
     const [contentFocused, setContentFocused] = useState(false)
+    const restoreAnchorRef = useRestoreAnchor('codeBlock', item.id)
 
     return {
         attributes,
@@ -28,6 +30,7 @@ export function useScriptAccordionBehavior({ item, parentId }: Pick<Props, 'item
         isDragging,
         play,
         contentFocused,
+        restoreAnchorRef,
         handlers: {
             setContentFocused,
             contentChange: (newContent: string) => dispatch.update(item.id, { content: newContent }),

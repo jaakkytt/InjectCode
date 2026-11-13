@@ -10,9 +10,9 @@ import {
     useSensors,
 } from '@dnd-kit/core'
 import { Script, ScriptsByPattern } from '../../../../shared/types'
-import { LOCAL_STORAGE_CHILD_EXPANDED, LOCAL_STORAGE_CLOSE_PARENTS } from '../../../../shared/constants'
 import { useUrls, useUrlsDispatch } from '../../../providers/urlsContext'
-import { useLastInteracted } from '../../../providers/LastInteractedProvider'
+import { useAccordionState, useAccordionStateDispatch } from '../../../providers/AccordionStateProvider'
+import { useInteractions } from '../../../providers/InteractionsProvider'
 
 const dragMinimumDelta = 5
 
@@ -50,28 +50,13 @@ function resolveDropIndex(
 export function useUrlAccordionBehavior() {
     const items = useUrls()
     const dispatch = useUrlsDispatch()
-    const { setLastUrl } = useLastInteracted()
+    const { openCodeBlock, closedUrlBlocks } = useAccordionState()
+    const expanded: string | false = openCodeBlock ?? false
+    const accordions = useAccordionStateDispatch()
+    const interactions = useInteractions()
 
     const [activeItem, setActiveItem] = useState<Script | null>(null)
     const [dragTranslation, setTranslation] = useState<{ top: number; left: number } | null>(null)
-
-    const [expanded, setExpanded] = useState<string | false>(() => {
-        const savedExpanded = localStorage.getItem(LOCAL_STORAGE_CHILD_EXPANDED)
-        return savedExpanded ? savedExpanded : false
-    })
-
-    const [closedParents, setClosedParents] = useState<Set<string>>(() => {
-        const savedState = localStorage.getItem(LOCAL_STORAGE_CLOSE_PARENTS)
-        return savedState ? new Set(JSON.parse(savedState)) : new Set()
-    })
-
-    useEffect(() => {
-        localStorage.setItem(LOCAL_STORAGE_CLOSE_PARENTS, JSON.stringify(Array.from(closedParents)))
-    }, [closedParents])
-
-    useEffect(() => {
-        localStorage.setItem(LOCAL_STORAGE_CHILD_EXPANDED, expanded || '')
-    }, [expanded])
 
     const sensors = useSensors(useSensor(PointerSensor))
     const dropAnimation: DropAnimation = { ...defaultDropAnimation }
@@ -95,16 +80,7 @@ export function useUrlAccordionBehavior() {
 
     function parentAccordionChange(panel: string) {
         return (_event: React.SyntheticEvent, isExpanded: boolean) => {
-            setClosedParents((prevState) => {
-                const newState = new Set(prevState)
-                if (isExpanded) {
-                    newState.delete(panel)
-                } else {
-                    newState.add(panel)
-                }
-                return newState
-            })
-            setLastUrl(panel)
+            accordions.setUrlBlockOpen(panel, isExpanded)
         }
     }
 
@@ -117,7 +93,7 @@ export function useUrlAccordionBehavior() {
         const container = findContainer(items, activeId)
 
         if (container) {
-            setLastUrl(container)
+            interactions.publish({ kind: 'codeBlockDragged', scriptId: activeId, urlBlockId: container })
             const item = items[container].find(i => i.id === activeId)
             if (item) {
                 setActiveItem(item)
@@ -147,7 +123,7 @@ export function useUrlAccordionBehavior() {
             return
         }
 
-        if (closedParents.has(overContainer)) {
+        if (closedUrlBlocks.has(overContainer)) {
             return
         }
 
@@ -211,14 +187,14 @@ export function useUrlAccordionBehavior() {
         }
 
         dispatch({ name: 'dragDrop' })
-        setLastUrl(overContainer)
+        interactions.publish({ kind: 'codeBlockDragged', scriptId: activeId, urlBlockId: overContainer })
     }
 
     return {
         items,
         activeItem,
         expanded,
-        closedParents,
+        closedUrlBlocks,
         sensors,
         dropAnimation,
         handlers: {
@@ -229,11 +205,11 @@ export function useUrlAccordionBehavior() {
             parentAccordionChange,
             removeContainer: (containerId: string) => dispatch({ name: 'deleted', id: containerId }),
             accordionChange: (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
-                setExpanded(isExpanded ? panel : false)
+                accordions.setCodeBlockOpen(panel, findContainer(items, panel) ?? panel, isExpanded)
             },
             renameParentAccordionKey: (oldKey: string, newKey: string) => {
                 dispatch({ name: 'renamed', id: oldKey, title: newKey })
-                setLastUrl(newKey)
+                accordions.renameUrlBlock(oldKey, newKey)
             },
         },
     }

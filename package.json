@@ -1,18 +1,19 @@
 {
     "name": "injectcode",
-    "version": "2.0.0-rc1",
+    "version": "2.0.0-rc2",
     "packageManager": "pnpm@12.17.0",
     "scripts": {
         "build": "webpack --mode production",
         "dev": "webpack --mode development",
         "start": "webpack --watch",
-        "type-check": "tsc --noEmit",
-        "lint": "eslint ./src ./test ./webpack.config.js --ext .ts,.tsx",
-        "lint-fix": "eslint ./src ./test ./webpack.config.js --ext .ts,.tsx --fix",
+        "type-check": "tsc --noEmit && tsc --noEmit -p e2e",
+        "lint": "eslint ./src ./test ./e2e ./playwright.config.ts ./webpack.config.js --ext .ts,.tsx",
+        "lint-fix": "eslint ./src ./test ./e2e ./playwright.config.ts ./webpack.config.js --ext .ts,.tsx --fix",
         "test": "vitest run",
+        "e2e": "playwright test",
         "audit": "pnpm audit",
         "audit-fix": "pnpm audit --fix=override",
-        "validate": "pnpm run audit && pnpm run type-check && pnpm run lint && pnpm run test && pnpm run build"
+        "validate": "pnpm run audit && pnpm run type-check && pnpm run lint && pnpm run test && pnpm run build && pnpm run e2e"
     },
     "author": {
         "name": "Jaak Kütt",
@@ -38,7 +39,9 @@
         "@fontsource/roboto": "^5.3.0",
         "@mui/icons-material": "^9.4.0",
         "@mui/material": "^9.4.0",
+        "@playwright/test": "^1.65.0",
         "@types/chrome": "^0.3.0",
+        "@types/node": "^24.19.2",
         "@types/react": "^19.3.0",
         "@types/react-dom": "^19.3.0",
         "@typescript-eslint/eslint-plugin": "^8.70.0",

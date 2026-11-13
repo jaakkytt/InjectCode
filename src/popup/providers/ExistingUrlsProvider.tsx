@@ -1,4 +1,5 @@
 import React, { createContext, useContext } from 'react'
+import { requireContext } from '../../shared/lib/requireContext'
 
 export const ExistingUrlsContext = createContext<string[]>([])
 
@@ -16,9 +17,5 @@ export function ExistingUrlsProvider({ value, children } : Props) {
 }
 
 export function useExistingUrls(): string[] {
-    const context = useContext(ExistingUrlsContext)
-    if (!context) {
-        throw new Error('useExistingUrls must be used within <ExistingUrlsProvider>')
-    }
-    return context
+    return requireContext(useContext(ExistingUrlsContext), 'ExistingUrlsProvider')
 }

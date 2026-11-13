@@ -1,35 +1,41 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react'
-import { SHARED_CODE, LOCAL_STORAGE_LAST_URL } from '../../shared/constants'
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { LOCAL_STORAGE_LAST_URL, SHARED_CODE } from '../../shared/constants'
+import { Interaction } from '../service/interactions/interaction.types'
+import { useInteractions } from './InteractionsProvider'
+import { requireContext } from '../../shared/lib/requireContext'
 
-type LastInteractedContextType = {
-    lastUrl: string;
-    setLastUrl: (id: string) => void;
-};
+const lastInteractedContext = createContext<string | undefined>(undefined)
 
-const LastInteractedContext = createContext<LastInteractedContextType | undefined>(undefined)
+export function LastInteractedProvider({ children }: { children: ReactNode }) {
+    const interactions = useInteractions()
+    const [lastUrl, setLastUrl] = useState<string>(() => localStorage.getItem(LOCAL_STORAGE_LAST_URL) ?? SHARED_CODE)
 
-export const LastInteractedProvider = ({ children }: { children: ReactNode }) => {
-    const [lastUrl, setLastUrlState] = useState<string>(() => {
-        const stored = localStorage.getItem(LOCAL_STORAGE_LAST_URL)
-        return stored !== null ? stored : SHARED_CODE
-    })
+    useEffect(() => interactions.subscribe((interaction) => {
+        const urlBlockId = interactedUrlBlockOf(interaction)
+        if (urlBlockId !== undefined) {
+            setLastUrl(urlBlockId)
+            localStorage.setItem(LOCAL_STORAGE_LAST_URL, urlBlockId)
+        }
+    }), [interactions])
 
-    const setLastUrl = (id: string) => {
-        setLastUrlState(id)
-        localStorage.setItem(LOCAL_STORAGE_LAST_URL, id)
-    }
-
-    return (
-        <LastInteractedContext.Provider value={{ lastUrl, setLastUrl }}>
-            {children}
-        </LastInteractedContext.Provider>
-    )
+    return <lastInteractedContext.Provider value={lastUrl}>{children}</lastInteractedContext.Provider>
 }
 
-export const useLastInteracted = () => {
-    const context = useContext(LastInteractedContext)
-    if (!context) {
-        throw new Error('useLastInteracted must be used within LastInteractedProvider')
+export function useLastInteracted(): string {
+    return requireContext(useContext(lastInteractedContext), 'LastInteractedProvider')
+}
+
+function interactedUrlBlockOf(interaction: Interaction): string | undefined {
+    switch (interaction.kind) {
+        case 'urlBlockToggled':
+        case 'urlBlockCreated':
+        case 'urlBlockPicked':
+        case 'codeBlockCreated':
+        case 'codeBlockDragged':
+            return interaction.urlBlockId
+        case 'urlBlockRenamed':
+            return interaction.newId
+        default:
+            return undefined
     }
-    return context
 }

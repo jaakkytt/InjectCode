@@ -1,35 +1,54 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
-const CurrentUrlContext = createContext<URL | undefined>(undefined)
+interface CurrentTab {
+    url?: URL
+    tabId?: number
+    isResolved: boolean
+}
+
+const UNRESOLVED: CurrentTab = { isResolved: false }
+
+const CurrentTabContext = createContext<CurrentTab>(UNRESOLVED)
 
 export function CurrentUrlProvider({ children } : { children?: React.ReactNode }) {
-    const [currentUrl, setCurrentUrl] = useState<URL | undefined>(undefined)
+    const [currentTab, setCurrentTab] = useState<CurrentTab>(UNRESOLVED)
 
     useEffect(() => {
-        async function fetchCurrentUrl() {
+        async function fetchCurrentTab(): Promise<CurrentTab> {
             if (typeof chrome !== 'undefined' && chrome.tabs) {
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
                 if (!tab || !tab.id || !tab.url) {
                     console.error('No active tab found.')
-                    return
+                    return { isResolved: true }
                 }
-                return new URL(tab.url)
+                return { url: new URL(tab.url), tabId: tab.id, isResolved: true }
             } else if (typeof window !== 'undefined' && window.location) {
-                return new URL(window.location.href)
+                return { url: new URL(window.location.href), isResolved: true }
             } else {
                 console.error('Unable to determine current URL.')
+                return { isResolved: true }
             }
         }
-        fetchCurrentUrl().then(setCurrentUrl)
+
+        fetchCurrentTab()
+            .catch((error) => {
+                console.error('Unable to determine current tab:', error)
+                return { isResolved: true }
+            })
+            .then(setCurrentTab)
     }, [])
 
     return (
-        <CurrentUrlContext value={currentUrl}>
+        <CurrentTabContext value={currentTab}>
             {children}
-        </CurrentUrlContext>
+        </CurrentTabContext>
     )
 }
 
+export function useCurrentTab() {
+    return useContext(CurrentTabContext)
+}
+
 export function useCurrentUrl() {
-    return useContext(CurrentUrlContext)
+    return useContext(CurrentTabContext).url
 }

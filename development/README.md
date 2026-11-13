@@ -60,6 +60,22 @@ docker compose -f development/compose.yml run --rm lint-fix
 docker compose -f development/compose.yml run --rm test
 ```
 
+## End-to-end tests
+
+Playwright drives the built extension in Chromium, so build first. The `e2e` image carries the browser, matched
+to the `@playwright/test` version in `pnpm-lock.yaml` (pnpm likewise comes from `packageManager` in
+`package.json`), so after bumping either, rebuild the image with `--build`:
+
+```sh
+docker compose -f development/compose.yml run --rm build
+docker compose -f development/compose.yml run --rm e2e
+docker compose -f development/compose.yml run --rm e2e restore-editor -g "focused"
+docker compose -f development/compose.yml run --rm e2e-debug
+```
+
+The list reporter prints to the console and the JSON report lands in `development/.artifacts/e2e.json`; traces and
+screenshots of failures go to `development/.artifacts/e2e-results/`.
+
 ## Audit
 
 ```sh

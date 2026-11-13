@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, useState, ReactNode } from 'react'
 import { FeedbackSeverity } from '../../shared/types'
 import { Message } from '../service/Message'
+import { requireContext } from '../../shared/lib/requireContext'
 
 type FeedbackContextType = {
     id: number;
@@ -45,17 +46,9 @@ export const FeedbackProvider = ({ children }: { children: ReactNode }) => {
 }
 
 export const useFeedback = () => {
-    const context = useContext(FeedbackContext)
-    if (!context) {
-        throw new Error('useFeedback must be used within FeedbackProvider')
-    }
-    return context
+    return requireContext(useContext(FeedbackContext), 'FeedbackProvider')
 }
 
 export const useFeedbackDispatch = () => {
-    const context = useContext(FeedbackDispatchContext)
-    if (!context) {
-        throw new Error('useFeedbackDispatch must be used within FeedbackProvider')
-    }
-    return context
+    return requireContext(useContext(FeedbackDispatchContext), 'FeedbackProvider')
 }

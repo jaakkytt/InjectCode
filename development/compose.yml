@@ -12,6 +12,20 @@ x-toolchain: &toolchain
     - ..:/app
     - pnpm-store:/pnpm-store
 
+x-e2e: &e2e
+  image: injectcode-e2e
+  build:
+    context: ..
+    dockerfile: development/Dockerfile
+    target: e2e
+  environment:
+    - CI=true
+  volumes:
+    - ..:/app
+    - pnpm-store:/pnpm-store
+  ipc: host # Chromium wants more than Docker's default 64MB /dev/shm, hence ipc: host;
+  init: true # init reaps the child processes it leaves behind
+
 services:
 
   node:
@@ -63,8 +77,24 @@ services:
     command: sh -c "pnpm run start"
 
   validate:
-    <<: *toolchain
+    <<: *e2e
     command: sh -c "pnpm run validate"
+
+  e2e:
+    <<: *e2e
+    environment:
+      - CI=true
+      - PLAYWRIGHT_JSON_OUTPUT_NAME=development/.artifacts/e2e.json
+    entrypoint: ["pnpm", "exec", "playwright", "test", "--reporter=list,json"]
+    command: []
+
+  e2e-debug:
+    <<: *e2e
+    environment:
+      - CI=true
+      - PLAYWRIGHT_JSON_OUTPUT_NAME=development/.artifacts/e2e-debug.json
+    entrypoint: ["pnpm", "exec", "playwright", "test", "--reporter=list,json", "--retries=0"]
+    command: []
 
 volumes:
   pnpm-store:

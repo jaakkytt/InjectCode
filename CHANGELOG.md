@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[#4]** CSS scripts alongside JavaScript
 - **[#4]** Shared scripts that run before every URL's own scripts
 - **[#4]** Export and import of scripts as a backup file
+- **[#4]** The popup reopens where you left off: selected view, open blocks and the last block or editor, per host, per tab or off
 
 ### Removed
 

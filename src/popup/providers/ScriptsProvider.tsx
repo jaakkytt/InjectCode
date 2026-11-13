@@ -13,8 +13,8 @@ export function ScriptsProvider({ containerId, children } : Props) {
     const scripts = useMemo(() => urls[containerId] ?? [], [urls, containerId])
     const dispatch: ScriptsDispatch = useMemo(
         () => ({
-            add: (type, title) =>
-                parentDispatch({ name: 'scriptAdd', containerId, type, title }),
+            add: (id, type, title) =>
+                parentDispatch({ name: 'scriptAdd', containerId, id, type, title }),
             update: (scriptId, patch) =>
                 parentDispatch({ name: 'scriptUpdate', containerId, scriptId, patch }),
             remove: (scriptId) =>

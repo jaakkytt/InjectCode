@@ -135,6 +135,10 @@ export const Setting = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'flex-start',
     gap: theme.spacing(2),
+    '& > .MuiInputBase-root, & > .MuiFormControl-root': {
+        width: 180,
+        flexShrink: 0,
+    },
 }))
 
 export const SettingTitle = styled('h3')(({ theme }) => ({

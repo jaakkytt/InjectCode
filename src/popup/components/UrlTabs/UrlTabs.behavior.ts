@@ -1,5 +1,6 @@
 import React from 'react'
-import { useTab } from '../../providers/TabProvider'
+import { TabIndex } from '../../types'
+import { useView, useViewDispatch } from '../../providers/ViewProvider'
 
 export function a11yProps(index: number) {
     return {
@@ -9,12 +10,13 @@ export function a11yProps(index: number) {
 }
 
 export function useUrlTabsBehavior() {
-    const { tabIndex, setTabIndex } = useTab()
+    const view = useView()
+    const { selectView } = useViewDispatch()
 
     return {
-        tabIndex,
+        tabIndex: view,
         handlers: {
-            change: (_event: React.SyntheticEvent, newValue: number) => setTabIndex(newValue),
+            change: (_event: React.SyntheticEvent, newValue: TabIndex) => selectView(newValue),
             settingsClick: (e: React.MouseEvent) => {
                 e.preventDefault()
                 chrome.runtime.openOptionsPage()

@@ -33,11 +33,15 @@ export default function AccordionItem({
     expandedPanel,
     onAccordionChange,
 }: Props) {
-    const { play, transformTitleInput, handlers } = useAccordionItemBehavior({ containerId, items, onRename })
+    const { play, restoreAnchorRef, transformTitleInput, handlers } = useAccordionItemBehavior({
+        containerId,
+        items,
+        onRename,
+    })
 
     return (
         <Accordion defaultExpanded expanded={isExpanded} onChange={onParentChange} style={accordionStyle}>
-            <AccordionSummary component="div" expandIcon={<ExpandMoreIcon />}>
+            <AccordionSummary ref={restoreAnchorRef} component="div" expandIcon={<ExpandMoreIcon />}>
                 <Box sx={headerRowSx}>
                     <AccordionTitle
                         value={containerId}

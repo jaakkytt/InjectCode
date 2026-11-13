@@ -15,8 +15,14 @@ import { Props } from './AccordionBody.types'
 import { useAccordionBodyBehavior } from './AccordionBody.behavior'
 import { EditorFrame, StatusSlot } from './AccordionBody.styles'
 
-export default function AccordionBody({ value, language, onChange, onFocusChange }: Props) {
-    const { editorSource, status, handlers } = useAccordionBodyBehavior({ value, onChange, onFocusChange })
+export default function AccordionBody({ scriptId, urlBlockId, value, language, onChange, onFocusChange }: Props) {
+    const { editorSource, status, editorRef, handlers } = useAccordionBodyBehavior({
+        scriptId,
+        urlBlockId,
+        value,
+        onChange,
+        onFocusChange,
+    })
 
     return (
         <EditorFrame onClick={handlers.stopClickPropagation}>
@@ -25,6 +31,7 @@ export default function AccordionBody({ value, language, onChange, onFocusChange
             </StatusSlot>
             <Editor
                 key={editorSource.revision}
+                ref={editorRef}
                 language={language}
                 value={editorSource.value}
                 onUpdate={handlers.update}

@@ -37,7 +37,6 @@ const InjectionTimeoutInput = ({ unit, invalid }: Props) => {
             error={!isValid}
             helperText={isValid ? undefined : invalid}
             onChange={handleChange}
-            sx={{ width: 180, flexShrink: 0 }}
             slotProps={{
                 htmlInput: { min: 0, step: 'any' },
                 input: { endAdornment: <InputAdornment position="end">{unit}</InputAdornment> },

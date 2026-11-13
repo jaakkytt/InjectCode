@@ -6,7 +6,7 @@ import { SHARED_CODE } from '../../../../shared/constants'
 import { useUrlAccordionBehavior } from './UrlAccordion.behavior'
 
 export default function UrlAccordion() {
-    const { items, activeItem, expanded, closedParents, sensors, dropAnimation, handlers } = useUrlAccordionBehavior()
+    const { items, activeItem, expanded, closedUrlBlocks, sensors, dropAnimation, handlers } = useUrlAccordionBehavior()
 
     return (
         <DndContext
@@ -23,9 +23,9 @@ export default function UrlAccordion() {
                         key={`container-${containerId}`}
                         containerId={containerId}
                         items={items[containerId]}
-                        isExpanded={!closedParents.has(containerId)}
+                        isExpanded={!closedUrlBlocks.has(containerId)}
                         onParentChange={handlers.parentAccordionChange(containerId)}
-                        allowEditing={!closedParents.has(containerId) && containerId !== SHARED_CODE}
+                        allowEditing={!closedUrlBlocks.has(containerId) && containerId !== SHARED_CODE}
                         onRename={(newKey) => handlers.renameParentAccordionKey(containerId, newKey)}
                         onRemove={() => handlers.removeContainer(containerId)}
                         expandedPanel={expanded}

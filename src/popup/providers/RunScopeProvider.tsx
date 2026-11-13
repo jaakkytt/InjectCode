@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 import { LOCAL_STORAGE_SCOPE } from '../../shared/constants'
 import { RunScope } from '../types'
+import { requireContext } from '../../shared/lib/requireContext'
 
 type RunScopeContextType = {
     scope: RunScope;
@@ -28,9 +29,5 @@ export const RunScopeProvider = ({ children }: { children: ReactNode }) => {
 }
 
 export const useRunScope = () => {
-    const context = useContext(RunScopeContext)
-    if (!context) {
-        throw new Error('useRunScope must be used within RunScopeProvider')
-    }
-    return context
+    return requireContext(useContext(RunScopeContext), 'RunScopeProvider')
 }

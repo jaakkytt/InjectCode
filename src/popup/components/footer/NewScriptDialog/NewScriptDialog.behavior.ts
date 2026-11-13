@@ -3,16 +3,19 @@ import { SelectChangeEvent } from '@mui/material'
 import { useUrls, useUrlsDispatch } from '../../../providers/urlsContext'
 import { useLastInteracted } from '../../../providers/LastInteractedProvider'
 import { SHARED_CODE } from '../../../../shared/constants'
+import { useInteractions } from '../../../providers/InteractionsProvider'
+import { createScriptId } from '../../../service/scriptId'
 import { Props } from './NewScriptDialog.types'
 
 export function useNewScriptDialogBehavior({ scriptType, onClose }: Pick<Props, 'scriptType' | 'onClose'>) {
-    const { lastUrl, setLastUrl } = useLastInteracted()
+    const lastUrl = useLastInteracted()
     const [inputValue, setInputValue] = useState('')
     const [selectedUrl, setSelectedUrl] = useState(lastUrl)
     const [error, setError] = useState<string | undefined>(undefined)
 
     const urls = useUrls()
     const dispatch = useUrlsDispatch()
+    const interactions = useInteractions()
 
     useEffect(() => {
         if (urls && Object.keys(urls).length > 0 && lastUrl in urls) {
@@ -53,7 +56,12 @@ export function useNewScriptDialogBehavior({ scriptType, onClose }: Pick<Props, 
             return
         }
 
-        dispatch({ name: 'scriptAdd', containerId: firstContainer, type: scriptType, title: value })
+        const scriptId = createScriptId(scriptType)
+
+        dispatch({ name: 'scriptAdd', containerId: firstContainer, id: scriptId, type: scriptType, title: value })
+
+        interactions.publish({ kind: 'codeBlockCreated', scriptId, urlBlockId: firstContainer })
+
         close()
     }
 
@@ -73,7 +81,7 @@ export function useNewScriptDialogBehavior({ scriptType, onClose }: Pick<Props, 
             },
             select: (event: SelectChangeEvent) => {
                 setSelectedUrl(event.target.value as string)
-                setLastUrl(event.target.value as string)
+                interactions.publish({ kind: 'urlBlockPicked', urlBlockId: event.target.value as string })
             },
         },
     }

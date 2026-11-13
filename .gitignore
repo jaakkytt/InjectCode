@@ -1,4 +1,5 @@
 node_modules
 dist
+development/.artifacts
 *.zip
 *.zip.sha256
