@@ -5,6 +5,7 @@ export const ALL_URL = '<all_urls>'
 export const MATCH_PATTERN_DOCS = 'https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns'
 export const RUN_AT_DOCS = 'https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts#run_time'
 export const CHANGELOG_URL = 'https://github.com/jaakkytt/InjectCode/blob/feature/4-manifest-v3-overhaul/CHANGELOG.md'
+export const PRIVACY_URL = 'https://github.com/jaakkytt/InjectCode/blob/feature/4-manifest-v3-overhaul/PRIVACY.md'
 export const ISSUES_URL = 'https://github.com/jaakkytt/InjectCode/issues'
 
 export const LOCAL_STORAGE_LAST_URL = 'lastInteractedUrl'

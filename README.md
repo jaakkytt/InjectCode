@@ -25,6 +25,11 @@ being published there again. Until then, install it from a release zip as descri
 - Drag to reorder, which also sets the order the scripts run in
 - Export and import your scripts as a backup file
 
+## Privacy
+
+InjectCode has no server and sends nothing anywhere. Your scripts and settings stay in your Chrome profile.
+See [PRIVACY.md](PRIVACY.md) for exactly what is stored, what the extension reads and why it needs each permission.
+
 ## Getting started
 
 Requires Chrome 138 or newer. Every release on the [Releases page](https://github.com/jaakkytt/InjectCode/releases)

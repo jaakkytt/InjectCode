@@ -10,7 +10,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import CodeIcon from '@mui/icons-material/Code'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import { CHANGELOG_URL, ISSUES_URL, MATCH_PATTERN_DOCS, RUN_AT_DOCS } from '../shared/constants'
+import { CHANGELOG_URL, PRIVACY_URL, ISSUES_URL, MATCH_PATTERN_DOCS, RUN_AT_DOCS } from '../shared/constants'
 import BuildInfo from './BuildInfo'
 import SetupToggle from './inputs/SetupToggle'
 import ExtensionSettingsLink from './links/ExtensionSettingsLink'
@@ -169,9 +169,9 @@ const Options = () => (
                                     <SettingTitle>Reopen where you left off</SettingTitle>
                                     <SettingText>
                                         Choose whether the popup reopens where you left it. "Same host" remembers
-                                        your place per site, shared by all its tabs. "Same tab" remembers it per
-                                        browser tab. "Off" always opens at the top. Restarting the browser or
-                                        changing this setting starts fresh.
+                                        your place for up to 20 sites, shared by all their tabs. "Same tab"
+                                        remembers it per browser tab. "Off" always opens at the top. Restarting the
+                                        browser or changing this setting starts fresh.
                                     </SettingText>
                                 </div>
                             </Setting>
@@ -636,8 +636,13 @@ const Options = () => (
                     <Section>
                         <SectionHeading>
                             <SectionIcon><HistoryIcon /></SectionIcon>
-                            Changelog & issues
+                            Privacy, changelog & issues
                         </SectionHeading>
+                        <SectionText>
+                            InjectCode has no server and sends nothing anywhere. Your scripts and settings stay in
+                            your Chrome profile. See <ExternalLink href={PRIVACY_URL}>privacy policy</ExternalLink> for
+                            exactly what is stored, what the extension reads and why it needs each permission.
+                        </SectionText>
                         <SectionText>
                             See the <ExternalLink href={CHANGELOG_URL}>changelog</ExternalLink> to read about features
                             removed since version 1.
