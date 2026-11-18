@@ -6,6 +6,7 @@ audit:
   ignorePrune: true
   ignore:
     - GHSA-g3hv-75wg-m249 # minimatch: lint-only, trusted globs
+    - GHSA-fc5q-39xc-vjpf # picomatch: build/lint/test only, trusted globs
 overrides:
   '@vitest/mocker@>=5.0.0-beta.1 <5.0.3': ^5.0.3
   '@vitest/mocker@>=5.0.0-rc.2 <5.0.3': ^5.0.3

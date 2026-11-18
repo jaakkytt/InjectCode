@@ -42,7 +42,6 @@ export const Success = styled('b')(({ theme }) => ({
 export const TopBarLogo = styled('img')(({ theme }) => ({
     width: 24,
     height: 24,
-    filter: 'invert(100%)',
     marginRight: theme.spacing(1.5),
 }))
 
