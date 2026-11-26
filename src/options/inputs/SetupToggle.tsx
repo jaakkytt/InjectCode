@@ -1,30 +1,34 @@
-import { Switch } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { styled, Switch, switchClasses, SwitchProps } from '@mui/material'
 
-import { isUserScriptsEnabled } from '../../shared/service/userScripts'
-import { isFileAccessEnabled } from '../service/extensionSetup'
+type OffColor = Exclude<SwitchProps['color'], 'default' | undefined>
 
-export type SetupCheck = 'userScripts' | 'fileAccess'
-
-export interface Props {
-    check: SetupCheck
+interface Props {
+    check: () => Promise<boolean>
+    offColor?: OffColor
 }
 
 const POLL_INTERVAL_MS = 5000
 
-const CHECKS: Record<SetupCheck, () => Promise<boolean>> = {
-    userScripts: isUserScriptsEnabled,
-    fileAccess: isFileAccessEnabled,
-}
+const StyledSwitch = styled(Switch, {
+    shouldForwardProp: (prop) => prop !== 'offColor',
+})<{ offColor?: OffColor }>(({ theme, offColor }) => offColor && {
+    [`& .${switchClasses.switchBase}:not(.${switchClasses.checked})`]: {
+        color: theme.lighten(theme.palette[offColor].main, 0.62),
+        [`& + .${switchClasses.track}`]: {
+            backgroundColor: theme.palette[offColor].main,
+        },
+    },
+})
 
-const SetupToggle = ({ check }: Props) => {
+const SetupToggle = ({ check, offColor }: Props) => {
     const [enabled, setEnabled] = useState(false)
 
     useEffect(() => {
         let isMounted = true
 
         async function refresh() {
-            const result = await CHECKS[check]()
+            const result = await check()
             if (isMounted) {
                 setEnabled(result)
             }
@@ -39,7 +43,7 @@ const SetupToggle = ({ check }: Props) => {
         }
     }, [check])
 
-    return <Switch checked={enabled} disabled />
+    return <StyledSwitch checked={enabled} offColor={offColor} disabled />
 }
 
 export default SetupToggle

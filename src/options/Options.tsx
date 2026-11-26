@@ -11,6 +11,7 @@ import Box from '@mui/material/Box'
 import React from 'react'
 import { Alert, AppBar, Toolbar } from '@mui/material'
 
+import { isUserScriptsEnabled } from '../shared/service/userScripts'
 import BackupNotice from './backup/BackupNotice'
 import ExportButton from './backup/ExportButton'
 import ImportButton from './backup/ImportButton'
@@ -36,6 +37,7 @@ import { BackupProvider } from './providers/BackupProvider'
 import { EditorSettingsProvider } from './providers/EditorSettingsProvider'
 import { FeedbackAutoHideProvider } from './providers/FeedbackAutoHideProvider'
 import { ViewRestoreModeProvider } from './providers/ViewRestoreModeProvider'
+import { isFileAccessEnabled } from './service/extensionSetup'
 import {
     CHANGELOG_URL,
     ISSUES_URL,
@@ -127,7 +129,7 @@ const Options = () => (
                         </SectionHeading>
                         <Settings>
                             <Setting>
-                                <SetupToggle check="userScripts" />
+                                <SetupToggle check={isUserScriptsEnabled} offColor="warning" />
                                 <div>
                                     <SettingTitle>User scripts</SettingTitle>
                                     <SettingText>
@@ -138,7 +140,7 @@ const Options = () => (
                             </Setting>
 
                             <Setting>
-                                <SetupToggle check="fileAccess" />
+                                <SetupToggle check={isFileAccessEnabled} />
                                 <div>
                                     <SettingTitle>File URLs</SettingTitle>
                                     <SettingText>
