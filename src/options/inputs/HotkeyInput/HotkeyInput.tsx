@@ -1,7 +1,8 @@
-import React from 'react'
 import { TextField } from '@mui/material'
-import { Props } from './HotkeyInput.types'
+import React from 'react'
+
 import { useHotkeyInputBehavior } from './HotkeyInput.behavior'
+import { Props } from './HotkeyInput.types'
 
 const HotkeyInput = ({ command }: Props) => {
     const { value, isDisabled, handlers } = useHotkeyInputBehavior({ command })

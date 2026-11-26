@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { Message } from '../../../src/popup/service/Message'
 
 const TIMEOUT_SECONDS = 5

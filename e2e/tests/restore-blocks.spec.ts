@@ -1,7 +1,8 @@
 import type { Locator } from '@playwright/test'
+
+import type { ViewName } from '../pages/PopupPage'
 import { expect, test } from '../fixtures/extension'
 import { SCRIPTS, SITE_A_PAGE, SITE_B, SITE_C, TAB_A } from '../fixtures/scripts'
-import type { ViewName } from '../pages/PopupPage'
 
 const VIEWS: ViewName[] = ['All Scripts', 'Currently Matching']
 const NEW_SITE = '*://d.example/*'

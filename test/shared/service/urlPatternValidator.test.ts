@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { SHARED_CODE } from '../../../src/shared/constants'
 import { urlPatternValidator } from '../../../src/shared/service/urlPatternValidator'
 

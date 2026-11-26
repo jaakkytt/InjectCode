@@ -1,4 +1,5 @@
 import type { InputSelection } from 'prism-react-editor'
+
 import { TabIndex } from '../../types'
 
 export type Interaction =

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { Script, ScriptsByPattern } from '../../../src/shared/types'
+
 import { SHARED_CODE } from '../../../src/shared/constants'
+import { Script, ScriptsByPattern } from '../../../src/shared/types'
 import {
     BACKUP_FORMAT,
     BACKUP_VERSION,

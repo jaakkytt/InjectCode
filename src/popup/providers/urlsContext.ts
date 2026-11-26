@@ -1,7 +1,8 @@
 import { createContext, Dispatch, useContext } from 'react'
+
+import { requireContext } from '../../shared/lib/requireContext'
 import { ScriptsByPattern } from '../../shared/types'
 import { Action } from '../types'
-import { requireContext } from '../../shared/lib/requireContext'
 
 export const UrlsContext = createContext<ScriptsByPattern | undefined>(undefined)
 export const UrlsDispatchContext = createContext<Dispatch<Action> | undefined>(undefined)

@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
 import { Box, Link } from '@mui/material'
+import React, { useState } from 'react'
+
 import { resetTooltipCounters } from '../../shared/service/settings/tooltipPreferences'
 
 const ResetTooltipsLink = () => {

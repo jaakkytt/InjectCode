@@ -1,4 +1,5 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+
 import {
     DEFAULT_EDITOR_SETTINGS,
     EditorSettings,

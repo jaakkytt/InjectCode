@@ -1,13 +1,14 @@
-import { useRef } from 'react'
 import { useDroppable } from '@dnd-kit/core'
+import { useRef } from 'react'
+
 import { useScripts } from '../../../providers/scriptsContext'
+
+const emptyStableIds: StableIds = { key: '', ids: [] }
 
 interface StableIds {
     key: string
     ids: string[]
 }
-
-const emptyStableIds: StableIds = { key: '', ids: [] }
 
 export function useContainerBehavior(id: string) {
     const { isOver, setNodeRef } = useDroppable({ id })

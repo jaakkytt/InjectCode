@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
+
+import { urlsRootReducer } from '../../../src/popup/providers/urlsReducer'
 import { Script } from '../../../src/shared/types'
 import { Action, StoreState } from '../../../src/popup/types'
-import { urlsRootReducer } from '../../../src/popup/providers/urlsReducer'
 
 const contentUpdate: Action = {
     name: 'scriptUpdate',

@@ -1,7 +1,8 @@
 import React from 'react'
+
+import { usePlayControls } from '../../../hooks/usePlayControls'
 import { useRunScope } from '../../../providers/RunScopeProvider'
 import { useUrls } from '../../../providers/urlsContext'
-import { usePlayControls } from '../../../hooks/usePlayControls'
 import { RunScope } from '../../../types'
 
 export function useFooterBehavior() {

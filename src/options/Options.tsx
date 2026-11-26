@@ -1,48 +1,49 @@
-import React from 'react'
-import Box from '@mui/material/Box'
-import { Alert, AppBar, Toolbar } from '@mui/material'
-import TuneIcon from '@mui/icons-material/Tune'
 import BackupIcon from '@mui/icons-material/Backup'
-import MenuBookIcon from '@mui/icons-material/MenuBook'
 import BuildIcon from '@mui/icons-material/Build'
-import HistoryIcon from '@mui/icons-material/History'
-import NotificationsIcon from '@mui/icons-material/Notifications'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import CodeIcon from '@mui/icons-material/Code'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import {
-    CHANGELOG_URL,
-    PRIVACY_URL,
-    ISSUES_URL,
-    MATCH_PATTERN_DOCS,
-    RUN_AT_DOCS,
-    LOCAL_STORAGE_LEGACY_SCRIPTS,
-} from '../shared/constants'
-import BuildInfo from './BuildInfo'
-import SetupToggle from './inputs/SetupToggle'
-import ExtensionSettingsLink from './links/ExtensionSettingsLink'
-import { AlwaysOnTimingProvider } from './providers/AlwaysOnTimingProvider'
-import AlwaysOnTimingSelect from './inputs/AlwaysOnTimingSelect'
-import TooltipsToggle from './inputs/TooltipsToggle'
-import ResetTooltipsLink from './links/ResetTooltipsLink'
-import { BackupProvider } from './providers/BackupProvider'
+import HistoryIcon from '@mui/icons-material/History'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import TuneIcon from '@mui/icons-material/Tune'
+import Box from '@mui/material/Box'
+import React from 'react'
+import { Alert, AppBar, Toolbar } from '@mui/material'
+
+import BackupNotice from './backup/BackupNotice'
 import ExportButton from './backup/ExportButton'
 import ImportButton from './backup/ImportButton'
-import BackupNotice from './backup/BackupNotice'
 import LegacyImportNotice from './backup/LegacyImportNotice'
-import { FeedbackAutoHideProvider } from './providers/FeedbackAutoHideProvider'
+import BuildInfo from './BuildInfo'
+import AlwaysOnTimingSelect from './inputs/AlwaysOnTimingSelect'
 import AutoHideSelect from './inputs/AutoHideSelect'
-import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
-import { ViewRestoreModeProvider } from './providers/ViewRestoreModeProvider'
-import ViewRestoreModeSelect from './inputs/ViewRestoreModeSelect'
-import { EditorSettingsProvider } from './providers/EditorSettingsProvider'
-import TabSizeSelect from './inputs/TabSizeSelect'
-import InsertSpacesToggle from './inputs/InsertSpacesToggle'
 import HotkeyInput from './inputs/HotkeyInput'
+import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
+import InsertSpacesToggle from './inputs/InsertSpacesToggle'
+import SetupToggle from './inputs/SetupToggle'
 import SiteAccessSelect from './inputs/SiteAccessSelect'
-import ExternalLink from './links/ExternalLink'
+import TabSizeSelect from './inputs/TabSizeSelect'
+import TooltipsToggle from './inputs/TooltipsToggle'
+import ViewRestoreModeSelect from './inputs/ViewRestoreModeSelect'
 import ExtensionErrorLink from './links/ExtensionErrorLink'
+import ExtensionSettingsLink from './links/ExtensionSettingsLink'
+import ExternalLink from './links/ExternalLink'
 import ReregisterAlwaysOnLink from './links/ReregisterAlwaysOnLink'
+import ResetTooltipsLink from './links/ResetTooltipsLink'
+import { AlwaysOnTimingProvider } from './providers/AlwaysOnTimingProvider'
+import { BackupProvider } from './providers/BackupProvider'
+import { EditorSettingsProvider } from './providers/EditorSettingsProvider'
+import { FeedbackAutoHideProvider } from './providers/FeedbackAutoHideProvider'
+import { ViewRestoreModeProvider } from './providers/ViewRestoreModeProvider'
+import {
+    CHANGELOG_URL,
+    ISSUES_URL,
+    LOCAL_STORAGE_LEGACY_SCRIPTS,
+    MATCH_PATTERN_DOCS,
+    PRIVACY_URL,
+    RUN_AT_DOCS,
+} from '../shared/constants'
 import {
     ActiveModeIcon,
     AllTabsScopeIcon,

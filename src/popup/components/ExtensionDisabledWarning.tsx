@@ -1,10 +1,10 @@
-import React from 'react'
+import SettingsIcon from '@mui/icons-material/Settings'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import SettingsIcon from '@mui/icons-material/Settings'
+import React from 'react'
 
 const ExtensionDisabledWarning = () => {
 

@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
 import { Switch } from '@mui/material'
+import React, { useState } from 'react'
+
 import { areTooltipsEnabled, setTooltipsEnabled } from '../../shared/service/settings/tooltipPreferences'
 
 const TooltipsToggle = () => {

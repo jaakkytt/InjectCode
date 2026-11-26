@@ -1,6 +1,24 @@
+import { s } from '../../shared/lib/text'
 import { FeedbackSeverity } from '../../shared/types'
 import { RunResult } from './scriptApi'
-import { s } from '../../shared/lib/text'
+
+export class Message {
+    readonly message: string
+    readonly severity: FeedbackSeverity
+
+    constructor(message: string, severity: FeedbackSeverity)
+    constructor(result: RunResult, timeoutSeconds: number)
+    constructor(messageOrResult: string | RunResult, severityOrTimeout: FeedbackSeverity | number) {
+        if (typeof messageOrResult === 'string') {
+            this.message = messageOrResult
+            this.severity = severityOrTimeout as FeedbackSeverity
+            return
+        }
+
+        this.message = describeRun(messageOrResult, severityOrTimeout as number)
+        this.severity = runSeverity(messageOrResult)
+    }
+}
 
 function describeRun(result: RunResult, timeoutSeconds: number): string {
     if (result.executed + result.failed + result.timedOut === 0) {
@@ -30,22 +48,4 @@ function runSeverity(result: RunResult): FeedbackSeverity {
     }
 
     return result.executed > 0 ? 'success' : 'info'
-}
-
-export class Message {
-    readonly message: string
-    readonly severity: FeedbackSeverity
-
-    constructor(message: string, severity: FeedbackSeverity)
-    constructor(result: RunResult, timeoutSeconds: number)
-    constructor(messageOrResult: string | RunResult, severityOrTimeout: FeedbackSeverity | number) {
-        if (typeof messageOrResult === 'string') {
-            this.message = messageOrResult
-            this.severity = severityOrTimeout as FeedbackSeverity
-            return
-        }
-
-        this.message = describeRun(messageOrResult, severityOrTimeout as number)
-        this.severity = runSeverity(messageOrResult)
-    }
 }

@@ -1,5 +1,6 @@
-import React, { ReactNode, useEffect, useState } from 'react'
 import { InputAdornment, TextField } from '@mui/material'
+import React, { ReactNode, useEffect, useState } from 'react'
+
 import {
     parseInjectionTimeout,
     readInjectionTimeout,

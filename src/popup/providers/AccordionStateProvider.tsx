@@ -1,12 +1,13 @@
 import React, { createContext, ReactNode, useContext, useMemo, useState } from 'react'
+
+import { requireContext } from '../../shared/lib/requireContext'
+import { useInteractions } from './InteractionsProvider'
 import {
     AccordionState,
     withCodeBlockOpen,
     withUrlBlockOpen,
     withUrlBlockRenamed,
 } from '../lib/accordionState'
-import { useInteractions } from './InteractionsProvider'
-import { requireContext } from '../../shared/lib/requireContext'
 
 export interface AccordionSnapshot {
     openCodeBlock: string | null

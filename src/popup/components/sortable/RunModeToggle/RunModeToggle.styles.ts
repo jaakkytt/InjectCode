@@ -1,7 +1,14 @@
-import { alpha, styled } from '@mui/material/styles'
-import { SxProps, Theme } from '@mui/material'
 import { TooltipProps } from '@mui/material/Tooltip'
+import { SxProps, Theme } from '@mui/material'
+import { alpha, styled } from '@mui/material/styles'
+
 import { ScriptRunMode } from '../../../../shared/types'
+
+export const iconSx: SxProps<Theme> = { fontSize: 15 }
+
+export const tooltipSlotProps: TooltipProps['slotProps'] = {
+    tooltip: { sx: { whiteSpace: 'nowrap' } },
+}
 
 export const Root = styled('div')({
     position: 'relative',
@@ -95,9 +102,3 @@ export const Thumb = styled('div', {
         },
     ],
 }))
-
-export const iconSx: SxProps<Theme> = { fontSize: 15 }
-
-export const tooltipSlotProps: TooltipProps['slotProps'] = {
-    tooltip: { sx: { whiteSpace: 'nowrap' } },
-}

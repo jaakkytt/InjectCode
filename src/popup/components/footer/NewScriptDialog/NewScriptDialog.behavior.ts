@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
 import { SelectChangeEvent } from '@mui/material'
-import { useUrls, useUrlsDispatch } from '../../../providers/urlsContext'
-import { useLastInteracted } from '../../../providers/LastInteractedProvider'
+import React, { useEffect, useState } from 'react'
+
 import { SHARED_CODE } from '../../../../shared/constants'
 import { useInteractions } from '../../../providers/InteractionsProvider'
+import { useLastInteracted } from '../../../providers/LastInteractedProvider'
 import { createScriptId } from '../../../service/scriptId'
 import { Props } from './NewScriptDialog.types'
+import { useUrls, useUrlsDispatch } from '../../../providers/urlsContext'
 
 export function useNewScriptDialogBehavior({ scriptType, onClose }: Pick<Props, 'scriptType' | 'onClose'>) {
     const lastUrl = useLastInteracted()

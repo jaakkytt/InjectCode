@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Props, Status } from './AccordionBody.types'
+
 import { useEditorRestore } from '../../../hooks/useEditorRestore'
 import { useEditorSettings } from '../../../providers/EditorSettingsProvider'
-
-function isDirty(current: string, lastSaved: string): boolean {
-    return current.trim() !== lastSaved.trim()
-}
+import { Props, Status } from './AccordionBody.types'
 
 type EditorSource = { value: string; revision: number }
 
@@ -111,4 +108,8 @@ export function useAccordionBodyBehavior(
             stopClickPropagation: (e: React.MouseEvent) => e.stopPropagation(),
         },
     }
+}
+
+function isDirty(current: string, lastSaved: string): boolean {
+    return current.trim() !== lastSaved.trim()
 }

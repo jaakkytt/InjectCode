@@ -1,5 +1,6 @@
-import React, { ReactNode, useState } from 'react'
 import { Box, Link } from '@mui/material'
+import React, { ReactNode, useState } from 'react'
+
 import { AlwaysOnResyncResult, requestAlwaysOnResync } from '../service/extensionSetup'
 
 export interface Props {

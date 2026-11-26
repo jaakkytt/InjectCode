@@ -1,48 +1,6 @@
 import { SHARED_CODE } from '../constants'
 import { urlPatternMatcher } from './urlPatternMatcher'
 
-const checkScheme = (value: string) : string | undefined => {
-    if (value[0] === 'h') {
-        return value.startsWith('http://') || value.startsWith('https://')
-            ? undefined
-            : 'A http(s) scheme must start with "http://" or "https://"'
-    }
-    if (value[0] === '*') {
-        return value.startsWith('*://') ? undefined : 'A wildcard scheme must start with "*://"'
-    }
-    if (value[0] === 'f') {
-        return value.startsWith('file:///') ? undefined : 'A file scheme must start with "file:///"'
-    }
-    return 'Pattern must start with a scheme "http://", "https://", "*://", or "file:///"'
-}
-
-const checkHost = (value: string) : string | undefined => {
-    if (value.startsWith('file:///')) {
-        return undefined
-    }
-
-    const urlParts = value.split('/')
-    if (urlParts.length < 4) {
-        return 'Pattern must include a host and a path'
-    }
-
-    if (urlParts[2].endsWith('.')) {
-        return 'Host must not end with a dot'
-    }
-    return undefined
-}
-
-const patchWildcardError = (value: string, originalError: string) => {
-    const asHttp = value.replace(/^\*:/, 'http:')
-    const matcher = urlPatternMatcher(asHttp)
-
-    if (matcher.valid) {
-        return originalError
-    }
-
-    return matcher.error.message.replaceAll('http:', '*:')
-}
-
 export const urlPatternValidator = (value: string, existing: string[]): string | undefined => {
     if (value.trim() === '') {
         return 'Pattern must follow the structure <scheme>://<host>/<path>'
@@ -88,4 +46,46 @@ export const urlPatternValidator = (value: string, existing: string[]): string |
     }
 
     return matcher.error.message
+}
+
+const checkScheme = (value: string) : string | undefined => {
+    if (value[0] === 'h') {
+        return value.startsWith('http://') || value.startsWith('https://')
+            ? undefined
+            : 'A http(s) scheme must start with "http://" or "https://"'
+    }
+    if (value[0] === '*') {
+        return value.startsWith('*://') ? undefined : 'A wildcard scheme must start with "*://"'
+    }
+    if (value[0] === 'f') {
+        return value.startsWith('file:///') ? undefined : 'A file scheme must start with "file:///"'
+    }
+    return 'Pattern must start with a scheme "http://", "https://", "*://", or "file:///"'
+}
+
+const checkHost = (value: string) : string | undefined => {
+    if (value.startsWith('file:///')) {
+        return undefined
+    }
+
+    const urlParts = value.split('/')
+    if (urlParts.length < 4) {
+        return 'Pattern must include a host and a path'
+    }
+
+    if (urlParts[2].endsWith('.')) {
+        return 'Host must not end with a dot'
+    }
+    return undefined
+}
+
+const patchWildcardError = (value: string, originalError: string) => {
+    const asHttp = value.replace(/^\*:/, 'http:')
+    const matcher = urlPatternMatcher(asHttp)
+
+    if (matcher.valid) {
+        return originalError
+    }
+
+    return matcher.error.message.replaceAll('http:', '*:')
 }

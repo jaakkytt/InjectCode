@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react'
-import { Script, ScriptType } from '../../shared/types'
+
 import { requireContext } from '../../shared/lib/requireContext'
+import { Script, ScriptType } from '../../shared/types'
 
 export type ScriptsDispatch = {
     add: (id: string, type: ScriptType, title: string) => void

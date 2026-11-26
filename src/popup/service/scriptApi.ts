@@ -1,8 +1,8 @@
-import { Script, ScriptsByPattern } from '../../shared/types'
-import { RunScope } from '../types'
 import { USER_SCRIPT_ID } from '../../shared/constants'
-import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
 import { NO_INJECTION_TIMEOUT } from '../../shared/service/settings/injectionTimeout'
+import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
+import { RunScope } from '../types'
+import { Script, ScriptsByPattern } from '../../shared/types'
 
 export interface ScriptApi {
     run(scripts: ScriptsByPattern, shared: Script[], scope: RunScope, timeoutMs: number): Promise<RunResult>
@@ -19,6 +19,28 @@ export interface RunResult {
 type InjectionStep =
     | { type: 'js', code: [string, ...string[]] }
     | { type: 'css', css: string }
+
+export class ChromeScriptAPI implements ScriptApi {
+    async run(scripts: ScriptsByPattern, shared: Script[], scope: RunScope, timeoutMs: number) {
+        if (scope === 'global') {
+            return runOnAllTabs(scripts, shared, timeoutMs)
+        }
+
+        return runOnActiveTab(scripts, shared, timeoutMs)
+    }
+}
+
+export class DummyScriptAPI implements ScriptApi {
+    async run(scripts: ScriptsByPattern, shared: Script[], scope: RunScope, timeoutMs: number) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        console.debug('DummyScriptAPI run', shared, scripts, scope, timeoutMs)
+        return { executed: 1, failed: 0, timedOut: 0 }
+    }
+}
+
+export const scriptApi: ScriptApi = typeof chrome !== 'undefined' && chrome.scripting
+    ? new ChromeScriptAPI()
+    : new DummyScriptAPI()
 
 function selectItemsForUrl(scripts: ScriptsByPattern, url: string): Script[] {
     return Object.entries(scripts)
@@ -153,25 +175,3 @@ async function runOnAllTabs(scripts: ScriptsByPattern, shared: Script[], timeout
 
     return countOutcomes(outcomes)
 }
-
-export class ChromeScriptAPI implements ScriptApi {
-    async run(scripts: ScriptsByPattern, shared: Script[], scope: RunScope, timeoutMs: number) {
-        if (scope === 'global') {
-            return runOnAllTabs(scripts, shared, timeoutMs)
-        }
-
-        return runOnActiveTab(scripts, shared, timeoutMs)
-    }
-}
-
-export class DummyScriptAPI implements ScriptApi {
-    async run(scripts: ScriptsByPattern, shared: Script[], scope: RunScope, timeoutMs: number) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        console.debug('DummyScriptAPI run', shared, scripts, scope, timeoutMs)
-        return { executed: 1, failed: 0, timedOut: 0 }
-    }
-}
-
-export const scriptApi: ScriptApi = typeof chrome !== 'undefined' && chrome.scripting
-    ? new ChromeScriptAPI()
-    : new DummyScriptAPI()

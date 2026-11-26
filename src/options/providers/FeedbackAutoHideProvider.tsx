@@ -1,12 +1,13 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+
+import { requireContext } from '../../shared/lib/requireContext'
 import { FeedbackSeverity } from '../../shared/types'
 import {
-    FeedbackAutoHideMs,
     FeedbackAutoHideBySeverity,
+    FeedbackAutoHideMs,
     readFeedbackAutoHide,
     saveFeedbackAutoHide,
 } from '../../shared/service/settings/feedbackAutoHide'
-import { requireContext } from '../../shared/lib/requireContext'
 
 interface FeedbackAutoHideValue {
     autoHide: FeedbackAutoHideBySeverity | null

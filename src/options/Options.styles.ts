@@ -1,23 +1,11 @@
-import { Accordion, accordionClasses, AccordionSummary, accordionSummaryClasses, Container } from '@mui/material'
-import { CSSObject, styled } from '@mui/material/styles'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
-import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew'
 import AdsClickIcon from '@mui/icons-material/AdsClick'
 import BoltIcon from '@mui/icons-material/Bolt'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew'
 import PublicIcon from '@mui/icons-material/Public'
-
-function thumbIcon(backgroundColor: string, color: string): CSSObject {
-    return {
-        fontSize: 22,
-        padding: 3,
-        boxSizing: 'border-box',
-        borderRadius: '50%',
-        backgroundColor,
-        color,
-        verticalAlign: 'middle',
-    }
-}
+import { CSSObject, styled } from '@mui/material/styles'
+import { Accordion, accordionClasses, AccordionSummary, accordionSummaryClasses, Container } from '@mui/material'
 
 export const Warning = styled('b')(({ theme }) => ({
     color: theme.palette.warning.main,
@@ -281,3 +269,15 @@ export const CollapsibleSummary = styled(AccordionSummary)(({ theme }) => ({
         transform: 'rotate(90deg)',
     },
 }))
+
+function thumbIcon(backgroundColor: string, color: string): CSSObject {
+    return {
+        fontSize: 22,
+        padding: 3,
+        boxSizing: 'border-box',
+        borderRadius: '50%',
+        backgroundColor,
+        color,
+        verticalAlign: 'middle',
+    }
+}

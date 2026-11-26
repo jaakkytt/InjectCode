@@ -1,9 +1,10 @@
+import DeleteIcon from '@mui/icons-material/Delete'
 import React from 'react'
 import { Fade, IconButton } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
+
 import TutorialTooltip from '../TutorialTooltip'
-import { Props } from './ConfirmDeleteButton.types'
 import { useConfirmDeleteButtonBehavior } from './ConfirmDeleteButton.behavior'
+import { Props } from './ConfirmDeleteButton.types'
 
 const ConfirmDeleteButton = ({ onConfirm, showDeleteTooltip, placement }: Props) => {
     const { isConfirming, tooltipTitle, tooltipOpen, handlers } = useConfirmDeleteButtonBehavior({

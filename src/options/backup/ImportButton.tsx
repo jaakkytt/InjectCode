@@ -1,6 +1,7 @@
-import React, { ReactNode } from 'react'
-import { Button } from '@mui/material'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
+import { Button } from '@mui/material'
+import React, { ReactNode } from 'react'
+
 import { useBackup } from '../providers/BackupProvider'
 
 export interface Props {

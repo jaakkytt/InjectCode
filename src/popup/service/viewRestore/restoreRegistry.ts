@@ -1,4 +1,5 @@
 import type { InputSelection } from 'prism-react-editor'
+
 import { AnchorKind } from './viewRestore.types'
 
 export interface Anchor {

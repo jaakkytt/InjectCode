@@ -1,5 +1,6 @@
-import React, { ReactNode, useEffect, useState } from 'react'
 import { MenuItem, Select } from '@mui/material'
+import React, { ReactNode, useEffect, useState } from 'react'
+
 import { onSiteAccessChange, readSiteAccess, SiteAccess } from '../service/extensionSetup'
 
 export interface Props {

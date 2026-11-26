@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
     DEFAULT_VIEW_RESTORE_MODE,
     parseViewRestoreMode,

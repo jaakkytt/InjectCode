@@ -1,6 +1,6 @@
+import type { ViewName } from '../pages/PopupPage'
 import { expect, test } from '../fixtures/extension'
 import { SCRIPTS, TAB_A, TAB_C } from '../fixtures/scripts'
-import type { ViewName } from '../pages/PopupPage'
 
 const VIEWS: ViewName[] = ['All Scripts', 'Currently Matching']
 const EDITOR_SCROLL_TOP = 120

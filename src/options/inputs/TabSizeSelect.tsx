@@ -1,5 +1,6 @@
 import React from 'react'
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material'
+
 import { TAB_SIZES } from '../../shared/service/settings/editorSettings'
 import { useEditorSettings } from '../providers/EditorSettingsProvider'
 

@@ -1,7 +1,8 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { Script, ScriptsByPattern } from '../../../src/shared/types'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { ChromeScriptAPI } from '../../../src/popup/service/scriptApi'
 import { NO_INJECTION_TIMEOUT } from '../../../src/shared/service/settings/injectionTimeout'
+import { Script, ScriptsByPattern } from '../../../src/shared/types'
 
 const TIMEOUT_MS = 5000
 

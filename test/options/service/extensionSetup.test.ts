@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { readSiteAccess } from '../../../src/options/service/extensionSetup'
 
 describe('readSiteAccess', () => {

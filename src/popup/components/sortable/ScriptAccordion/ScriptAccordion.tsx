@@ -1,33 +1,34 @@
-import React from 'react'
-import Accordion from '@mui/material/Accordion'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
-import Box from '@mui/material/Box'
-import DragHandleIcon from '@mui/icons-material/DragHandle'
-import JavascriptIcon from '@mui/icons-material/Javascript'
 import CssIcon from '@mui/icons-material/Css'
-import Typography from '@mui/material/Typography'
+import DragHandleIcon from '@mui/icons-material/DragHandle'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import JavascriptIcon from '@mui/icons-material/Javascript'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
+import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import React from 'react'
 import { Fade, IconButton } from '@mui/material'
-import AccordionTitle from '../AccordionTitle'
-import AccordionBody from '../AccordionBody'
+
+import { SHARED_CODE } from '../../../../shared/constants'
 import ConfirmDeleteButton from '../../ConfirmDeleteButton'
 import TutorialTooltip from '../../TutorialTooltip'
-import { SHARED_CODE } from '../../../../shared/constants'
+import AccordionBody from '../AccordionBody'
+import AccordionTitle from '../AccordionTitle'
 import RunModeToggle from '../RunModeToggle'
-import { Props } from './ScriptAccordion.types'
 import { useScriptAccordionBehavior } from './ScriptAccordion.behavior'
+import { Props } from './ScriptAccordion.types'
 import {
-    AccordionSummary,
-    TypeIconOverlay,
-    expandIconSx,
-    accordionSx,
     accordionDetailsSx,
-    headerRowSx,
-    dragHandleWrapperStyle,
-    dragHandleButtonStyle,
-    rootStyle,
+    AccordionSummary,
+    accordionSx,
     deleteButtonWrapperSx,
+    dragHandleButtonStyle,
+    dragHandleWrapperStyle,
+    expandIconSx,
+    headerRowSx,
+    rootStyle,
+    TypeIconOverlay,
 } from './ScriptAccordion.styles'
 
 export default function ScriptAccordion(

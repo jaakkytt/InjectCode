@@ -1,7 +1,8 @@
 import React from 'react'
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material'
-import { FeedbackSeverity } from '../../shared/types'
+
 import { FeedbackAutoHideMs } from '../../shared/service/settings/feedbackAutoHide'
+import { FeedbackSeverity } from '../../shared/types'
 import { useFeedbackAutoHide } from '../providers/FeedbackAutoHideProvider'
 
 export interface Props {

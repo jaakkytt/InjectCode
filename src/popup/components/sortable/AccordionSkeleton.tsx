@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { Stack } from '@mui/material'
-import Skeleton from '@mui/material/Skeleton'
 import Paper from '@mui/material/Paper'
+import Skeleton from '@mui/material/Skeleton'
+import * as React from 'react'
 
 const AccordionSkeleton = () => {
     return (

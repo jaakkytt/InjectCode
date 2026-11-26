@@ -1,5 +1,5 @@
-import type { Script, ScriptsByPattern, ScriptType } from '../../src/shared/types'
 import { SHARED_CODE } from '../../src/shared/constants'
+import type { Script, ScriptsByPattern, ScriptType } from '../../src/shared/types'
 
 export const SITE_A = '*://a.example/*'
 export const SITE_A_PAGE = '*://a.example/page*'

@@ -1,7 +1,8 @@
 import type { InputSelection } from 'prism-react-editor'
+
+import { isPlainObject } from '../../../shared/lib/isPlainObject'
 import { ViewRestoreMode } from '../../../shared/service/settings/viewRestoreMode'
 import { withUrlBlockRenamed } from '../../lib/accordionState'
-import { isPlainObject } from '../../../shared/lib/isPlainObject'
 import { TabIndex } from '../../types'
 import {
     AccordionState,

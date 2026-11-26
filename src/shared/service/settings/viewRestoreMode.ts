@@ -1,11 +1,11 @@
 import { STORAGE_VIEW_RESTORE_MODE } from '../../constants'
 import { storage } from '../storageApi'
 
-export type ViewRestoreMode = 'off' | 'sameTab' | 'sameHost'
-
 export const DEFAULT_VIEW_RESTORE_MODE: ViewRestoreMode = 'sameHost'
 
 const VIEW_RESTORE_MODES: ViewRestoreMode[] = ['off', 'sameTab', 'sameHost']
+
+export type ViewRestoreMode = 'off' | 'sameTab' | 'sameHost'
 
 export function parseViewRestoreMode(value: unknown): ViewRestoreMode {
     return VIEW_RESTORE_MODES.find(mode => mode === value) ?? DEFAULT_VIEW_RESTORE_MODE

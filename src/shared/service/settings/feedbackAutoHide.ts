@@ -2,15 +2,24 @@ import { STORAGE_FEEDBACK_AUTO_HIDE } from '../../constants'
 import { FeedbackSeverity } from '../../types'
 import { storage } from '../storageApi'
 
-export type FeedbackAutoHideMs = number | null
-
-export type FeedbackAutoHideBySeverity = Record<FeedbackSeverity, FeedbackAutoHideMs>
-
 export const DEFAULT_FEEDBACK_AUTO_HIDE: FeedbackAutoHideBySeverity = {
     success: 1000,
     info: 2000,
     warning: 10000,
     error: 10000,
+}
+
+export type FeedbackAutoHideMs = number | null
+
+export type FeedbackAutoHideBySeverity = Record<FeedbackSeverity, FeedbackAutoHideMs>
+
+export async function readFeedbackAutoHide(): Promise<FeedbackAutoHideBySeverity> {
+    const stored = await storage.getValue<unknown>(STORAGE_FEEDBACK_AUTO_HIDE, DEFAULT_FEEDBACK_AUTO_HIDE)
+    return parseFeedbackAutoHide(stored)
+}
+
+export function saveFeedbackAutoHide(autoHide: FeedbackAutoHideBySeverity): Promise<void> {
+    return storage.setValue(STORAGE_FEEDBACK_AUTO_HIDE, autoHide)
 }
 
 function isAutoHideMs(value: unknown): value is FeedbackAutoHideMs {
@@ -25,13 +34,4 @@ function parseFeedbackAutoHide(value: unknown): FeedbackAutoHideBySeverity {
         severity,
         isAutoHideMs(stored[severity]) ? stored[severity] : DEFAULT_FEEDBACK_AUTO_HIDE[severity],
     ])) as FeedbackAutoHideBySeverity
-}
-
-export async function readFeedbackAutoHide(): Promise<FeedbackAutoHideBySeverity> {
-    const stored = await storage.getValue<unknown>(STORAGE_FEEDBACK_AUTO_HIDE, DEFAULT_FEEDBACK_AUTO_HIDE)
-    return parseFeedbackAutoHide(stored)
-}
-
-export function saveFeedbackAutoHide(autoHide: FeedbackAutoHideBySeverity): Promise<void> {
-    return storage.setValue(STORAGE_FEEDBACK_AUTO_HIDE, autoHide)
 }

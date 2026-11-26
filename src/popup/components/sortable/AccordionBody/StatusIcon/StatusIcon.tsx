@@ -1,8 +1,9 @@
-import React from 'react'
-import Fade from '@mui/material/Fade'
-import Box from '@mui/material/Box'
 import CloudDoneIcon from '@mui/icons-material/CloudDone'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import Box from '@mui/material/Box'
+import Fade from '@mui/material/Fade'
+import React from 'react'
+
 import CloudDotsIcon from '../../../CloudDotsIcon'
 import { Props } from './StatusIcon.types'
 import { containerSx, fadeStyle, iconWrapperSx, svgIconSx } from './StatusIcon.styles'

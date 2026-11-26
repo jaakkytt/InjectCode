@@ -1,6 +1,80 @@
 import { Script, ScriptsByPattern } from '../../shared/types'
 import { Action, ScriptPatch, StoreState } from '../types'
 
+export function urlsRootReducer(state: StoreState, action: Action): StoreState {
+    switch (action.name) {
+        case 'hydrate': {
+            if (state.isDirty) {
+                return state
+            }
+            return { ...state, committed: action.payload, isHydrated: true }
+        }
+
+        case 'dragStart': {
+            if (state.isDirty) {
+                return state
+            }
+            return { ...state, working: { ...state.committed }, isDirty: true }
+        }
+        case 'dragWithinContainer': {
+            const s = ensureWorking(state)
+            const { containerId, fromIndex, toIndex } = action
+            const arr = s.working![containerId] ?? []
+            return {
+                ...s,
+                working: { ...s.working!, [containerId]: arrayMove(arr, fromIndex, toIndex) },
+            }
+        }
+        case 'dragAcrossContainer': {
+            const s = ensureWorking(state)
+
+            const { fromId, fromIndex, toId, toIndex, itemId } = action
+            const fromArr = s.working![fromId] ?? []
+            const toArr = s.working![toId] ?? []
+            const moving = fromArr[fromIndex]
+
+            if (!moving || moving.id !== itemId) return s
+            if (fromId === toId && fromIndex === toIndex) return s
+
+            const newFrom = fromArr.slice()
+            newFrom.splice(fromIndex, 1)
+            const newTo = toArr.slice()
+            newTo.splice(toIndex, 0, moving)
+            return {
+                ...s,
+                working: { ...s.working!, [fromId]: newFrom, [toId]: newTo },
+            }
+        }
+        case 'dragDrop': {
+            if (!state.working) return { ...state, isDirty: false }
+            return { ...state, committed: state.working, working: null, isDirty: false }
+        }
+        case 'dragCancel': {
+            return { ...state, working: null, isDirty: false }
+        }
+
+        case 'added':
+        case 'renamed':
+        case 'deleted': {
+            if (state.working) {
+                return { ...state, working: applyNormalAction(state.working, action) }
+            }
+            return { ...state, committed: applyNormalAction(state.committed, action) }
+        }
+
+        case 'scriptAdd':
+        case 'scriptUpdate':
+        case 'scriptDelete': {
+            const committed = applyScriptAction(state.committed, action)
+            const working = state.working && applyScriptAction(state.working, action)
+            return { ...state, committed, working }
+        }
+
+        default:
+            return state
+    }
+}
+
 function arrayMove<T>(arr: readonly T[], from: number, to: number): T[] {
     if (from === to) return arr.slice()
     const copy = arr.slice()
@@ -80,80 +154,6 @@ function applyNormalAction(state: ScriptsByPattern, action: Action): ScriptsByPa
             delete copy[action.id]
             return copy
         }
-        default:
-            return state
-    }
-}
-
-export function urlsRootReducer(state: StoreState, action: Action): StoreState {
-    switch (action.name) {
-        case 'hydrate': {
-            if (state.isDirty) {
-                return state
-            }
-            return { ...state, committed: action.payload, isHydrated: true }
-        }
-
-        case 'dragStart': {
-            if (state.isDirty) {
-                return state
-            }
-            return { ...state, working: { ...state.committed }, isDirty: true }
-        }
-        case 'dragWithinContainer': {
-            const s = ensureWorking(state)
-            const { containerId, fromIndex, toIndex } = action
-            const arr = s.working![containerId] ?? []
-            return {
-                ...s,
-                working: { ...s.working!, [containerId]: arrayMove(arr, fromIndex, toIndex) },
-            }
-        }
-        case 'dragAcrossContainer': {
-            const s = ensureWorking(state)
-
-            const { fromId, fromIndex, toId, toIndex, itemId } = action
-            const fromArr = s.working![fromId] ?? []
-            const toArr = s.working![toId] ?? []
-            const moving = fromArr[fromIndex]
-
-            if (!moving || moving.id !== itemId) return s
-            if (fromId === toId && fromIndex === toIndex) return s
-
-            const newFrom = fromArr.slice()
-            newFrom.splice(fromIndex, 1)
-            const newTo = toArr.slice()
-            newTo.splice(toIndex, 0, moving)
-            return {
-                ...s,
-                working: { ...s.working!, [fromId]: newFrom, [toId]: newTo },
-            }
-        }
-        case 'dragDrop': {
-            if (!state.working) return { ...state, isDirty: false }
-            return { ...state, committed: state.working, working: null, isDirty: false }
-        }
-        case 'dragCancel': {
-            return { ...state, working: null, isDirty: false }
-        }
-
-        case 'added':
-        case 'renamed':
-        case 'deleted': {
-            if (state.working) {
-                return { ...state, working: applyNormalAction(state.working, action) }
-            }
-            return { ...state, committed: applyNormalAction(state.committed, action) }
-        }
-
-        case 'scriptAdd':
-        case 'scriptUpdate':
-        case 'scriptDelete': {
-            const committed = applyScriptAction(state.committed, action)
-            const working = state.working && applyScriptAction(state.working, action)
-            return { ...state, committed, working }
-        }
-
         default:
             return state
     }

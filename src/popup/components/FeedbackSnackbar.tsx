@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
 import { Alert, Snackbar, SnackbarCloseReason } from '@mui/material'
-import { useFeedback, useFeedbackDispatch } from '../providers/FeedbackProvider'
+import React, { useEffect, useState } from 'react'
+
 import { DEFAULT_FEEDBACK_AUTO_HIDE, readFeedbackAutoHide } from '../../shared/service/settings/feedbackAutoHide'
+import { useFeedback, useFeedbackDispatch } from '../providers/FeedbackProvider'
 
 const FeedbackSnackbar = () => {
     const { id, open, message, severity } = useFeedback()

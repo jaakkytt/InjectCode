@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
+
+import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
 import { Script, ScriptsByPattern } from '../../shared/types'
 import { UrlsContext, useUrls } from './urlsContext'
-import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
 
 type UrlsFilter = (containerId: string, items: Script[]) => boolean
 

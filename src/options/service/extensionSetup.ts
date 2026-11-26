@@ -1,7 +1,9 @@
-import { ALL_URL, MESSAGE_RESYNC_ALWAYS_ON } from '../../shared/constants'
 import { isUserScriptsEnabled } from '../../shared/service/userScripts'
+import { ALL_URL, MESSAGE_RESYNC_ALWAYS_ON } from '../../shared/constants'
 
 export type AlwaysOnResyncResult = 'reregistered' | 'notAllowed' | 'failed'
+
+export type SiteAccess = 'allSites' | 'specificSites' | 'onClick'
 
 export async function requestAlwaysOnResync(): Promise<AlwaysOnResyncResult> {
     if (!await isUserScriptsEnabled()) {
@@ -19,18 +21,6 @@ export async function isFileAccessEnabled(): Promise<boolean> {
     } catch {
         return false
     }
-}
-
-export type SiteAccess = 'allSites' | 'specificSites' | 'onClick'
-
-function siteAccessFromOrigins(origins: string[]): SiteAccess {
-    const siteOrigins = origins.filter(origin => !origin.startsWith('file:'))
-
-    if (siteOrigins.includes(ALL_URL)) {
-        return 'allSites'
-    }
-
-    return siteOrigins.length > 0 ? 'specificSites' : 'onClick'
 }
 
 export async function readSiteAccess(): Promise<SiteAccess> {
@@ -54,4 +44,14 @@ export function openExtensionSettings() {
 
 export function openExtensionErrors() {
     return chrome.tabs.create({ url: `chrome://extensions/?errors=${chrome.runtime.id}` })
+}
+
+function siteAccessFromOrigins(origins: string[]): SiteAccess {
+    const siteOrigins = origins.filter(origin => !origin.startsWith('file:'))
+
+    if (siteOrigins.includes(ALL_URL)) {
+        return 'allSites'
+    }
+
+    return siteOrigins.length > 0 ? 'specificSites' : 'onClick'
 }

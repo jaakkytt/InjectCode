@@ -1,7 +1,7 @@
-import { Script, ScriptsByPattern, ScriptRunMode, ScriptType } from '../../shared/types'
 import { SHARED_CODE } from '../../shared/constants'
-import { urlPatternValidator } from '../../shared/service/urlPatternValidator'
 import { isPlainObject } from '../../shared/lib/isPlainObject'
+import { urlPatternValidator } from '../../shared/service/urlPatternValidator'
+import { Script, ScriptRunMode, ScriptsByPattern, ScriptType } from '../../shared/types'
 
 export const BACKUP_FORMAT = 'injectcode-backup'
 export const BACKUP_VERSION = 1
@@ -35,10 +35,6 @@ export interface MergeResult {
 
 type IdGenerator = (type: ScriptType) => string
 
-function padded(value: number): string {
-    return String(value).padStart(2, '0')
-}
-
 export function backupFileName(date: Date): string {
     const day = `${date.getFullYear()}-${padded(date.getMonth() + 1)}-${padded(date.getDate())}`
     return `injectcode-backup-${day}.json`
@@ -59,6 +55,112 @@ export function serializeBackup(backup: Backup): string {
 
 export function countScripts(scripts: ScriptsByPattern): number {
     return Object.values(scripts).reduce((total, items) => total + items.length, 0)
+}
+
+export function parseBackup(text: string): ParsedBackup {
+    let raw: unknown
+    try {
+        raw = JSON.parse(text)
+    } catch {
+        return { ok: false, errors: ['The file is not valid JSON'] }
+    }
+
+    if (!isPlainObject(raw) || raw.format !== BACKUP_FORMAT) {
+        return { ok: false, errors: ['The file is not an InjectCode backup'] }
+    }
+
+    if (raw.version !== BACKUP_VERSION) {
+        const isNewer = typeof raw.version === 'number' && raw.version > BACKUP_VERSION
+        return {
+            ok: false,
+            errors: [isNewer ? 'The backup was made by a newer version of InjectCode' : 'Unsupported backup version'],
+        }
+    }
+
+    if (!isPlainObject(raw.scripts)) {
+        return { ok: false, errors: ['The backup does not contain any scripts data'] }
+    }
+
+    const errors: string[] = []
+    const scripts: ScriptsByPattern = {}
+
+    for (const [pattern, rawItems] of Object.entries(raw.scripts)) {
+        const items = parseContainer(pattern, rawItems, errors)
+        if (items) {
+            scripts[pattern] = items
+        }
+    }
+
+    if (errors.length === 0) {
+        errors.push(...findIdProblems(scripts))
+    }
+
+    return errors.length > 0 ? { ok: false, errors: cappedErrors(errors) } : { ok: true, scripts }
+}
+
+export function createImportedId(type: ScriptType): string {
+    return `${type}-imported-${Math.random().toString(36).substring(2, 10)}`
+}
+
+export function mergeScripts(
+    existing: ScriptsByPattern,
+    incoming: ScriptsByPattern,
+    generateId: IdGenerator = createImportedId,
+): MergeResult {
+    const merged: ScriptsByPattern = { [SHARED_CODE]: [] }
+
+    Object.entries(existing).forEach(([pattern, items]) => {
+        merged[pattern] = [...items]
+    })
+
+    const usedIds = new Set<string>(Object.keys(merged))
+    const locations = new Map<string, { pattern: string, index: number }>()
+
+    Object.entries(merged).forEach(([pattern, items]) => items.forEach((item, index) => {
+        usedIds.add(item.id)
+        locations.set(item.id, { pattern, index })
+    }))
+
+    const summary: ImportSummary = { added: 0, overwritten: 0, skipped: 0 }
+
+    Object.entries(incoming).forEach(([pattern, items]) => {
+        const target = merged[pattern] ?? []
+        merged[pattern] = target
+        usedIds.add(pattern)
+
+        items.forEach(item => {
+            const location = locations.get(item.id)
+
+            if (location) {
+                const container = merged[location.pattern]
+                if (isSameScript(container[location.index], item)) {
+                    summary.skipped += 1
+                } else {
+                    container[location.index] = { ...item }
+                    summary.overwritten += 1
+                }
+                return
+            }
+
+            let id = item.id
+
+            while (usedIds.has(id)) {
+                id = generateId(item.type)
+            }
+
+            usedIds.add(id)
+
+            target.push({ ...item, id })
+            locations.set(id, { pattern, index: target.length - 1 })
+            summary.added += 1
+        })
+    })
+
+    return { scripts: merged, summary }
+}
+
+function padded(value: number): string {
+    return String(value).padStart(2, '0')
 }
 
 function parseItem(raw: unknown, where: string, errors: string[]): Script | undefined {
@@ -142,112 +244,10 @@ function cappedErrors(errors: string[]): string[] {
     return [...errors.slice(0, MAX_REPORTED_ERRORS), `and ${hidden} more ${hidden === 1 ? 'problem' : 'problems'}`]
 }
 
-export function parseBackup(text: string): ParsedBackup {
-    let raw: unknown
-    try {
-        raw = JSON.parse(text)
-    } catch {
-        return { ok: false, errors: ['The file is not valid JSON'] }
-    }
-
-    if (!isPlainObject(raw) || raw.format !== BACKUP_FORMAT) {
-        return { ok: false, errors: ['The file is not an InjectCode backup'] }
-    }
-
-    if (raw.version !== BACKUP_VERSION) {
-        const isNewer = typeof raw.version === 'number' && raw.version > BACKUP_VERSION
-        return {
-            ok: false,
-            errors: [isNewer ? 'The backup was made by a newer version of InjectCode' : 'Unsupported backup version'],
-        }
-    }
-
-    if (!isPlainObject(raw.scripts)) {
-        return { ok: false, errors: ['The backup does not contain any scripts data'] }
-    }
-
-    const errors: string[] = []
-    const scripts: ScriptsByPattern = {}
-
-    for (const [pattern, rawItems] of Object.entries(raw.scripts)) {
-        const items = parseContainer(pattern, rawItems, errors)
-        if (items) {
-            scripts[pattern] = items
-        }
-    }
-
-    if (errors.length === 0) {
-        errors.push(...findIdProblems(scripts))
-    }
-
-    return errors.length > 0 ? { ok: false, errors: cappedErrors(errors) } : { ok: true, scripts }
-}
-
-export function createImportedId(type: ScriptType): string {
-    return `${type}-imported-${Math.random().toString(36).substring(2, 10)}`
-}
-
 function isSameScript(a: Script, b: Script): boolean {
     return a.id === b.id
         && a.type === b.type
         && a.title === b.title
         && a.secondaryText === b.secondaryText
         && a.content === b.content
-}
-
-export function mergeScripts(
-    existing: ScriptsByPattern,
-    incoming: ScriptsByPattern,
-    generateId: IdGenerator = createImportedId,
-): MergeResult {
-    const merged: ScriptsByPattern = { [SHARED_CODE]: [] }
-
-    Object.entries(existing).forEach(([pattern, items]) => {
-        merged[pattern] = [...items]
-    })
-
-    const usedIds = new Set<string>(Object.keys(merged))
-    const locations = new Map<string, { pattern: string, index: number }>()
-
-    Object.entries(merged).forEach(([pattern, items]) => items.forEach((item, index) => {
-        usedIds.add(item.id)
-        locations.set(item.id, { pattern, index })
-    }))
-
-    const summary: ImportSummary = { added: 0, overwritten: 0, skipped: 0 }
-
-    Object.entries(incoming).forEach(([pattern, items]) => {
-        const target = merged[pattern] ?? []
-        merged[pattern] = target
-        usedIds.add(pattern)
-
-        items.forEach(item => {
-            const location = locations.get(item.id)
-
-            if (location) {
-                const container = merged[location.pattern]
-                if (isSameScript(container[location.index], item)) {
-                    summary.skipped += 1
-                } else {
-                    container[location.index] = { ...item }
-                    summary.overwritten += 1
-                }
-                return
-            }
-
-            let id = item.id
-
-            while (usedIds.has(id)) {
-                id = generateId(item.type)
-            }
-
-            usedIds.add(id)
-
-            target.push({ ...item, id })
-            locations.set(id, { pattern, index: target.length - 1 })
-            summary.added += 1
-        })
-    })
-
-    return { scripts: merged, summary }
 }

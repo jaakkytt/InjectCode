@@ -1,8 +1,9 @@
 import React from 'react'
 import { DndContext, DragOverlay, rectIntersection } from '@dnd-kit/core'
-import { OverlayItem } from '../OverlayItem'
-import AccordionItem from '../AccordionItem'
+
 import { SHARED_CODE } from '../../../../shared/constants'
+import AccordionItem from '../AccordionItem'
+import { OverlayItem } from '../OverlayItem'
 import { useUrlAccordionBehavior } from './UrlAccordion.behavior'
 
 export default function UrlAccordion() {

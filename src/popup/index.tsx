@@ -1,15 +1,16 @@
-import '../shared/styles/global.css'
-import './Popup.css'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import Popup from './Popup'
+
+import '../shared/styles/global.css'
+import './Popup.css'
 import { isUserScriptsEnabled } from '../shared/service/userScripts'
-import { CurrentUrlProvider } from './providers/CurrentUrlProvider'
-import { RunScopeProvider } from './providers/RunScopeProvider'
-import { FeedbackProvider } from './providers/FeedbackProvider'
-import { EditorSettingsProvider } from './providers/EditorSettingsProvider'
-import FeedbackSnackbar from './components/FeedbackSnackbar'
 import ExtensionDisabledWarning from './components/ExtensionDisabledWarning'
+import FeedbackSnackbar from './components/FeedbackSnackbar'
+import Popup from './Popup'
+import { CurrentUrlProvider } from './providers/CurrentUrlProvider'
+import { EditorSettingsProvider } from './providers/EditorSettingsProvider'
+import { FeedbackProvider } from './providers/FeedbackProvider'
+import { RunScopeProvider } from './providers/RunScopeProvider'
 
 const container = document.getElementById('root')!
 const root = createRoot(container)

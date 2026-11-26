@@ -1,6 +1,7 @@
-import React, { forwardRef } from 'react'
-import PublicIcon from '@mui/icons-material/Public'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
+import PublicIcon from '@mui/icons-material/Public'
+import React, { forwardRef } from 'react'
+
 import { Props } from './IconSwitch.types'
 import { StyledSwitch, Thumb } from './IconSwitch.styles'
 

@@ -1,8 +1,8 @@
-import { useExistingUrls } from '../../../providers/ExistingUrlsProvider'
 import { urlPatternValidator } from '../../../../shared/service/urlPatternValidator'
-import { urlCharacterFilter } from '../../../service/urlCharacterFilter'
 import { usePlayControls } from '../../../hooks/usePlayControls'
 import { useRestoreAnchor } from '../../../hooks/useRestoreAnchor'
+import { useExistingUrls } from '../../../providers/ExistingUrlsProvider'
+import { urlCharacterFilter } from '../../../service/urlCharacterFilter'
 import { Props } from './AccordionItem.types'
 
 export function useAccordionItemBehavior(

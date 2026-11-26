@@ -1,10 +1,11 @@
 import type { InputSelection } from 'prism-react-editor'
-import { withCodeBlockOpen, withUrlBlockOpen } from '../../lib/accordionState'
+
 import { Interaction } from '../interactions/interaction.types'
-import { createRestoreRegistry, RestoreRegistry } from './restoreRegistry'
-import { anchorKindOf, restoreLastInteraction } from './restoreLastInteraction'
 import { renameUrlBlockInEntry } from './viewRestoreCache'
 import { ViewRestoreStore } from './viewRestoreStore'
+import { withCodeBlockOpen, withUrlBlockOpen } from '../../lib/accordionState'
+import { anchorKindOf, restoreLastInteraction } from './restoreLastInteraction'
+import { createRestoreRegistry, RestoreRegistry } from './restoreRegistry'
 import { AnchorKind, InteractionTarget, ViewRestoreChange, ViewRestoreEntry } from './viewRestore.types'
 
 export interface ViewRestoreController {

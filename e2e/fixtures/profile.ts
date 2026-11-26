@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { chromium, type BrowserContext } from '@playwright/test'
+import { type BrowserContext, chromium } from '@playwright/test'
 
 const EXTENSION_PATH = path.resolve(__dirname, '../../dist')
 const PROFILE_TEMPLATE = path.join(os.tmpdir(), 'injectcode-e2e-profile')

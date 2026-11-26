@@ -1,11 +1,12 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+
+import { requireContext } from '../../shared/lib/requireContext'
 import {
     EditorCommand,
     EditorSettings,
     readEditorSettings,
     saveEditorSettings,
 } from '../../shared/service/settings/editorSettings'
-import { requireContext } from '../../shared/lib/requireContext'
 
 interface EditorSettingsValue {
     settings: EditorSettings | null

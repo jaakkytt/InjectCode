@@ -1,7 +1,8 @@
-import React from 'react'
 import Button from '@mui/material/Button'
-import { Props } from './TintedScopeButton.types'
+import React from 'react'
+
 import { buttonSx } from './TintedScopeButton.styles'
+import { Props } from './TintedScopeButton.types'
 
 export default function TintedScopeButton({ color, label, active, onClick }: Props) {
     return (

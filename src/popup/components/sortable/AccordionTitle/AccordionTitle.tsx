@@ -1,9 +1,10 @@
-import React from 'react'
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
+import React from 'react'
 import { IconButton, TextField, Typography } from '@mui/material'
-import { Props } from './AccordionTitle.types'
+
 import { useAccordionTitleBehavior } from './AccordionTitle.behavior'
+import { Props } from './AccordionTitle.types'
 import { actionIconWrapperSx, titleValueSx } from './AccordionTitle.styles'
 
 export default function AccordionTitle({

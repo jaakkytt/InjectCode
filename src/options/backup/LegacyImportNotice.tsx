@@ -1,5 +1,6 @@
-import React, { ReactNode, useEffect, useState } from 'react'
 import { Alert } from '@mui/material'
+import React, { ReactNode, useEffect, useState } from 'react'
+
 import { importLegacyScriptsOnce, LegacyImportResult } from '../service/legacyImport'
 
 const LegacyImportNotice = ({ imported, failed }: { imported: ReactNode, failed: ReactNode }) => {

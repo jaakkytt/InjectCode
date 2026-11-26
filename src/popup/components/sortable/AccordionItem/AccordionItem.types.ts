@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { Script } from '../../../../shared/types'
 
 export interface Props {

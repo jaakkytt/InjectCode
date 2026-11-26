@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material'
+
 import { parseViewRestoreMode } from '../../shared/service/settings/viewRestoreMode'
 import { useViewRestoreMode } from '../providers/ViewRestoreModeProvider'
 

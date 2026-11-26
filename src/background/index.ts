@@ -1,6 +1,6 @@
+import { readAlwaysOnTiming } from '../shared/service/settings/alwaysOnTiming'
 import { storage } from '../shared/service/storageApi'
 import { createSerializedPersistentScriptsSync } from './service/persistentScripts'
-import { readAlwaysOnTiming } from '../shared/service/settings/alwaysOnTiming'
 import { MESSAGE_RESYNC_ALWAYS_ON, SHARED_CODE, STORAGE_ALWAYS_ON_TIMING, STORAGE_SCRIPTS } from '../shared/constants'
 
 const resyncPersistentScripts = createSerializedPersistentScriptsSync(async () => ({

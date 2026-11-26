@@ -1,11 +1,11 @@
 import { Script, ScriptsByPattern, ScriptType } from '../shared/types'
 
-export type RunScope = 'global' | 'current'
-
 export enum TabIndex {
     Current = 0,
     All = 1,
 }
+
+export type RunScope = 'global' | 'current'
 
 export type StoreState = {
     committed: ScriptsByPattern

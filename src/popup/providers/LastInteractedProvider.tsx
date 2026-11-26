@@ -1,8 +1,9 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { LOCAL_STORAGE_LAST_URL, SHARED_CODE } from '../../shared/constants'
+
+import { requireContext } from '../../shared/lib/requireContext'
 import { Interaction } from '../service/interactions/interaction.types'
 import { useInteractions } from './InteractionsProvider'
-import { requireContext } from '../../shared/lib/requireContext'
+import { LOCAL_STORAGE_LAST_URL, SHARED_CODE } from '../../shared/constants'
 
 const lastInteractedContext = createContext<string | undefined>(undefined)
 

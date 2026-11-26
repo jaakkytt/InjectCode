@@ -1,4 +1,5 @@
 import type { InputSelection } from 'prism-react-editor'
+
 import { ViewRestoreMode } from '../../../shared/service/settings/viewRestoreMode'
 import { AccordionState } from '../../lib/accordionState'
 import { TabIndex } from '../../types'

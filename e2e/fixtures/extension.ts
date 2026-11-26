@@ -1,8 +1,9 @@
-import { test as base, type BrowserContext } from '@playwright/test'
-import type { ScriptsByPattern } from '../../src/shared/types'
+import { type BrowserContext, test as base } from '@playwright/test'
+
 import type { ViewRestoreMode } from '../../src/shared/service/settings/viewRestoreMode'
-import { STORAGE_SCRIPTS, STORAGE_VIEW_RESTORE_MODE } from '../../src/shared/constants'
+import type { ScriptsByPattern } from '../../src/shared/types'
 import { PopupPage } from '../pages/PopupPage'
+import { STORAGE_SCRIPTS, STORAGE_VIEW_RESTORE_MODE } from '../../src/shared/constants'
 import { cloneProfileTemplate, launchWithExtension, removeProfile, templateExtensionId } from './profile'
 
 export interface BrowserTab {
@@ -13,16 +14,6 @@ export interface BrowserTab {
 interface ExtensionFixtures {
     extension: Extension
 }
-
-export const test = base.extend<ExtensionFixtures>({
-    extension: async ({}, use) => {
-        const extension = await Extension.launch()
-        await use(extension)
-        await extension.dispose()
-    },
-})
-
-export const expect = test.expect
 
 export class Extension {
     private userDataDir: string
@@ -75,6 +66,16 @@ export class Extension {
         await serviceWorker.evaluate(([k, v]) => chrome.storage.local.set({ [k]: v }), [key, value] as const)
     }
 }
+
+export const test = base.extend<ExtensionFixtures>({
+    extension: async ({}, use) => {
+        const extension = await Extension.launch()
+        await use(extension)
+        await extension.dispose()
+    },
+})
+
+export const expect = test.expect
 
 function stubActiveTab(browserTab: BrowserTab) {
     const activeTab = { id: browserTab.id, url: browserTab.url, active: true } as chrome.tabs.Tab

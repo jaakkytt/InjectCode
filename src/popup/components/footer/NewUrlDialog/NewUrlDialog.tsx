@@ -1,19 +1,21 @@
-import React from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import CloseIcon from '@mui/icons-material/Close'
 import Button from '@mui/material/Button'
+import React from 'react'
 import {
-    Dialog, DialogActions,
+    Dialog,
+    DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
     Link,
     TextField,
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import AddIcon from '@mui/icons-material/Add'
+
 import { MATCH_PATTERN_DOCS } from '../../../../shared/constants'
-import { Props } from './NewUrlDialog.types'
 import { useNewUrlDialogBehavior } from './NewUrlDialog.behavior'
 import { dialogSx } from './NewUrlDialog.styles'
+import { Props } from './NewUrlDialog.types'
 
 const NewUrlDialog = ({ isOpen, onClose }: Props) => {
     const { inputValue, placeholder, error, submitDisabled, handlers } = useNewUrlDialogBehavior({ onClose })

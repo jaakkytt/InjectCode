@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
     injectionTimeoutMs,
     NO_INJECTION_TIMEOUT,

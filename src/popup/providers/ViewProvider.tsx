@@ -1,7 +1,8 @@
 import React, { createContext, ReactNode, useContext, useMemo, useState } from 'react'
+
+import { requireContext } from '../../shared/lib/requireContext'
 import { TabIndex } from '../types'
 import { useInteractions } from './InteractionsProvider'
-import { requireContext } from '../../shared/lib/requireContext'
 
 interface ViewDispatch {
     selectView(view: TabIndex): void

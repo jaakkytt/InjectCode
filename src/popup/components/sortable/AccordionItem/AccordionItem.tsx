@@ -1,25 +1,26 @@
-import React from 'react'
-import { Accordion, Fade, IconButton, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import LinkIcon from '@mui/icons-material/Link'
 import InfoOutlineIcon from '@mui/icons-material/InfoOutlined'
+import LinkIcon from '@mui/icons-material/Link'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import Box from '@mui/material/Box'
-import ConfirmDeleteButton from '../../ConfirmDeleteButton'
-import AccordionTitle from '../AccordionTitle'
-import { ScriptsProvider } from '../../../providers/ScriptsProvider'
-import Container from '../Container'
-import TutorialTooltip from '../../TutorialTooltip'
-import { PlayBadgeIcon } from '../../PlayBadgeIcon'
+import React from 'react'
+import { Accordion, Fade, IconButton, Typography } from '@mui/material'
+
 import { SHARED_CODE } from '../../../../shared/constants'
-import { Props } from './AccordionItem.types'
+import { ScriptsProvider } from '../../../providers/ScriptsProvider'
+import ConfirmDeleteButton from '../../ConfirmDeleteButton'
+import { PlayBadgeIcon } from '../../PlayBadgeIcon'
+import TutorialTooltip from '../../TutorialTooltip'
+import AccordionTitle from '../AccordionTitle'
+import Container from '../Container'
 import { useAccordionItemBehavior } from './AccordionItem.behavior'
+import { Props } from './AccordionItem.types'
 import {
-    AccordionSummary,
     accordionStyle,
+    AccordionSummary,
+    detailsSx,
     headerRowSx,
     titleIconWrapperSx,
-    detailsSx,
 } from './AccordionItem.styles'
 
 export default function AccordionItem({

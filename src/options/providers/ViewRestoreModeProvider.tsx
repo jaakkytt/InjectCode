@@ -1,10 +1,11 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+
+import { requireContext } from '../../shared/lib/requireContext'
 import {
     readViewRestoreMode,
     saveViewRestoreMode,
     ViewRestoreMode,
 } from '../../shared/service/settings/viewRestoreMode'
-import { requireContext } from '../../shared/lib/requireContext'
 
 interface ViewRestoreModeValue {
     mode: ViewRestoreMode | null

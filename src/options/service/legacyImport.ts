@@ -1,4 +1,8 @@
+import { cyrb53 } from '../../shared/lib/hash/cyrb53'
+import { isPlainObject } from '../../shared/lib/isPlainObject'
+import { storage } from '../../shared/service/storageApi'
 import { Script } from '../../shared/types'
+import { ImportSummary, mergeScripts } from './backup'
 import {
     LOCAL_STORAGE_LEGACY_IMPORT_FAILED,
     LOCAL_STORAGE_LEGACY_SCOPE,
@@ -6,19 +10,13 @@ import {
     SHARED_CODE,
     STORAGE_SCRIPTS,
 } from '../../shared/constants'
-import { storage } from '../../shared/service/storageApi'
-import { cyrb53 } from '../../shared/lib/hash/cyrb53'
-import { isPlainObject } from '../../shared/lib/isPlainObject'
-import { ImportSummary, mergeScripts } from './backup'
+
+let pending: Promise<LegacyImportResult> | undefined
 
 export type LegacyImportResult =
     | { status: 'nothing' }
     | { status: 'failed' }
     | { status: 'imported', summary: ImportSummary }
-
-function stableId(index: number, name: unknown, code: string): string {
-    return `js-imported-${cyrb53(JSON.stringify([index, name, code])).toString(36)}`
-}
 
 export function parseLegacyScripts(raw: string): Script[] {
     const parsed: unknown = JSON.parse(raw)
@@ -45,27 +43,6 @@ export function parseLegacyScripts(raw: string): Script[] {
             type: 'js',
         }]
     })
-}
-
-async function addToShared(legacy: Script[]): Promise<LegacyImportResult> {
-    if (legacy.length === 0) {
-        return { status: 'nothing' }
-    }
-
-    const existing = await storage.get(STORAGE_SCRIPTS, { [SHARED_CODE]: [] })
-    const existingIds = new Set(Object.values(existing).flat().map(item => item.id))
-    const notYetImported = legacy.filter(item => !existingIds.has(item.id))
-
-    if (notYetImported.length === 0) {
-        return { status: 'nothing' }
-    }
-
-    const { scripts, summary } = mergeScripts(existing, { [SHARED_CODE]: notYetImported })
-    const alreadyImported = legacy.length - notYetImported.length
-
-    await storage.set(STORAGE_SCRIPTS, scripts)
-
-    return { status: 'imported', summary: { ...summary, skipped: summary.skipped + alreadyImported } }
 }
 
 export async function importLegacyScripts(): Promise<LegacyImportResult> {
@@ -97,10 +74,33 @@ export async function importLegacyScripts(): Promise<LegacyImportResult> {
     return result
 }
 
-let pending: Promise<LegacyImportResult> | undefined
-
 export function importLegacyScriptsOnce(): Promise<LegacyImportResult> {
     pending ??= importLegacyScripts()
 
     return pending
+}
+
+function stableId(index: number, name: unknown, code: string): string {
+    return `js-imported-${cyrb53(JSON.stringify([index, name, code])).toString(36)}`
+}
+
+async function addToShared(legacy: Script[]): Promise<LegacyImportResult> {
+    if (legacy.length === 0) {
+        return { status: 'nothing' }
+    }
+
+    const existing = await storage.get(STORAGE_SCRIPTS, { [SHARED_CODE]: [] })
+    const existingIds = new Set(Object.values(existing).flat().map(item => item.id))
+    const notYetImported = legacy.filter(item => !existingIds.has(item.id))
+
+    if (notYetImported.length === 0) {
+        return { status: 'nothing' }
+    }
+
+    const { scripts, summary } = mergeScripts(existing, { [SHARED_CODE]: notYetImported })
+    const alreadyImported = legacy.length - notYetImported.length
+
+    await storage.set(STORAGE_SCRIPTS, scripts)
+
+    return { status: 'imported', summary: { ...summary, skipped: summary.skipped + alreadyImported } }
 }

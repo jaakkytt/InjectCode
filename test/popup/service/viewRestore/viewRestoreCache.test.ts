@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { TabIndex } from '../../../../src/popup/types'
 import { LastUsedState, ViewRestoreEntry } from '../../../../src/popup/service/viewRestore/viewRestore.types'
 import {

@@ -1,6 +1,7 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { Script, ScriptsByPattern } from '../../../src/shared/types'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { SHARED_CODE, USER_SCRIPT_ID } from '../../../src/shared/constants'
+import { Script, ScriptsByPattern } from '../../../src/shared/types'
 import {
     computeDesiredRegistrations,
     createSerializedPersistentScriptsSync,

@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { Script, ScriptsByPattern } from '../../../src/shared/types'
-import { SHARED_CODE } from '../../../src/shared/constants'
+
 import { disableFilePatternScripts } from '../../../src/options/service/filePatternScripts'
+import { SHARED_CODE } from '../../../src/shared/constants'
+import { Script, ScriptsByPattern } from '../../../src/shared/types'
 
 describe('disableFilePatternScripts', () => {
     let fileAccess: boolean

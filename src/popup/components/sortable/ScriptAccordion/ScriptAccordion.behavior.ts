@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
+import React, { useState } from 'react'
+
 import { ScriptRunMode } from '../../../../shared/types'
-import { useScriptsDispatch } from '../../../providers/scriptsContext'
 import { usePlayControls } from '../../../hooks/usePlayControls'
 import { useRestoreAnchor } from '../../../hooks/useRestoreAnchor'
+import { useScriptsDispatch } from '../../../providers/scriptsContext'
 import { Props } from './ScriptAccordion.types'
 
 export function useScriptAccordionBehavior({ item, parentId }: Pick<Props, 'item' | 'parentId'>) {

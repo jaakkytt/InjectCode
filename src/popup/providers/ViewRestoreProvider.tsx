@@ -1,12 +1,13 @@
 import React, { ReactNode, useEffect, useState } from 'react'
-import { bindToDocument, browserEnvironment, openBrowserViewRestoreStore } from '../service/viewRestore/browserPorts'
-import { createViewRestoreController, ViewRestoreController } from '../service/viewRestore/viewRestoreController'
+
 import { AccordionStateProvider } from './AccordionStateProvider'
 import { useCurrentTab } from './CurrentUrlProvider'
 import { useInteractions } from './InteractionsProvider'
+import { restoreRegistryContext } from './restoreRegistryContext'
 import { useUrlsHydrated } from './urlsContext'
 import { ViewProvider } from './ViewProvider'
-import { restoreRegistryContext } from './restoreRegistryContext'
+import { createViewRestoreController, ViewRestoreController } from '../service/viewRestore/viewRestoreController'
+import { bindToDocument, browserEnvironment, openBrowserViewRestoreStore } from '../service/viewRestore/browserPorts'
 
 interface Props {
     fallback: ReactNode

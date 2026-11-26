@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, ReactNode, useContext, useState } from 'react'
+
 import { LOCAL_STORAGE_SCOPE } from '../../shared/constants'
-import { RunScope } from '../types'
 import { requireContext } from '../../shared/lib/requireContext'
+import { RunScope } from '../types'
 
 type RunScopeContextType = {
     scope: RunScope;

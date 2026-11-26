@@ -1,8 +1,8 @@
-import { LOCAL_STORAGE_VIEW_RESTORE, SESSION_STORAGE_BROWSER_SESSION_ID } from '../../../shared/constants'
 import { readViewRestoreMode } from '../../../shared/service/settings/viewRestoreMode'
+import { LOCAL_STORAGE_VIEW_RESTORE, SESSION_STORAGE_BROWSER_SESSION_ID } from '../../../shared/constants'
+import { BrowserTabLocation, ViewRestoreCache } from './viewRestore.types'
 import { ViewRestoreController, ViewRestoreEnvironment } from './viewRestoreController'
 import { openViewRestoreStore, ViewRestorePorts } from './viewRestoreStore'
-import { BrowserTabLocation, ViewRestoreCache } from './viewRestore.types'
 
 const NO_SESSION = 'no-session'
 

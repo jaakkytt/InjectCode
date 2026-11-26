@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { DEFAULT_EDITOR_SETTINGS, readEditorSettings } from '../../../../src/shared/service/settings/editorSettings'
 
 const { getValue } = vi.hoisted(() => ({ getValue: vi.fn() }))

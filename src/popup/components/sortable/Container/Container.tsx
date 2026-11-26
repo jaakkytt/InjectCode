@@ -1,10 +1,11 @@
-import React from 'react'
-import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import Typography from '@mui/material/Typography'
+import React from 'react'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+
 import ScriptAccordion from '../ScriptAccordion'
-import { Props } from './Container.types'
 import { useContainerBehavior } from './Container.behavior'
 import { containerStyle } from './Container.styles'
+import { Props } from './Container.types'
 
 export default function Container({ id, expandedPanel, onAccordionChange }: Props) {
     const { isOver, setNodeRef, items, itemIds } = useContainerBehavior(id)

@@ -1,14 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
+
 import { AccordionTitleBehaviorProps } from './AccordionTitle.types'
 
 type SaveOutcome =
     | { type: 'unchanged' }
     | { type: 'invalid'; error: string }
     | { type: 'saved'; value: string }
-
-function shouldValidateOnChange(transformedValue: string, originalValue: string) {
-    return transformedValue.trim() !== originalValue.trim() || originalValue.trim() === ''
-}
 
 export function useAccordionTitleBehavior(
     { value, onChange, inputValidator, inputTransformer }: AccordionTitleBehaviorProps,
@@ -123,4 +120,8 @@ export function useAccordionTitleBehavior(
             },
         },
     }
+}
+
+function shouldValidateOnChange(transformedValue: string, originalValue: string) {
+    return transformedValue.trim() !== originalValue.trim() || originalValue.trim() === ''
 }

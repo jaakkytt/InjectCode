@@ -1,6 +1,7 @@
-import '../shared/styles/global.css'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+
+import '../shared/styles/global.css'
 import Options from './Options'
 
 const container = document.getElementById('root')!

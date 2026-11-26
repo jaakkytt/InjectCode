@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { createFakeLocalStorage } from '../../../fakes/localStorage'
 import {
     areTooltipsEnabled,
     countTooltipShown,
@@ -6,7 +8,6 @@ import {
     resetTooltipCounters,
     setTooltipsEnabled,
 } from '../../../../src/shared/service/settings/tooltipPreferences'
-import { createFakeLocalStorage } from '../../../fakes/localStorage'
 
 const TITLE = 'Delete script'
 

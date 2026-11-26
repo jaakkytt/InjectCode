@@ -1,5 +1,6 @@
-import React from 'react'
 import { Switch } from '@mui/material'
+import React from 'react'
+
 import { useEditorSettings } from '../providers/EditorSettingsProvider'
 
 const InsertSpacesToggle = () => {

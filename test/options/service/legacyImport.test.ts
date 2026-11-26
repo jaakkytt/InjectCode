@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { Script } from '../../../src/shared/types'
+import { createFakeLocalStorage } from '../../fakes/localStorage'
+import { importLegacyScripts, parseLegacyScripts } from '../../../src/options/service/legacyImport'
 import {
     LOCAL_STORAGE_LEGACY_IMPORT_FAILED,
     LOCAL_STORAGE_LEGACY_SCOPE,
@@ -7,8 +10,6 @@ import {
     SHARED_CODE,
     STORAGE_SCRIPTS,
 } from '../../../src/shared/constants'
-import { importLegacyScripts, parseLegacyScripts } from '../../../src/options/service/legacyImport'
-import { createFakeLocalStorage } from '../../fakes/localStorage'
 
 const { get, set } = vi.hoisted(() => ({
     get: vi.fn(),

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { DEFAULT_ALWAYS_ON_TIMING, parseAlwaysOnTiming } from '../../../../src/shared/service/settings/alwaysOnTiming'
 
 describe('parseAlwaysOnTiming', () => {

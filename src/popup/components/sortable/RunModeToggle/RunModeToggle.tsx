@@ -1,9 +1,10 @@
-import React from 'react'
 import { Fade } from '@mui/material'
+import React from 'react'
+
 import TutorialTooltip from '../../TutorialTooltip'
 import { Props } from './RunModeToggle.types'
 import { MODES, useRunModeToggleBehavior } from './RunModeToggle.behavior'
-import { Root, Track, Marker, Thumb, iconSx, tooltipSlotProps } from './RunModeToggle.styles'
+import { iconSx, Marker, Root, Thumb, tooltipSlotProps, Track } from './RunModeToggle.styles'
 
 export default function RunModeToggle({ mode, onModeChange, warning }: Props) {
     const { Icon, tooltipTitle, tooltipOpen, handlers } = useRunModeToggleBehavior({ mode, onModeChange, warning })

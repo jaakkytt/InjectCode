@@ -1,22 +1,23 @@
-import React from 'react'
-import Accordion from '@mui/material/Accordion'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import Box from '@mui/material/Box'
-import DragHandleIcon from '@mui/icons-material/DragHandle'
-import JavascriptIcon from '@mui/icons-material/Javascript'
 import CssIcon from '@mui/icons-material/Css'
-import Typography from '@mui/material/Typography'
+import DragHandleIcon from '@mui/icons-material/DragHandle'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import JavascriptIcon from '@mui/icons-material/Javascript'
 import { IconButton } from '@mui/material'
+import Accordion from '@mui/material/Accordion'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import React from 'react'
+
 import RunModeToggle from '../RunModeToggle'
 import { Props } from './OverlayItem.types'
 import {
     AccordionSummary,
-    TypeIconOverlay,
-    rootStyle,
-    dragHandleWrapperStyle,
     dragHandleButtonStyle,
+    dragHandleWrapperStyle,
     headerRowSx,
+    rootStyle,
     titleSx,
+    TypeIconOverlay,
 } from './OverlayItem.styles'
 
 // eslint-disable-next-line no-empty-function

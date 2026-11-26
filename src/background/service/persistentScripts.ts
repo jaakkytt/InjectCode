@@ -1,9 +1,9 @@
-import { Script, ScriptsByPattern } from '../../shared/types'
-import { SHARED_CODE, USER_SCRIPT_ID } from '../../shared/constants'
-import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
 import { cyrb53 } from '../../shared/lib/hash/cyrb53'
-import { AlwaysOnTiming, DEFAULT_ALWAYS_ON_TIMING } from '../../shared/service/settings/alwaysOnTiming'
+import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
 import { isUserScriptsEnabled } from '../../shared/service/userScripts'
+import { SHARED_CODE, USER_SCRIPT_ID } from '../../shared/constants'
+import { AlwaysOnTiming, DEFAULT_ALWAYS_ON_TIMING } from '../../shared/service/settings/alwaysOnTiming'
+import { Script, ScriptsByPattern } from '../../shared/types'
 
 export interface PersistentScriptsState {
     scripts: ScriptsByPattern
@@ -16,16 +16,6 @@ export function wrapCssAsUserScript(css: string): string {
         s.textContent = ${JSON.stringify(css)};
         (document.head ?? document.documentElement).appendChild(s);
     })();`
-}
-
-function toScriptSources(items: Script[]): chrome.userScripts.ScriptSource[] {
-    return items.map(item => ({
-        code: item.type === 'css' ? wrapCssAsUserScript(item.content) : item.content,
-    }))
-}
-
-function idForPattern(pattern: string): string {
-    return `always-${cyrb53(pattern).toString(36)}`
 }
 
 export function computeDesiredRegistrations(
@@ -120,4 +110,14 @@ export function createSerializedPersistentScriptsSync(
         running = drain()
         return running
     }
+}
+
+function toScriptSources(items: Script[]): chrome.userScripts.ScriptSource[] {
+    return items.map(item => ({
+        code: item.type === 'css' ? wrapCssAsUserScript(item.content) : item.content,
+    }))
+}
+
+function idForPattern(pattern: string): string {
+    return `always-${cyrb53(pattern).toString(36)}`
 }

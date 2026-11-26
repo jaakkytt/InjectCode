@@ -1,6 +1,7 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react'
-import { createInteractionBus, InteractionBus } from '../service/interactions/interactionBus'
+
 import { requireContext } from '../../shared/lib/requireContext'
+import { createInteractionBus, InteractionBus } from '../service/interactions/interactionBus'
 
 const interactionsContext = createContext<InteractionBus | undefined>(undefined)
 

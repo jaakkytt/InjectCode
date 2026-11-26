@@ -1,11 +1,12 @@
 import React from 'react'
 import { Button, Stack } from '@mui/material'
+
+import { PlayBadgeIcon } from '../../PlayBadgeIcon'
 import ExpandingActionButton from '../ExpandingActionButton'
 import { IconSwitch } from '../IconSwitch'
-import { PlayBadgeIcon } from '../../PlayBadgeIcon'
 import { useFooterBehavior } from './Footer.behavior'
-import { rootStackSx, leftStackSx, scopeStackSx } from './Footer.styles'
 import TintedScopeButton from './TintedScopeButton'
+import { leftStackSx, rootStackSx, scopeStackSx } from './Footer.styles'
 
 const Footer = () => {
     const { scope, play, handlers } = useFooterBehavior()

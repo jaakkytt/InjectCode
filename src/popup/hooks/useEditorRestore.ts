@@ -1,6 +1,7 @@
-import { useCallback, useRef } from 'react'
-import { InputSelection, PrismEditor } from 'prism-react-editor'
 import { setSelection } from 'prism-react-editor/utils'
+import { InputSelection, PrismEditor } from 'prism-react-editor'
+import { useCallback, useRef } from 'react'
+
 import { useInteractions } from '../providers/InteractionsProvider'
 import { useRestoreRegistry } from '../providers/restoreRegistryContext'
 import { EditorHandle } from '../service/viewRestore/restoreRegistry'

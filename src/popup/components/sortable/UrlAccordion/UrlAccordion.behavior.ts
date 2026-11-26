@@ -9,43 +9,13 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core'
-import { Script, ScriptsByPattern } from '../../../../shared/types'
-import { useUrls, useUrlsDispatch } from '../../../providers/urlsContext'
-import { useAccordionState, useAccordionStateDispatch } from '../../../providers/AccordionStateProvider'
+
 import { useInteractions } from '../../../providers/InteractionsProvider'
+import { Script, ScriptsByPattern } from '../../../../shared/types'
+import { useAccordionState, useAccordionStateDispatch } from '../../../providers/AccordionStateProvider'
+import { useUrls, useUrlsDispatch } from '../../../providers/urlsContext'
 
 const dragMinimumDelta = 5
-
-function findContainer(items: ScriptsByPattern, id: string) {
-    if (id in items) {
-        return id
-    }
-    return Object.keys(items).find((key) => items[key].some(item => item.id === id))
-}
-
-function isPositionChangeSignificant(
-    dragTranslation: { top: number; left: number } | null,
-    rect: { top: number; left: number },
-    minimumDelta: number = dragMinimumDelta,
-) {
-    if (!dragTranslation) {
-        return true
-    }
-    return Math.abs(dragTranslation.top - rect.top) >= minimumDelta
-        || Math.abs(dragTranslation.left - rect.left) >= minimumDelta
-}
-
-function resolveDropIndex(
-    items: ScriptsByPattern,
-    overId: string,
-    overItems: Script[],
-    overIndex: number,
-) {
-    if (overId in items) {
-        return overItems.length
-    }
-    return overIndex >= 0 ? overIndex : overItems.length
-}
 
 export function useUrlAccordionBehavior() {
     const items = useUrls()
@@ -214,4 +184,35 @@ export function useUrlAccordionBehavior() {
             },
         },
     }
+}
+
+function findContainer(items: ScriptsByPattern, id: string) {
+    if (id in items) {
+        return id
+    }
+    return Object.keys(items).find((key) => items[key].some(item => item.id === id))
+}
+
+function isPositionChangeSignificant(
+    dragTranslation: { top: number; left: number } | null,
+    rect: { top: number; left: number },
+    minimumDelta: number = dragMinimumDelta,
+) {
+    if (!dragTranslation) {
+        return true
+    }
+    return Math.abs(dragTranslation.top - rect.top) >= minimumDelta
+        || Math.abs(dragTranslation.left - rect.left) >= minimumDelta
+}
+
+function resolveDropIndex(
+    items: ScriptsByPattern,
+    overId: string,
+    overItems: Script[],
+    overIndex: number,
+) {
+    if (overId in items) {
+        return overItems.length
+    }
+    return overIndex >= 0 ? overIndex : overItems.length
 }

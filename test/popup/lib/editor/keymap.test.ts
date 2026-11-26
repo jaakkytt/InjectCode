@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
 import { defaultKeymap } from 'prism-react-editor/commands'
+import { describe, expect, it } from 'vitest'
+
 import { buildKeymap } from '../../../../src/popup/lib/editor/keymap'
 import { DEFAULT_EDITOR_HOTKEYS } from '../../../../src/shared/service/settings/editorSettings'
 

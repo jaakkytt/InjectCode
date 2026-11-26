@@ -1,5 +1,3 @@
-import React from 'react'
-import { Editor } from 'prism-react-editor'
 import 'prism-react-editor/prism/languages/javascript'
 import 'prism-react-editor/prism/languages/css'
 import 'prism-react-editor/languages/clike'
@@ -8,11 +6,13 @@ import 'prism-react-editor/layout.css'
 import 'prism-react-editor/themes/github-light.css'
 import 'prism-react-editor/search.css'
 import 'prism-react-editor/invisibles.css'
+import { Editor } from 'prism-react-editor'
+import React from 'react'
 
-import StatusIcon from './StatusIcon'
-import EditorSetup from './EditorSetup'
-import { Props } from './AccordionBody.types'
 import { useAccordionBodyBehavior } from './AccordionBody.behavior'
+import { Props } from './AccordionBody.types'
+import EditorSetup from './EditorSetup'
+import StatusIcon from './StatusIcon'
 import { EditorFrame, StatusSlot } from './AccordionBody.styles'
 
 export default function AccordionBody({ scriptId, urlBlockId, value, language, onChange, onFocusChange }: Props) {

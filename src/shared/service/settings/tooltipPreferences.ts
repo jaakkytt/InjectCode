@@ -2,11 +2,6 @@ import { LOCAL_STORAGE_TOOLTIP_COUNTERS, LOCAL_STORAGE_TOOLTIP_DISABLED } from '
 
 const TOOLTIP_SHOW_LIMIT = 30
 
-function readTooltipCounters(): Record<string, number> {
-    const stored = localStorage.getItem(LOCAL_STORAGE_TOOLTIP_COUNTERS)
-    return stored !== null ? JSON.parse(stored) : {}
-}
-
 export function areTooltipsEnabled(): boolean {
     return localStorage.getItem(LOCAL_STORAGE_TOOLTIP_DISABLED) !== 'true'
 }
@@ -35,4 +30,9 @@ export function countTooltipShown(key: string) {
 
 export function resetTooltipCounters() {
     localStorage.removeItem(LOCAL_STORAGE_TOOLTIP_COUNTERS)
+}
+
+function readTooltipCounters(): Record<string, number> {
+    const stored = localStorage.getItem(LOCAL_STORAGE_TOOLTIP_COUNTERS)
+    return stored !== null ? JSON.parse(stored) : {}
 }

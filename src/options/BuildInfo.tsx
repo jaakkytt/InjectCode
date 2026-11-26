@@ -1,5 +1,5 @@
-import * as React from 'react'
 import Typography from '@mui/material/Typography'
+import * as React from 'react'
 
 export default function BuildInfo() {
     const builtAt = new Date(__BUILD_TIME__)

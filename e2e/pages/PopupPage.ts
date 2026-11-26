@@ -1,5 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 
+const DRAG_STEPS = 12
+
 export type ViewName = 'Currently Matching' | 'All Scripts'
 
 export interface EditorState {
@@ -7,8 +9,6 @@ export interface EditorState {
     selectionEnd: number
     scrollTop: number
 }
-
-const DRAG_STEPS = 12
 
 export class PopupPage {
     readonly page: Page

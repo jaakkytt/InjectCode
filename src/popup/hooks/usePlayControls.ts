@@ -1,34 +1,15 @@
 import * as React from 'react'
-import { Script, ScriptsByPattern } from '../../shared/types'
-import { RunScope } from '../types'
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
-import { useRunScope } from '../providers/RunScopeProvider'
-import { scriptApi } from '../service/scriptApi'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
 import { SHARED_CODE } from '../../shared/constants'
-import { useUrls } from '../providers/urlsContext'
 import { useFeedbackDispatch } from '../providers/FeedbackProvider'
+import { useRunScope } from '../providers/RunScopeProvider'
+import { useUrls } from '../providers/urlsContext'
 import { Message } from '../service/Message'
+import { scriptApi } from '../service/scriptApi'
+import { RunScope } from '../types'
 import { injectionTimeoutMs, readInjectionTimeout } from '../../shared/service/settings/injectionTimeout'
-
-function deepCopyAndFilterRunnable(data: ScriptsByPattern): ScriptsByPattern {
-    const result: ScriptsByPattern = {}
-    for (const [key, items] of Object.entries(data)) {
-        if (key === SHARED_CODE) {
-            continue
-        }
-        const filtered = items.filter(item => item.runMode !== 'disabled')
-        if (filtered.length > 0) {
-            result[key] = filtered.map(item => ({ ...item }))
-        }
-    }
-    return result
-}
-
-async function runWithTimeout(active: ScriptsByPattern, shared: Script[], scope: RunScope) {
-    const timeoutSeconds = await readInjectionTimeout()
-    const result = await scriptApi.run(active, shared, scope, injectionTimeoutMs(timeoutSeconds))
-    return { result, timeoutSeconds }
-}
+import { Script, ScriptsByPattern } from '../../shared/types'
 
 export function usePlayControls(urls: ScriptsByPattern) {
 
@@ -77,4 +58,24 @@ export function usePlayControls(urls: ScriptsByPattern) {
     const buttonProps = { disabled, onClick, loading } as const
 
     return { activeCount, disabled, onClick, buttonProps }
+}
+
+function deepCopyAndFilterRunnable(data: ScriptsByPattern): ScriptsByPattern {
+    const result: ScriptsByPattern = {}
+    for (const [key, items] of Object.entries(data)) {
+        if (key === SHARED_CODE) {
+            continue
+        }
+        const filtered = items.filter(item => item.runMode !== 'disabled')
+        if (filtered.length > 0) {
+            result[key] = filtered.map(item => ({ ...item }))
+        }
+    }
+    return result
+}
+
+async function runWithTimeout(active: ScriptsByPattern, shared: Script[], scope: RunScope) {
+    const timeoutSeconds = await readInjectionTimeout()
+    const result = await scriptApi.run(active, shared, scope, injectionTimeoutMs(timeoutSeconds))
+    return { result, timeoutSeconds }
 }

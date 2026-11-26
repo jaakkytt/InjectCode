@@ -1,5 +1,6 @@
-import React, { SyntheticEvent, useState } from 'react'
 import Tooltip, { TooltipProps } from '@mui/material/Tooltip'
+import React, { SyntheticEvent, useState } from 'react'
+
 import {
     areTooltipsEnabled,
     countTooltipShown,

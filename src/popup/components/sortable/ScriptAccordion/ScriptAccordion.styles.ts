@@ -1,10 +1,23 @@
-import React from 'react'
-import { styled } from '@mui/material'
-import { SxProps, Theme } from '@mui/material'
-import MuiAccordionSummary, { accordionSummaryClasses, AccordionSummaryProps } from '@mui/material/AccordionSummary'
 import { CSS } from '@dnd-kit/utilities'
 import { Transform } from '@dnd-kit/utilities'
+import { styled } from '@mui/material'
+import React from 'react'
+import { SxProps, Theme } from '@mui/material'
+import MuiAccordionSummary, { accordionSummaryClasses, AccordionSummaryProps } from '@mui/material/AccordionSummary'
+
 import { ScriptRunMode } from '../../../../shared/types'
+
+export const expandIconSx: SxProps<Theme> = { marginLeft: '4px' }
+
+export const accordionSx: SxProps<Theme> = { '&.Mui-expanded': { margin: '8px 0' } }
+
+export const accordionDetailsSx: SxProps<Theme> = { padding: '0 8px 8px' }
+
+export const headerRowSx: SxProps<Theme> = { display: 'flex', alignItems: 'center', width: '100%' }
+
+export const dragHandleWrapperStyle: React.CSSProperties = { cursor: 'grab', marginRight: 8 }
+
+export const dragHandleButtonStyle: React.CSSProperties = { cursor: 'grab' }
 
 export const AccordionSummary = styled((props: AccordionSummaryProps) =>
     React.createElement(MuiAccordionSummary, props),
@@ -27,18 +40,6 @@ export const TypeIconOverlay = styled('span')({
     top: 0,
     opacity: 0.3,
 })
-
-export const expandIconSx: SxProps<Theme> = { marginLeft: '4px' }
-
-export const accordionSx: SxProps<Theme> = { '&.Mui-expanded': { margin: '8px 0' } }
-
-export const accordionDetailsSx: SxProps<Theme> = { padding: '0 8px 8px' }
-
-export const headerRowSx: SxProps<Theme> = { display: 'flex', alignItems: 'center', width: '100%' }
-
-export const dragHandleWrapperStyle: React.CSSProperties = { cursor: 'grab', marginRight: 8 }
-
-export const dragHandleButtonStyle: React.CSSProperties = { cursor: 'grab' }
 
 export function rootStyle(
     transform: Transform | null,

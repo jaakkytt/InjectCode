@@ -1,22 +1,15 @@
 import React, { useMemo, useState } from 'react'
-import { useUrlsDispatch } from '../../../providers/urlsContext'
-import { useExistingUrls } from '../../../providers/ExistingUrlsProvider'
-import { urlPatternValidator } from '../../../../shared/service/urlPatternValidator'
-import { urlCharacterFilter } from '../../../service/urlCharacterFilter'
-import { useCurrentUrl } from '../../../providers/CurrentUrlProvider'
-import { useView, useViewDispatch } from '../../../providers/ViewProvider'
-import { useInteractions } from '../../../providers/InteractionsProvider'
-import { TabIndex } from '../../../types'
-import { urlPatternMatcher } from '../../../../shared/service/urlPatternMatcher'
-import { Props } from './NewUrlDialog.types'
 
-function getOriginPattern(url: URL): string {
-    let origin = url.origin
-    if (url.port && origin.endsWith(url.port)) {
-        origin = origin.slice(0, -url.port.length - 1)
-    }
-    return `${origin}/*`
-}
+import { urlPatternMatcher } from '../../../../shared/service/urlPatternMatcher'
+import { urlPatternValidator } from '../../../../shared/service/urlPatternValidator'
+import { useCurrentUrl } from '../../../providers/CurrentUrlProvider'
+import { useExistingUrls } from '../../../providers/ExistingUrlsProvider'
+import { useInteractions } from '../../../providers/InteractionsProvider'
+import { useUrlsDispatch } from '../../../providers/urlsContext'
+import { urlCharacterFilter } from '../../../service/urlCharacterFilter'
+import { TabIndex } from '../../../types'
+import { Props } from './NewUrlDialog.types'
+import { useView, useViewDispatch } from '../../../providers/ViewProvider'
 
 export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
     const [inputValue, setInputValue] = useState('')
@@ -100,4 +93,12 @@ export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
             submit,
         },
     }
+}
+
+function getOriginPattern(url: URL): string {
+    let origin = url.origin
+    if (url.port && origin.endsWith(url.port)) {
+        origin = origin.slice(0, -url.port.length - 1)
+    }
+    return `${origin}/*`
 }

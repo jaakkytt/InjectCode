@@ -1,18 +1,21 @@
-import React from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import CloseIcon from '@mui/icons-material/Close'
 import Button from '@mui/material/Button'
+import MenuItem from '@mui/material/MenuItem'
+import React from 'react'
 import {
-    Dialog, DialogActions,
+    Dialog,
+    DialogActions,
     DialogContent,
-    DialogTitle, FormControl,
+    DialogTitle,
+    FormControl,
     InputLabel,
     Select,
     TextField,
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import AddIcon from '@mui/icons-material/Add'
-import MenuItem from '@mui/material/MenuItem'
-import { Props } from './NewScriptDialog.types'
+
 import { useNewScriptDialogBehavior } from './NewScriptDialog.behavior'
+import { Props } from './NewScriptDialog.types'
 import { dialogSx, formControlSx } from './NewScriptDialog.styles'
 
 const NewScriptDialog = ({ isOpen, scriptType, onClose }: Props) => {

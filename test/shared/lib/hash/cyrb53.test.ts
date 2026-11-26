@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { cyrb53 } from '../../../../src/shared/lib/hash/cyrb53'
 
 describe('cyrb53', () => {
