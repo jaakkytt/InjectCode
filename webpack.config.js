@@ -3,10 +3,15 @@ const webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ROBOTO_PKG_DIR = path.dirname(require.resolve('@fontsource/roboto/package.json'))
+const EDITOR_THEME_FILES = [
+    require.resolve('prism-react-editor/themes/github-light.css'),
+    require.resolve('prism-react-editor/themes/github-dark.css'),
+]
 
 const outputPath = path.resolve(__dirname, 'dist')
 const packageVersion = require('./package.json').version
 const manifestVersion = packageVersion.match(/^(\d+\.\d+\.\d+)(-.+)?$/)?.[1]
+
 if (!manifestVersion) {
     throw new Error(`package.json version "${packageVersion}" must be nr.nr.nr, optionally followed by -text`)
 }
@@ -56,7 +61,10 @@ const pagesConfig = {
             tsRule,
             {
                 test: /\.css$/i,
-                use: ['style-loader', 'css-loader'],
+                oneOf: [
+                    { include: EDITOR_THEME_FILES, type: 'asset/source' },
+                    { use: ['style-loader', 'css-loader'] },
+                ],
             },
             {
                 test: /\.(woff2?|eot|ttf|otf)$/,

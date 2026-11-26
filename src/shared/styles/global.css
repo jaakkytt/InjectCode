@@ -55,12 +55,7 @@
 body {
     margin: 0;
     font-family: Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f4f4f4;
     overflow-y: scroll;
-}
-
-h1 {
-    color: #007bff;
 }
 
 button {

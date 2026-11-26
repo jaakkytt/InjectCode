@@ -52,7 +52,7 @@ export default function ScriptAccordion(
     return (
         <div
             ref={setNodeRef}
-            style={rootStyle(transform, transition, isDragging, item.runMode)}
+            style={rootStyle(transform, transition, isDragging)}
         >
             <Accordion
                 expanded={!isDragging && isExpanded} onChange={onAccordionChange(item.id)}
@@ -63,6 +63,7 @@ export default function ScriptAccordion(
             >
                 <AccordionSummary
                     ref={restoreAnchorRef}
+                    runMode={item.runMode}
                     expandIcon={<ExpandMoreIcon sx={expandIconSx} color="primary" />}
                     aria-controls={`${item.id}-content`}
                     id={`${item.id}-header`}

@@ -22,7 +22,7 @@ Sync, and the extension doesn't send any of it anywhere.
 |---|---|---|
 | Your scripts: name, code, type (JS/CSS), run mode and the URL pattern they belong to | `chrome.storage.local` | The extension's main feature |
 | Settings: Always on timing, injection timeout, editor settings, feedback auto-hide, *Reopen where you left off* | `chrome.storage.local` | To remember your choices |
-| Popup preferences: last used URL pattern, run scope, tooltip state | The extension's `localStorage` | To reopen the popup the way you left it |
+| Popup preferences: last used URL pattern, run scope, tooltip state, theme | The extension's `localStorage` | To reopen the popup the way you left it |
 | Popup view state, depending on the *Reopen where you left off* setting: per **website host name** (default, up to 20 hosts from the current browser session), per browser tab, or not at all | The extension's `localStorage` | To reopen the popup where you left off on that site or tab |
 | A random ID for the current browser session | `chrome.storage.session` (cleared when Chrome closes) | To tell apart tab-based view state from earlier sessions |
 

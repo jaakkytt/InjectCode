@@ -6,6 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import HistoryIcon from '@mui/icons-material/History'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import NotificationsIcon from '@mui/icons-material/Notifications'
+import PaletteIcon from '@mui/icons-material/Palette'
 import TuneIcon from '@mui/icons-material/Tune'
 import Box from '@mui/material/Box'
 import React from 'react'
@@ -19,6 +20,7 @@ import LegacyImportNotice from './backup/LegacyImportNotice'
 import BuildInfo from './BuildInfo'
 import AlwaysOnTimingSelect from './inputs/AlwaysOnTimingSelect'
 import AutoHideSelect from './inputs/AutoHideSelect'
+import DarkModeToggle from './inputs/DarkModeToggle'
 import HotkeyInput from './inputs/HotkeyInput'
 import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
 import InsertSpacesToggle from './inputs/InsertSpacesToggle'
@@ -151,17 +153,6 @@ const Options = () => (
                             </Setting>
 
                             <Setting>
-                                <TooltipsToggle />
-                                <div>
-                                    <SettingTitle>Tutorial tooltips</SettingTitle>
-                                    <SettingText>
-                                        Show tooltip hints on buttons such as Run and Delete. Each hint stops appearing
-                                        after it has been shown a number of times. <ResetTooltipsLink />
-                                    </SettingText>
-                                </div>
-                            </Setting>
-
-                            <Setting>
                                 <SiteAccessSelect
                                     allSites="On all sites"
                                     specificSites="On specific sites"
@@ -208,6 +199,35 @@ const Options = () => (
                                 </div>
                             </Setting>
 
+                        </Settings>
+                    </Section>
+
+                    <Section>
+                        <SectionHeading>
+                            <SectionIcon><PaletteIcon /></SectionIcon>
+                            Appearance
+                        </SectionHeading>
+                        <Settings>
+                            <Setting>
+                                <DarkModeToggle />
+                                <div>
+                                    <SettingTitle>Dark mode</SettingTitle>
+                                    <SettingText>
+                                        Show the popup and this page in dark colors.
+                                    </SettingText>
+                                </div>
+                            </Setting>
+
+                            <Setting>
+                                <TooltipsToggle />
+                                <div>
+                                    <SettingTitle>Tutorial tooltips</SettingTitle>
+                                    <SettingText>
+                                        Show tooltip hints on buttons such as Run and Delete. Each hint stops appearing
+                                        after it has been shown a number of times. <ResetTooltipsLink />
+                                    </SettingText>
+                                </div>
+                            </Setting>
                         </Settings>
                     </Section>
 

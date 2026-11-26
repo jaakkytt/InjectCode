@@ -30,7 +30,13 @@ export const Track = styled('div', {
     borderRadius: '8px',
     transition: 'background 200ms cubic-bezier(0.4,0,0.2,1)',
     variants: [
-        { props: { mode: 'disabled' }, style: { backgroundColor: alpha(theme.palette.common.black, 0.25) } },
+        {
+            props: { mode: 'disabled' },
+            style: {
+                backgroundColor: alpha(theme.palette.common.black, 0.25),
+                ...theme.applyStyles('dark', { backgroundColor: alpha(theme.palette.common.white, 0.25) }),
+            },
+        },
         { props: { mode: 'active' }, style: { backgroundColor: alpha(theme.palette.primary.main, 0.5) } },
         { props: { mode: 'always' }, style: { backgroundColor: alpha(theme.palette.warning.main, 0.5) } },
     ],
@@ -82,6 +88,10 @@ export const Thumb = styled('div', {
                 transform: 'translateX(0px)',
                 backgroundColor: theme.palette.grey[50],
                 color: theme.palette.action.active,
+                ...theme.applyStyles('dark', {
+                    backgroundColor: theme.palette.grey[300],
+                    color: theme.palette.grey[700],
+                }),
             },
         },
         {

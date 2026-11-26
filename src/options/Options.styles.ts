@@ -4,7 +4,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlined'
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew'
 import PublicIcon from '@mui/icons-material/Public'
-import { CSSObject, styled } from '@mui/material/styles'
+import { alpha, CSSObject, getOverlayAlpha, styled } from '@mui/material/styles'
 import { Accordion, accordionClasses, AccordionSummary, accordionSummaryClasses, Container } from '@mui/material'
 
 export const Warning = styled('b')(({ theme }) => ({
@@ -17,10 +17,13 @@ export const Primary = styled('b')(({ theme }) => ({
     fontStyle: 'italic',
 }))
 
-export const Disabled = styled('b')(({ theme }) => ({
-    color: theme.palette.action.active,
-    fontStyle: 'italic',
-}))
+export const Disabled = styled('b')(({ theme }) => [
+    {
+        color: theme.palette.action.active,
+        fontStyle: 'italic',
+    },
+    theme.applyStyles('dark', { color: theme.palette.text.secondary }),
+])
 
 export const Success = styled('b')(({ theme }) => ({
     color: theme.palette.success.main,
@@ -38,10 +41,16 @@ export const RunIcon = styled(PlayCircleOutlineIcon)(({ theme }) => ({
     color: theme.palette.primary.main,
 }))
 
-export const DisabledModeIcon = styled(PowerSettingsNewIcon)(({ theme }) => ({
-    ...thumbIcon(theme.palette.grey[50], theme.palette.action.active),
-    boxShadow: theme.shadows[1],
-}))
+export const DisabledModeIcon = styled(PowerSettingsNewIcon)(({ theme }) => [
+    {
+        ...thumbIcon(theme.palette.grey[50], theme.palette.action.active),
+        boxShadow: theme.shadows[1],
+    },
+    theme.applyStyles('dark', {
+        backgroundColor: theme.palette.grey[300],
+        color: theme.palette.grey[700],
+    }),
+])
 
 export const ActiveModeIcon = styled(AdsClickIcon)(({ theme }) => ({
     ...thumbIcon(theme.palette.primary.main, theme.palette.primary.contrastText),
@@ -80,13 +89,18 @@ export const Sections = styled('div')(({ theme }) => ({
     gap: theme.spacing(3),
 }))
 
-export const Section = styled('section')(({ theme }) => ({
-    padding: theme.spacing(3),
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: theme.palette.background.paper,
-    color: theme.palette.text.primary,
-    boxShadow: theme.shadows[1],
-}))
+export const Section = styled('section')(({ theme }) => [
+    {
+        padding: theme.spacing(3),
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        boxShadow: theme.shadows[1],
+    },
+    theme.applyStyles('dark', {
+        backgroundImage: elevationOverlay(theme.palette.common.white, 1),
+    }),
+])
 
 export const SectionHeading = styled('h2')(({ theme }) => ({
     ...theme.typography.h6,
@@ -185,6 +199,7 @@ export const TroubleshootingTopics = styled('div')(({ theme }) => ({
 
 export const TroubleshootingTopic = styled(Accordion)(({ theme }) => ({
     backgroundColor: 'transparent',
+    backgroundImage: 'none',
     color: 'inherit',
     boxShadow: 'none',
     borderRadius: 0,
@@ -218,6 +233,7 @@ export const TroubleshootingHeading = styled(AccordionSummary)(({ theme }) => ({
 
 export const Collapsible = styled(Accordion)(({ theme }) => ({
     backgroundColor: 'transparent',
+    backgroundImage: 'none',
     color: 'inherit',
     boxShadow: 'none',
     '&::before': {
@@ -280,4 +296,10 @@ function thumbIcon(backgroundColor: string, color: string): CSSObject {
         color,
         verticalAlign: 'middle',
     }
+}
+
+function elevationOverlay(color: string, elevation: number): string {
+    const overlay = alpha(color, getOverlayAlpha(elevation))
+
+    return `linear-gradient(${overlay}, ${overlay})`
 }

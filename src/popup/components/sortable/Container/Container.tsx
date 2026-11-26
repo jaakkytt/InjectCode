@@ -4,7 +4,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
 import ScriptAccordion from '../ScriptAccordion'
 import { useContainerBehavior } from './Container.behavior'
-import { containerStyle } from './Container.styles'
+import { DropArea } from './Container.styles'
 import { Props } from './Container.types'
 
 export default function Container({ id, expandedPanel, onAccordionChange }: Props) {
@@ -12,10 +12,7 @@ export default function Container({ id, expandedPanel, onAccordionChange }: Prop
 
     return (
         <SortableContext id={id} items={itemIds} strategy={verticalListSortingStrategy}>
-            <div
-                ref={setNodeRef}
-                style={containerStyle(isOver)}
-            >
+            <DropArea ref={setNodeRef} isOver={isOver}>
                 {items.length > 0 ? (
                     items.map(item => (
                         <ScriptAccordion
@@ -31,7 +28,7 @@ export default function Container({ id, expandedPanel, onAccordionChange }: Prop
                         Add scripts here
                     </Typography>
                 )}
-            </div>
+            </DropArea>
         </SortableContext>
     )
 }

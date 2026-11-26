@@ -19,9 +19,16 @@ export const dragHandleWrapperStyle: React.CSSProperties = { cursor: 'grab', mar
 
 export const dragHandleButtonStyle: React.CSSProperties = { cursor: 'grab' }
 
-export const AccordionSummary = styled((props: AccordionSummaryProps) =>
-    React.createElement(MuiAccordionSummary, props),
-)(() => ({
+export const AccordionSummary = styled(
+    (props: AccordionSummaryProps) => React.createElement(MuiAccordionSummary, props),
+    { shouldForwardProp: (prop) => prop !== 'runMode' },
+)<{ runMode?: ScriptRunMode }>(({ theme }) => ({
+    transition: theme.transitions.create(['min-height', 'background-color', 'opacity'], {
+        duration: theme.transitions.duration.shortest,
+    }),
+    variants: [
+        { props: { runMode: 'disabled' }, style: { opacity: 0.5 } },
+    ],
     [`&.${accordionSummaryClasses.expanded}`]: {
         minHeight: 48,
     },
@@ -45,12 +52,11 @@ export function rootStyle(
     transform: Transform | null,
     transition: string | undefined,
     isDragging: boolean,
-    runMode: ScriptRunMode,
 ): React.CSSProperties {
     return {
         transform: CSS.Translate.toString(transform),
         transition: [transition, 'opacity 200ms ease'].filter(Boolean).join(', '),
-        opacity: isDragging ? 0.5 : (runMode !== 'disabled' ? 1 : 0.5),
+        opacity: isDragging ? 0.5 : 1,
     }
 }
 

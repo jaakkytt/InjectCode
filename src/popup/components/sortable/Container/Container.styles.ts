@@ -1,9 +1,11 @@
-import React from 'react'
+import { styled } from '@mui/material/styles'
 
-export function containerStyle(isOver: boolean): React.CSSProperties {
-    return {
+export const DropArea = styled('div', {
+    shouldForwardProp: (prop) => prop !== 'isOver',
+})<{ isOver: boolean }>(({ theme, isOver }) => [
+    {
         transition: 'background-color 0.2s ease',
-        backgroundColor: isOver ? 'rgba(34, 139, 230, 0.1)' : '#F3F4F6',
+        backgroundColor: '#F3F4F6',
         padding: 8,
         border: '1px dashed #9CA3AF',
         borderRadius: 8,
@@ -11,5 +13,10 @@ export function containerStyle(isOver: boolean): React.CSSProperties {
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
-    }
-}
+    },
+    theme.applyStyles('dark', {
+        backgroundColor: theme.palette.background.default,
+        borderColor: theme.palette.grey[700],
+    }),
+    isOver && { backgroundColor: 'rgba(34, 139, 230, 0.1)' },
+])
