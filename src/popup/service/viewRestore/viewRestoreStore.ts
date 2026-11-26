@@ -41,7 +41,7 @@ export async function openViewRestoreStore(
     } catch (error) {
         console.error('Failed to open the popup view state, using defaults:', error)
 
-        return createViewRestoreStore(emptyCache('off', ''), null, ports.writeCache)
+        return createViewRestoreStore(emptyCache('off', ''), null, () => undefined)
     }
 }
 

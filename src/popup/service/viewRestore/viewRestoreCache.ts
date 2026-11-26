@@ -1,6 +1,7 @@
 import type { InputSelection } from 'prism-react-editor'
 import { ViewRestoreMode } from '../../../shared/service/settings/viewRestoreMode'
 import { withUrlBlockRenamed } from '../../lib/accordionState'
+import { isPlainObject } from '../../../shared/lib/isPlainObject'
 import { TabIndex } from '../../types'
 import {
     AccordionState,
@@ -38,7 +39,7 @@ export function emptyCache(mode: ViewRestoreMode, sessionId: string): ViewRestor
 }
 
 export function parseViewRestoreCache(raw: unknown, mode: ViewRestoreMode, sessionId: string): ViewRestoreCache {
-    if (!isRecord(raw)) {
+    if (!isPlainObject(raw)) {
         return emptyCache(mode, sessionId)
     }
 
@@ -99,27 +100,27 @@ export function renameUrlBlockInEntry(entry: ViewRestoreEntry, oldId: string, ne
 }
 
 function isViewRestoreEntry(value: unknown): value is ViewRestoreEntry {
-    return isRecord(value)
+    return isPlainObject(value)
         && typeof value.key === 'string'
         && isLastUsedState(value)
         && (value.lastInteraction === null || isLastInteraction(value.lastInteraction))
 }
 
 function isLastUsedState(value: unknown): value is LastUsedState {
-    return isRecord(value)
+    return isPlainObject(value)
         && (value.view === TabIndex.Current || value.view === TabIndex.All)
         && isAccordionState(value.accordions)
 }
 
 function isAccordionState(value: unknown): value is AccordionState {
-    return isRecord(value)
+    return isPlainObject(value)
         && (value.openCodeBlock === null || typeof value.openCodeBlock === 'string')
         && Array.isArray(value.closedUrlBlocks)
         && value.closedUrlBlocks.every(id => typeof id === 'string')
 }
 
 function isLastInteraction(value: unknown): value is LastInteraction {
-    return isRecord(value)
+    return isPlainObject(value)
         && INTERACTION_KINDS.includes(value.kind as string)
         && typeof value.id === 'string'
         && typeof value.urlBlockId === 'string'
@@ -128,7 +129,7 @@ function isLastInteraction(value: unknown): value is LastInteraction {
 }
 
 function isEditorScroll(value: unknown): value is EditorScroll {
-    return isRecord(value) && typeof value.scriptId === 'string' && typeof value.scrollTop === 'number'
+    return isPlainObject(value) && typeof value.scriptId === 'string' && typeof value.scrollTop === 'number'
 }
 
 function isSelection(value: unknown): value is InputSelection {
@@ -137,8 +138,4 @@ function isSelection(value: unknown): value is InputSelection {
         && typeof value[0] === 'number'
         && typeof value[1] === 'number'
         && SELECTION_DIRECTIONS.includes(value[2])
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null
 }

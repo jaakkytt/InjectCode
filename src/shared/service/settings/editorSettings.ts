@@ -1,5 +1,6 @@
 import { STORAGE_EDITOR_SETTINGS } from '../../constants'
 import { storage } from '../storageApi'
+import { isPlainObject } from '../../lib/isPlainObject'
 
 export const EDITOR_COMMANDS = ['toggleComment'] as const
 
@@ -26,7 +27,7 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
-    return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+    return isPlainObject(value) ? value : {}
 }
 
 function parseHotkeys(value: unknown): EditorHotkeys {

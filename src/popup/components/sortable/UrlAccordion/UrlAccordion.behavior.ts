@@ -155,6 +155,7 @@ export function useUrlAccordionBehavior() {
         const { active, over } = event
         dragActiveRef.current = false
         setActiveItem(null)
+        setTranslation(null)
 
         if (!over) {
             dispatch({ name: 'dragCancel' })

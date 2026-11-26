@@ -63,7 +63,7 @@ export function usePlayControls(urls: ScriptsByPattern) {
             runWithTimeout(active, shared, scope).then(({ result, timeoutSeconds }) => {
                 show(new Message(result, timeoutSeconds))
             }).catch((err) => {
-                console.error('Error running scripts:', JSON.stringify(err))
+                console.error('Error running scripts:', err)
                 show(new Message('Error running scripts', 'error'))
             }).finally(() => {
                 if (mountedRef.current) {
@@ -71,7 +71,7 @@ export function usePlayControls(urls: ScriptsByPattern) {
                 }
             })
         },
-        [disabled, active, scope, urlsContext, show],
+        [disabled, loading, active, scope, urlsContext, show],
     )
 
     const buttonProps = { disabled, onClick, loading } as const

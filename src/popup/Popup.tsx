@@ -14,10 +14,18 @@ import AccordionSkeleton from './components/sortable/AccordionSkeleton'
 import { LastInteractedProvider } from './providers/LastInteractedProvider'
 import { ViewRestoreProvider } from './providers/ViewRestoreProvider'
 import { InteractionsProvider } from './providers/InteractionsProvider'
+import { useFeedbackDispatch } from './providers/FeedbackProvider'
+import { Message } from './service/Message'
+
+const SAVE_FAILED_MESSAGE = new Message(
+    'Saving failed. Copy your latest changes before closing the popup, then see Finding errors on the options page.',
+    'error',
+)
 
 const Popup = () => {
     const persistedScripts = useRef<ScriptsByPattern | null>(null)
     const currentUrl = useCurrentUrl()
+    const { show } = useFeedbackDispatch()
 
     const [state, dispatch] = useReducer(urlsRootReducer, {
         committed: { [SHARED_CODE]: [] },
@@ -38,11 +46,16 @@ const Popup = () => {
             return
         }
 
-        persistedScripts.current = state.committed
-        storage.set(STORAGE_SCRIPTS, state.committed).then(() => {
+        const scripts = state.committed
+
+        storage.set(STORAGE_SCRIPTS, scripts).then(() => {
+            persistedScripts.current = scripts
             console.debug('State saved')
+        }).catch((error: unknown) => {
+            console.error('Failed to save scripts:', error)
+            show(SAVE_FAILED_MESSAGE)
         })
-    }, [state.committed, state.isDirty, state.isHydrated])
+    }, [state.committed, state.isDirty, state.isHydrated, show])
 
     return <UrlsProvider state={state} dispatch={dispatch}>
         <ExistingUrlsProvider value={Object.keys(state.committed)}>

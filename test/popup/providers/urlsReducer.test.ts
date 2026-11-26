@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { Script } from '../../../src/shared/types'
-import { StoreState } from '../../../src/popup/types'
+import { Action, StoreState } from '../../../src/popup/types'
 import { urlsRootReducer } from '../../../src/popup/providers/urlsReducer'
+
+const contentUpdate: Action = {
+    name: 'scriptUpdate',
+    containerId: 'https://example.com/*',
+    scriptId: 'item-id',
+    patch: { content: 'new content' },
+}
 
 describe('urlsRootReducer scriptUpdate - always-on edit downgrade guard', () => {
     it('downgrades an always-on item to active when its content changes', () => {
@@ -76,6 +83,20 @@ describe('urlsRootReducer scriptUpdate - always-on edit downgrade guard', () => 
     })
 })
 
+describe('urlsRootReducer script edits during a drag', () => {
+    it('keeps an edit saved during a drag after the drag is cancelled', () => {
+        const next = reduceAll(stateWith(makeItem()), [{ name: 'dragStart' }, contentUpdate, { name: 'dragCancel' }])
+
+        expect(itemAfter(next).content).toBe('new content')
+    })
+
+    it('keeps an edit saved during a drag after the drop', () => {
+        const next = reduceAll(stateWith(makeItem()), [{ name: 'dragStart' }, contentUpdate, { name: 'dragDrop' }])
+
+        expect(itemAfter(next).content).toBe('new content')
+    })
+})
+
 function makeItem(overrides: Partial<Script> = {}): Script {
     return {
         id: overrides.id ?? 'item-id',
@@ -98,4 +119,8 @@ function stateWith(item: Script): StoreState {
 
 function itemAfter(state: StoreState, containerId = 'https://example.com/*', scriptId = 'item-id') {
     return state.committed[containerId].find(i => i.id === scriptId)!
+}
+
+function reduceAll(state: StoreState, actions: Action[]): StoreState {
+    return actions.reduce(urlsRootReducer, state)
 }

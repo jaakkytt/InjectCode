@@ -27,7 +27,8 @@ being published there again. Until then, install it from a release zip as descri
 
 ## Privacy
 
-InjectCode has no server and sends nothing anywhere. Your scripts and settings stay in your Chrome profile.
+InjectCode has no server and sends nothing anywhere. Your scripts and settings stay in your Chrome profile and are not
+synced between devices. Uninstalling the extension deletes them, so export a backup first if you want to keep them.
 See [PRIVACY.md](PRIVACY.md) for exactly what is stored, what the extension reads and why it needs each permission.
 
 ## Getting started
@@ -49,14 +50,14 @@ folder the same way.
 
 ## Upgrading from 1.x
 
-Version 2 is a rewrite for Chrome Manifest V3, and scripts saved by version 1 are not carried over. Scripts that relied
-on the bundled jQuery or the global `InjectCode`, `openTab(url)` and `XhrMonitor` helpers need to be rewritten without
-them. See the [changelog](CHANGELOG.md) for all changes.
+Version 2 is a rewrite for Chrome Manifest V3. When Chrome updates an installed version 1 to version 2 from the Chrome
+Web Store, the options page opens and imports your version 1 scripts once, into *Shared*, all set to *Disabled*. If the
+import fails, the options page shows how to copy them out of version 1's storage by hand. A copy loaded from a release
+zip is a separate extension and can't see version 1's scripts.
 
-## Privacy
-
-Your scripts are stored only in your browser profile. They are not synced between devices and nothing is sent
-anywhere. Uninstalling the extension deletes them, so export a backup first if you want to keep them.
+Scripts that relied on the bundled jQuery or the global `InjectCode`, `openTab(url)` and `XhrMonitor` helpers need to be
+rewritten without them, so review each imported script before you enable it. See the [changelog](CHANGELOG.md) for all
+changes.
 
 ## Issues and license
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cyrb53 } from '../../../../src/background/lib/hash/cyrb53'
+import { cyrb53 } from '../../../../src/shared/lib/hash/cyrb53'
 
 describe('cyrb53', () => {
     it('matches reference outputs of the canonical implementation', () => {

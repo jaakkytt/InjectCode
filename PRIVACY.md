@@ -1,7 +1,7 @@
 InjectCode Privacy Policy
 =========================
 
-*Last updated: 18 November 2026. Applies to InjectCode 2.0 and later.*
+*Last updated: 26 November 2026. Applies to InjectCode 2.0 and later.*
 
 **In short:** InjectCode has no server and no analytics, and nobody but you receives anything from it. Your scripts and
 settings stay in your Chrome profile on your computer. The extension makes no network requests of its own. What the
@@ -29,6 +29,11 @@ Sync, and the extension doesn't send any of it anywhere.
 The host-name entries record which websites you had open when you used the popup, for example `example.com`. The list
 starts over after Chrome restarts or the setting changes. The previous list is replaced the next time you use the popup.
 Set *Reopen where you left off* to *Same tab* or *Off* in the options page if you'd rather not keep them.
+
+Version 1.x kept your scripts in the extension's `localStorage`. After the update to version 2, InjectCode moves them
+into `chrome.storage.local` once, on your device, and deletes the old copy. If that move fails, the old copy stays in
+`localStorage` until you delete it, along with a marker that stops InjectCode from trying again. The marker is removed
+once the old copy is gone.
 
 ## What InjectCode reads from your browser
 

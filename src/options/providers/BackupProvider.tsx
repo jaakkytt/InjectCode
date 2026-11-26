@@ -77,13 +77,14 @@ function useBackupProviderBehavior(): BackupValue {
     async function exportBackup() {
         try {
             const scripts = await readStoredScripts()
+            const count = countScripts(scripts)
             const now = new Date()
             const fileName = backupFileName(now)
 
             downloadTextFile(fileName, serializeBackup(createBackup(scripts, now)))
             setNotice({
                 severity: 'success',
-                text: `Exported script${s(countScripts(scripts))} to ${fileName}.`,
+                text: `Exported ${count} script${s(count)} to ${fileName}.`,
                 details: [],
             })
         } catch (error) {

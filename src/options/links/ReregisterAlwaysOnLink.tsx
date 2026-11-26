@@ -1,31 +1,29 @@
 import React, { ReactNode, useState } from 'react'
 import { Box, Link } from '@mui/material'
-import { requestAlwaysOnResync } from '../service/extensionSetup'
+import { AlwaysOnResyncResult, requestAlwaysOnResync } from '../service/extensionSetup'
 
 export interface Props {
     children: ReactNode
 }
 
-type Result = 'reregistered' | 'notAllowed' | 'failed'
-
-const RESULT_TEXT: Record<Result, string> = {
+const RESULT_TEXT: Record<AlwaysOnResyncResult, string> = {
     reregistered: 'Re-registered. Reload the pages you want them on.',
     notAllowed: 'Turn on "Allow User Scripts" first.',
     failed: 'Re-registering failed, see Finding errors above.',
 }
 
-const RESULT_COLOR: Record<Result, string> = {
+const RESULT_COLOR: Record<AlwaysOnResyncResult, string> = {
     reregistered: 'success.main',
     notAllowed: 'warning.main',
     failed: 'error.main',
 }
 
 const ReregisterAlwaysOnLink = ({ children }: Props) => {
-    const [result, setResult] = useState<Result | null>(null)
+    const [result, setResult] = useState<AlwaysOnResyncResult | null>(null)
 
     async function handleReregister() {
         try {
-            setResult(await requestAlwaysOnResync() ? 'reregistered' : 'notAllowed')
+            setResult(await requestAlwaysOnResync())
         } catch (err) {
             console.error('Failed to re-register Always on scripts:', err)
             setResult('failed')

@@ -149,9 +149,9 @@ export function urlsRootReducer(state: StoreState, action: Action): StoreState {
         case 'scriptAdd':
         case 'scriptUpdate':
         case 'scriptDelete': {
-            const target = state.working ?? state.committed
-            const next = applyScriptAction(target, action)
-            return state.working ? { ...state, working: next } : { ...state, committed: next }
+            const committed = applyScriptAction(state.committed, action)
+            const working = state.working && applyScriptAction(state.working, action)
+            return { ...state, committed, working }
         }
 
         default:

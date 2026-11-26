@@ -38,7 +38,13 @@ describe('urlPatternValidator', () => {
             .toBe('"https://example.com/*" already exists')
     })
 
-    it('rejects a host without a dot', () => {
-        expect(urlPatternValidator('https://example/*', [])).toBe('Host must be a valid domain name or IP address')
+    it('accepts single-label and bare wildcard hosts', () => {
+        expect(urlPatternValidator('http://intranet/*', [])).toBeUndefined()
+        expect(urlPatternValidator('http://localhost/*', [])).toBeUndefined()
+        expect(urlPatternValidator('*://*/*', [])).toBeUndefined()
+    })
+
+    it('rejects a host that ends with a dot', () => {
+        expect(urlPatternValidator('https://example./*', [])).toBe('Host must not end with a dot')
     })
 })

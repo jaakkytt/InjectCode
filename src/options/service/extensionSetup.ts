@@ -1,13 +1,16 @@
 import { ALL_URL, MESSAGE_RESYNC_ALWAYS_ON } from '../../shared/constants'
 import { isUserScriptsEnabled } from '../../shared/service/userScripts'
 
-export async function requestAlwaysOnResync(): Promise<boolean> {
+export type AlwaysOnResyncResult = 'reregistered' | 'notAllowed' | 'failed'
+
+export async function requestAlwaysOnResync(): Promise<AlwaysOnResyncResult> {
     if (!await isUserScriptsEnabled()) {
-        return false
+        return 'notAllowed'
     }
 
-    await chrome.runtime.sendMessage(MESSAGE_RESYNC_ALWAYS_ON)
-    return true
+    const succeeded = await chrome.runtime.sendMessage(MESSAGE_RESYNC_ALWAYS_ON)
+
+    return succeeded === true ? 'reregistered' : 'failed'
 }
 
 export async function isFileAccessEnabled(): Promise<boolean> {

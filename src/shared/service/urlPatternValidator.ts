@@ -26,13 +26,8 @@ const checkHost = (value: string) : string | undefined => {
         return 'Pattern must include a host and a path'
     }
 
-    const hostPart = urlParts[2]
-    if (hostPart === 'localhost') {
-        return undefined
-    }
-
-    if (!hostPart.includes('.') || hostPart.endsWith('.')) {
-        return 'Host must be a valid domain name or IP address'
+    if (urlParts[2].endsWith('.')) {
+        return 'Host must not end with a dot'
     }
     return undefined
 }

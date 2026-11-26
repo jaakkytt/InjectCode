@@ -21,8 +21,8 @@ describe('backupFileName', () => {
 describe('createBackup and serializeBackup', () => {
     it('round trips through parseBackup unchanged', () => {
         const scripts: ScriptsByPattern = {
-            [SHARED_CODE]: [makeItem({ id: 's1', runMode: 'always' })],
-            'https://github.com/*': [makeItem({ id: 'g1', type: 'css', secondaryText: 'note' })],
+            [SHARED_CODE]: [makeItem({ id: 'js-s1', runMode: 'always' })],
+            'https://github.com/*': [makeItem({ id: 'css-g1', type: 'css', secondaryText: 'note' })],
         }
 
         const text = serializeBackup(createBackup(scripts, new Date('2026-09-19T10:00:00Z')))
@@ -69,7 +69,7 @@ describe('parseBackup', () => {
 
     it('rejects an item with a bad run mode and names its position', () => {
         const bad = { ...makeItem(), runMode: 'sometimes' }
-        const result = parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'ok' }), bad] }))
+        const result = parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'js-ok' }), bad] }))
 
         expect(result.ok === false && result.errors).toEqual([
             '"https://a.com/*" script 2: runMode must be one of disabled, active, always',
@@ -77,13 +77,13 @@ describe('parseBackup', () => {
     })
 
     it('rejects an item that is missing required fields', () => {
-        const result = parseBackup(backupText({ 'https://a.com/*': [{ id: 'x' }] }))
+        const result = parseBackup(backupText({ 'https://a.com/*': [{ id: 'js-x' }] }))
 
         expect(result.ok === false && result.errors[0]).toContain('title must be text')
     })
 
     it('defaults a missing secondaryText to an empty string', () => {
-        const { secondaryText, ...withoutSecondary } = makeItem({ id: 'x' })
+        const { secondaryText, ...withoutSecondary } = makeItem({ id: 'js-x' })
         const result = parseBackup(backupText({ 'https://a.com/*': [withoutSecondary] }))
 
         expect(secondaryText).toBe('')
@@ -91,25 +91,26 @@ describe('parseBackup', () => {
     })
 
     it('drops unknown fields from items', () => {
-        const item = { ...makeItem({ id: 'x' }), extra: 'should not survive' }
+        const item = { ...makeItem({ id: 'js-x' }), extra: 'should not survive' }
         const result = parseBackup(backupText({ 'https://a.com/*': [item] }))
 
-        expect(result.ok && result.scripts['https://a.com/*'][0]).toEqual(makeItem({ id: 'x' }))
+        expect(result.ok && result.scripts['https://a.com/*'][0]).toEqual(makeItem({ id: 'js-x' }))
     })
 
     it('rejects an id that is used twice', () => {
-        const scripts = { 'https://a.com/*': [makeItem({ id: 'dup' })], 'https://b.com/*': [makeItem({ id: 'dup' })] }
+        const duplicate = makeItem({ id: 'js-dup' })
+        const scripts = { 'https://a.com/*': [duplicate], 'https://b.com/*': [duplicate] }
 
         const result = parseBackup(backupText(scripts))
 
-        expect(result.ok === false && result.errors).toEqual(['script id "dup" is used more than once'])
+        expect(result.ok === false && result.errors).toEqual(['script id "js-dup" is used more than once'])
     })
 
-    it('rejects an id that equals a container key', () => {
-        const result = parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'https://a.com/*' })] }))
+    it('rejects an id without the js- or css- prefix', () => {
+        const result = parseBackup(backupText({ 'https://a.com/*': [makeItem({ id: 'constructor' })] }))
 
         expect(result.ok === false && result.errors).toEqual([
-            'script id "https://a.com/*" is the same as a URL pattern; script ids must differ from all URL patterns',
+            '"https://a.com/*" script 1: id must be text that starts with "js-" or "css-"',
         ])
     })
 
@@ -255,7 +256,7 @@ describe('mergeScripts', () => {
 
 function makeItem(overrides: Partial<Script> = {}): Script {
     return {
-        id: overrides.id ?? 'item-id',
+        id: overrides.id ?? 'js-item',
         title: overrides.title ?? 'item-title',
         secondaryText: overrides.secondaryText ?? '',
         content: overrides.content ?? 'run()',

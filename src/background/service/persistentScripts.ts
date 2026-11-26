@@ -1,7 +1,7 @@
 import { Script, ScriptsByPattern } from '../../shared/types'
 import { SHARED_CODE, USER_SCRIPT_ID } from '../../shared/constants'
 import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
-import { cyrb53 } from '../lib/hash/cyrb53'
+import { cyrb53 } from '../../shared/lib/hash/cyrb53'
 import { AlwaysOnTiming, DEFAULT_ALWAYS_ON_TIMING } from '../../shared/service/settings/alwaysOnTiming'
 import { isUserScriptsEnabled } from '../../shared/service/userScripts'
 
@@ -61,10 +61,10 @@ export function computeDesiredRegistrations(
 export async function syncPersistentScripts(
     scripts: ScriptsByPattern,
     runAt: AlwaysOnTiming = DEFAULT_ALWAYS_ON_TIMING,
-): Promise<void> {
+): Promise<boolean> {
     if (!await isUserScriptsEnabled()) {
         console.warn('Skipped syncing Always on scripts: "Allow User Scripts" is turned off.')
-        return
+        return false
     }
 
     const desired = computeDesiredRegistrations(scripts, runAt)
@@ -73,33 +73,42 @@ export async function syncPersistentScripts(
         if (desired.length > 0) {
             await chrome.userScripts.register(desired)
         }
+
+        return true
     } catch (err) {
         console.error('Failed to sync persistent (always on) scripts:', err)
+
+        return false
     }
 }
 
 export function createSerializedPersistentScriptsSync(
     readState: () => Promise<PersistentScriptsState>,
-): () => Promise<void> {
-    let running: Promise<void> | null = null
+): () => Promise<boolean> {
+    let running: Promise<boolean> | null = null
     let rerunRequested = false
 
-    async function syncLatest() {
+    async function syncLatest(): Promise<boolean> {
         try {
             const { scripts, runAt } = await readState()
-            await syncPersistentScripts(scripts, runAt)
+            return await syncPersistentScripts(scripts, runAt)
         } catch (err) {
             console.error('Failed to read scripts for persistent-script resync:', err)
+
+            return false
         }
     }
 
-    async function drain() {
+    async function drain(): Promise<boolean> {
+        let succeeded: boolean
         do {
             rerunRequested = false
-            await syncLatest()
+            succeeded = await syncLatest()
         } while (rerunRequested)
 
         running = null
+
+        return succeeded
     }
 
     return function requestSync() {

@@ -8,10 +8,13 @@ const resyncPersistentScripts = createSerializedPersistentScriptsSync(async () =
     runAt: await readAlwaysOnTiming(),
 }))
 
-chrome.runtime.onInstalled.addListener(({ reason }) => {
-    if (reason == chrome.runtime.OnInstalledReason.INSTALL) {
+chrome.runtime.onInstalled.addListener(({ reason, previousVersion }) => {
+    const isFromV1 = reason == chrome.runtime.OnInstalledReason.UPDATE && previousVersion?.startsWith('1.')
+
+    if (reason == chrome.runtime.OnInstalledReason.INSTALL || isFromV1) {
         chrome.runtime.openOptionsPage()
     }
+
     resyncPersistentScripts()
 })
 
@@ -30,6 +33,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         return false
     }
 
-    resyncPersistentScripts().then(() => sendResponse())
+    resyncPersistentScripts().then(succeeded => sendResponse(succeeded))
     return true
 })

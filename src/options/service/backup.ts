@@ -1,12 +1,14 @@
 import { Script, ScriptsByPattern, ScriptRunMode, ScriptType } from '../../shared/types'
 import { SHARED_CODE } from '../../shared/constants'
 import { urlPatternValidator } from '../../shared/service/urlPatternValidator'
+import { isPlainObject } from '../../shared/lib/isPlainObject'
 
 export const BACKUP_FORMAT = 'injectcode-backup'
 export const BACKUP_VERSION = 1
 
 const RUN_MODES: ScriptRunMode[] = ['disabled', 'active', 'always']
 const SCRIPT_TYPES: ScriptType[] = ['js', 'css']
+const SCRIPT_ID_PATTERN = /^(js|css)-./
 const MAX_REPORTED_ERRORS = 5
 
 export interface Backup {
@@ -32,10 +34,6 @@ export interface MergeResult {
 }
 
 type IdGenerator = (type: ScriptType) => string
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
 
 function padded(value: number): string {
     return String(value).padStart(2, '0')
@@ -72,8 +70,8 @@ function parseItem(raw: unknown, where: string, errors: string[]): Script | unde
     const { id, title, secondaryText, content, runMode, type } = raw
     const problems: string[] = []
 
-    if (typeof id !== 'string' || id === '') {
-        problems.push('id must be a non-empty text')
+    if (typeof id !== 'string' || !SCRIPT_ID_PATTERN.test(id)) {
+        problems.push('id must be text that starts with "js-" or "css-"')
     }
     if (typeof title !== 'string') {
         problems.push('title must be text')
@@ -123,17 +121,12 @@ function parseContainer(pattern: string, rawItems: unknown, errors: string[]): S
 }
 
 function findIdProblems(scripts: ScriptsByPattern): string[] {
-    const containerKeys = new Set(Object.keys(scripts))
     const seen = new Set<string>()
     const problems: string[] = []
 
     Object.values(scripts).flat().forEach(item => {
         if (seen.has(item.id)) {
             problems.push(`script id "${item.id}" is used more than once`)
-        } else if (containerKeys.has(item.id)) {
-            problems.push(
-                `script id "${item.id}" is the same as a URL pattern; script ids must differ from all URL patterns`,
-            )
         }
         seen.add(item.id)
     })
@@ -190,7 +183,7 @@ export function parseBackup(text: string): ParsedBackup {
     return errors.length > 0 ? { ok: false, errors: cappedErrors(errors) } : { ok: true, scripts }
 }
 
-function createImportedId(type: ScriptType): string {
+export function createImportedId(type: ScriptType): string {
     return `${type}-imported-${Math.random().toString(36).substring(2, 10)}`
 }
 

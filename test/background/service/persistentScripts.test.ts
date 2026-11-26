@@ -219,11 +219,25 @@ describe('createSerializedPersistentScriptsSync', () => {
 
         const requestSync = createSerializedPersistentScriptsSync(readState)
 
-        await expect(requestSync()).resolves.toBeUndefined()
+        await expect(requestSync()).resolves.toBe(false)
         await requestSync()
 
         expect(consoleError).toHaveBeenCalledTimes(1)
         expect([...fake.registered.values()]).toEqual(computeDesiredRegistrations(newerSnapshot))
+    })
+
+    it('resolves true once the scripts are registered', async () => {
+        const readState = vi.fn().mockResolvedValue({ scripts: newerSnapshot, runAt: 'document_idle' })
+
+        await expect(createSerializedPersistentScriptsSync(readState)()).resolves.toBe(true)
+    })
+
+    it('resolves false and logs when Chrome refuses the registration', async () => {
+        fake.register = vi.fn().mockRejectedValue(new Error('Invalid match pattern'))
+        const readState = vi.fn().mockResolvedValue({ scripts: newerSnapshot, runAt: 'document_idle' })
+
+        await expect(createSerializedPersistentScriptsSync(readState)()).resolves.toBe(false)
+        expect(consoleError).toHaveBeenCalledTimes(1)
     })
 })
 

@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **[#4]** **Breaking:** Rebuilt for Chrome Manifest V3
-- **[#4]** **Breaking:** Scrips are now stored in chrome.storage.local, user preferences in localStorage
+- **[#4]** **Breaking:** Scripts are now stored in chrome.storage.local, user preferences in localStorage
 - **[#4]** Reworked the whole UI
 
 ### Added
@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[#4]** Shared scripts that run before every URL's own scripts
 - **[#4]** Export and import of scripts as a backup file
 - **[#4]** The popup reopens where you left off: selected view, open blocks and the last block or editor, per host, per tab or off
+- **[#4]** One-time import of version 1.x scripts into Shared, all set to Disabled
 
 ### Removed
 

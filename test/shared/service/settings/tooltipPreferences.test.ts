@@ -6,6 +6,7 @@ import {
     resetTooltipCounters,
     setTooltipsEnabled,
 } from '../../../../src/shared/service/settings/tooltipPreferences'
+import { createFakeLocalStorage } from '../../../fakes/localStorage'
 
 const TITLE = 'Delete script'
 
@@ -50,19 +51,5 @@ describe('tooltip counters', () => {
 function showTimes(title: string, times: number) {
     for (let i = 0; i < times; i++) {
         countTooltipShown(title)
-    }
-}
-
-function createFakeLocalStorage(): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> {
-    const values = new Map<string, string>()
-
-    return {
-        getItem: (key: string) => values.get(key) ?? null,
-        setItem: (key: string, value: string) => {
-            values.set(key, value)
-        },
-        removeItem: (key: string) => {
-            values.delete(key)
-        },
     }
 }

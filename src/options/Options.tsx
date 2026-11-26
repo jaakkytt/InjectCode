@@ -10,7 +10,14 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import CodeIcon from '@mui/icons-material/Code'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import { CHANGELOG_URL, PRIVACY_URL, ISSUES_URL, MATCH_PATTERN_DOCS, RUN_AT_DOCS } from '../shared/constants'
+import {
+    CHANGELOG_URL,
+    PRIVACY_URL,
+    ISSUES_URL,
+    MATCH_PATTERN_DOCS,
+    RUN_AT_DOCS,
+    LOCAL_STORAGE_LEGACY_SCRIPTS,
+} from '../shared/constants'
 import BuildInfo from './BuildInfo'
 import SetupToggle from './inputs/SetupToggle'
 import ExtensionSettingsLink from './links/ExtensionSettingsLink'
@@ -22,6 +29,7 @@ import { BackupProvider } from './providers/BackupProvider'
 import ExportButton from './backup/ExportButton'
 import ImportButton from './backup/ImportButton'
 import BackupNotice from './backup/BackupNotice'
+import LegacyImportNotice from './backup/LegacyImportNotice'
 import { FeedbackAutoHideProvider } from './providers/FeedbackAutoHideProvider'
 import AutoHideSelect from './inputs/AutoHideSelect'
 import InjectionTimeoutInput from './inputs/InjectionTimeoutInput'
@@ -83,6 +91,27 @@ const Options = () => (
         <Page maxWidth="md">
             <AlwaysOnTimingProvider>
                 <Sections>
+                    <LegacyImportNotice
+                        imported={<>
+                            Your InjectCode 1.x scripts were imported into <em>Shared</em>, all set to{' '}
+                            <DisabledModeIcon /> <Disabled>Disabled</Disabled> and JavaScript. Version 2 changed what
+                            scripts can rely on, so read the{' '}
+                            <ExternalLink href={CHANGELOG_URL}>changelog</ExternalLink> and review each script before
+                            you enable it. Scripts imported:
+                        </>}
+                        failed={<>
+                            Importing your InjectCode 1.x scripts failed, but they're still stored in this extension's
+                            local storage. To copy them over by hand, press F12 on this page and run{' '}
+                            <code>copy(localStorage.getItem('{LOCAL_STORAGE_LEGACY_SCRIPTS}'))</code> in the Console,
+                            or find <code>{LOCAL_STORAGE_LEGACY_SCRIPTS}</code> in the Application panel under Local
+                            storage. Each script's code is in its <code>{LOCAL_STORAGE_LEGACY_SCRIPTS}</code> field.
+                            Once you've moved them, delete <code>{LOCAL_STORAGE_LEGACY_SCRIPTS}</code> to hide this
+                            message. Version 2 changed what scripts can rely on, so read the{' '}
+                            <ExternalLink href={CHANGELOG_URL}>changelog</ExternalLink> and review each script before
+                            you enable it.
+                        </>}
+                    />
+
                     <Alert severity="warning">
                         InjectCode is a tool for developers. It runs JavaScript and CSS that you write on the websites
                         you choose, with full access to those pages, including any site you are logged in to. Don't
@@ -628,6 +657,17 @@ const Options = () => (
                                     let extensions run on its own pages (<code>chrome://…</code>), the Chrome Web
                                     Store, other extensions' pages or the built-in PDF viewer. Local files{' '}
                                     (<code>file:///…</code>) only work with the File URLs setting enabled.
+                                </TopicText>
+                            </TroubleshootingTopic>
+
+                            <TroubleshootingTopic>
+                                <TroubleshootingHeading expandIcon={<ExpandMoreIcon />}>
+                                    Is the storage limited?
+                                </TroubleshootingHeading>
+                                <TopicText>
+                                    Yes, Chrome gives InjectCode 10 MB for your scripts and settings together. Once it's
+                                    full, saving in the popup fails. Make room by deleting scripts you no longer need,
+                                    and export a backup first if you want to keep a copy of them.
                                 </TopicText>
                             </TroubleshootingTopic>
                         </TroubleshootingTopics>
