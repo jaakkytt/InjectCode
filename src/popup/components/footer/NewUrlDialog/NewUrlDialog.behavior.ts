@@ -1,0 +1,104 @@
+import React, { useMemo, useState } from 'react'
+
+import { urlPatternMatcher } from '../../../../shared/service/urlPatternMatcher'
+import { urlPatternValidator } from '../../../../shared/service/urlPatternValidator'
+import { useCurrentUrl } from '../../../providers/CurrentUrlProvider'
+import { useExistingUrls } from '../../../providers/ExistingUrlsProvider'
+import { useInteractions } from '../../../providers/InteractionsProvider'
+import { useUrlsDispatch } from '../../../providers/urlsContext'
+import { urlCharacterFilter } from '../../../service/urlCharacterFilter'
+import { TabIndex } from '../../../types'
+import { Props } from './NewUrlDialog.types'
+import { useView, useViewDispatch } from '../../../providers/ViewProvider'
+
+export function useNewUrlDialogBehavior({ onClose }: Pick<Props, 'onClose'>) {
+    const [inputValue, setInputValue] = useState('')
+    const [error, setError] = useState<string | undefined>(undefined)
+    const view = useView()
+    const { selectView } = useViewDispatch()
+    const interactions = useInteractions()
+
+    const currentUrl = useCurrentUrl()
+    const urlsDispatch = useUrlsDispatch()
+    const existingUrls = useExistingUrls()
+
+    const placeholder = useMemo(() => {
+        if (!currentUrl) {
+            return undefined
+        }
+
+        const originPattern = getOriginPattern(currentUrl)
+
+        return urlPatternValidator(originPattern, existingUrls) ? undefined : originPattern
+    }, [existingUrls, currentUrl])
+
+    function isSubmitDisabled() {
+        return !!error || (inputValue.trim() === '' && !placeholder)
+    }
+
+    function close() {
+        onClose()
+        setInputValue('')
+        setError(undefined)
+    }
+
+    function change(event: React.ChangeEvent<HTMLInputElement>) {
+        let value = urlCharacterFilter(event.target.value).trim()
+        setInputValue(value)
+
+        if (value === '' && placeholder) {
+            value = placeholder
+        }
+
+        setError(urlPatternValidator(value, existingUrls))
+    }
+
+    function submit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+
+        const formData = new FormData(event.currentTarget)
+        let value = urlCharacterFilter(formData.get('newUrl') as string)
+
+        if (value === '' && placeholder) {
+            value = placeholder
+        }
+
+        const urlError = urlPatternValidator(value, existingUrls)
+        if (urlError) {
+            setError(urlError)
+            return
+        }
+
+        urlsDispatch({ name: 'added', id: value })
+        interactions.publish({ kind: 'urlBlockCreated', urlBlockId: value })
+
+        close()
+
+        if (view === TabIndex.Current && currentUrl) {
+            const matcher = urlPatternMatcher(value)
+            if (!matcher.valid || !matcher.match(currentUrl.href)) {
+                selectView(TabIndex.All)
+            }
+        }
+    }
+
+    return {
+        inputValue,
+        placeholder,
+        error,
+        submitDisabled: isSubmitDisabled(),
+        handlers: {
+            change,
+            close,
+            submit,
+        },
+    }
+}
+
+function getOriginPattern(url: URL): string {
+    let origin = url.origin
+    if (url.port && origin.endsWith(url.port)) {
+        origin = origin.slice(0, -url.port.length - 1)
+    }
+    return `${origin}/*`
+}

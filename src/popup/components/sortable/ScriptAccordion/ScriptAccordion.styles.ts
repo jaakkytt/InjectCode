@@ -1,0 +1,69 @@
+import { CSS } from '@dnd-kit/utilities'
+import { Transform } from '@dnd-kit/utilities'
+import { styled } from '@mui/material'
+import React from 'react'
+import { SxProps, Theme } from '@mui/material'
+import MuiAccordionSummary, { accordionSummaryClasses, AccordionSummaryProps } from '@mui/material/AccordionSummary'
+
+import { ScriptRunMode } from '../../../../shared/types'
+
+export const expandIconSx: SxProps<Theme> = { marginLeft: '4px' }
+
+export const accordionSx: SxProps<Theme> = { '&.Mui-expanded': { margin: '8px 0' } }
+
+export const accordionDetailsSx: SxProps<Theme> = { padding: '0 8px 8px' }
+
+export const headerRowSx: SxProps<Theme> = { display: 'flex', alignItems: 'center', width: '100%' }
+
+export const dragHandleWrapperStyle: React.CSSProperties = { cursor: 'grab', marginRight: 8 }
+
+export const dragHandleButtonStyle: React.CSSProperties = { cursor: 'grab' }
+
+export const AccordionSummary = styled(
+    (props: AccordionSummaryProps) => React.createElement(MuiAccordionSummary, props),
+    { shouldForwardProp: (prop) => prop !== 'runMode' },
+)<{ runMode?: ScriptRunMode }>(({ theme }) => ({
+    transition: theme.transitions.create(['min-height', 'background-color', 'opacity'], {
+        duration: theme.transitions.duration.shortest,
+    }),
+    variants: [
+        { props: { runMode: 'disabled' }, style: { opacity: 0.5 } },
+    ],
+    [`&.${accordionSummaryClasses.expanded}`]: {
+        minHeight: 48,
+    },
+    [`& .${accordionSummaryClasses.content}`]: {
+        margin: 0,
+    },
+    [`& .${accordionSummaryClasses.content}.${accordionSummaryClasses.expanded}`]: {
+        margin: 0,
+    },
+}))
+
+export const TypeIconOverlay = styled('span')({
+    display: 'block',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    opacity: 0.3,
+})
+
+export function rootStyle(
+    transform: Transform | null,
+    transition: string | undefined,
+    isDragging: boolean,
+): React.CSSProperties {
+    return {
+        transform: CSS.Translate.toString(transform),
+        transition: [transition, 'opacity 200ms ease'].filter(Boolean).join(', '),
+        opacity: isDragging ? 0.5 : 1,
+    }
+}
+
+export function deleteButtonWrapperSx(isExpanded: boolean): SxProps<Theme> {
+    return {
+        opacity: isExpanded ? 1 : 0,
+        display: isExpanded ? 'block' : 'none',
+        transition: 'all 0.3s ease-in-out',
+    }
+}

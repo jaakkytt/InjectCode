@@ -1,0 +1,149 @@
+import { FlatCompat } from '@eslint/eslintrc'
+import js from '@eslint/js'
+import typescriptEslint from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
+import { importX } from 'eslint-plugin-import-x'
+import { defineConfig } from 'eslint/config'
+import globals from 'globals'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const compat = new FlatCompat({
+    baseDirectory: __dirname,
+    recommendedConfig: js.configs.recommended,
+    allConfig: js.configs.all,
+})
+
+export default defineConfig([{
+    extends: compat.extends(
+        'eslint:recommended',
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+    ),
+
+    plugins: {
+        '@typescript-eslint': typescriptEslint,
+        'import-x': importX,
+    },
+
+    settings: {
+        'import-x/resolver-next': [
+            createTypeScriptImportResolver({ alwaysTryTypes: true }),
+        ],
+    },
+
+    languageOptions: {
+        globals: {
+            ...globals.node,
+        },
+
+        parser: tsParser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+    },
+
+    rules: {
+        'import-x/no-extraneous-dependencies': ['error', {
+            devDependencies: true,
+            includeTypes: true,
+        }],
+
+        '@typescript-eslint/parameter-properties': 'error',
+
+        'arrow-spacing': ['warn', {
+            before: true,
+            after: true,
+        }],
+
+        'brace-style': ['error', '1tbs', {
+            allowSingleLine: true,
+        }],
+
+        'comma-dangle': ['error', 'always-multiline'],
+        'comma-spacing': 'error',
+        'comma-style': 'error',
+        curly: ['error', 'multi-line', 'consistent'],
+        'dot-location': ['error', 'property'],
+        'handle-callback-err': 'off',
+        indent: ['error', 4, { 'SwitchCase': 1 }],
+        'no-tabs': ['off'],
+        'keyword-spacing': 'error',
+
+        'max-len': ['error', {
+            code: 120,
+        }],
+
+        'max-nested-callbacks': ['error', {
+            max: 4,
+        }],
+
+        'max-statements-per-line': ['error', {
+            max: 2,
+        }],
+
+        'no-console': 'off',
+        'no-empty-function': 'error',
+        'no-floating-decimal': 'error',
+        'no-inline-comments': 'error',
+        'no-lonely-if': 'error',
+        'no-multi-spaces': 'error',
+
+        'no-multiple-empty-lines': ['error', {
+            max: 2,
+            maxEOF: 1,
+            maxBOF: 0,
+        }],
+
+        'no-shadow': ['error', {
+            allow: ['err', 'resolve', 'reject'],
+        }],
+
+        'no-trailing-spaces': ['error'],
+        'no-var': 'error',
+        'object-curly-spacing': ['error', 'always'],
+        'prefer-const': 'error',
+        quotes: ['error', 'single'],
+        semi: ['error', 'never'],
+        'space-before-blocks': 'error',
+
+        'space-before-function-paren': ['error', {
+            anonymous: 'never',
+            named: 'never',
+            asyncArrow: 'always',
+        }],
+
+        'space-in-parens': 'error',
+        'space-infix-ops': 'error',
+        'space-unary-ops': 'error',
+        'spaced-comment': 'error',
+        yoda: 'error',
+    },
+}, {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+
+    rules: {
+        'no-restricted-syntax': ['error', {
+            selector: 'JSXAttribute[name.name="data-testid"]',
+            message: 'No test-only hooks in source - adapt the test locator instead.',
+        }],
+    },
+}, {
+    files: ['e2e/fixtures/**/*.ts'],
+
+    rules: {
+        'no-empty-pattern': 'off',
+    },
+}, {
+    files: ['webpack.config.js'],
+
+    languageOptions: {
+        sourceType: 'commonjs',
+    },
+
+    rules: {
+        '@typescript-eslint/no-require-imports': 'off',
+    },
+}])

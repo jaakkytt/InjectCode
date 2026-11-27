@@ -1,0 +1,6 @@
+storeDir: /pnpm-store
+nodeLinker: hoisted
+allowBuilds:
+  unrs-resolver: false
+audit:
+  ignorePrune: true

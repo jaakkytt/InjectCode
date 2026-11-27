@@ -1,0 +1,127 @@
+import React, { useEffect, useRef, useState } from 'react'
+
+import { AccordionTitleBehaviorProps } from './AccordionTitle.types'
+
+type SaveOutcome =
+    | { type: 'unchanged' }
+    | { type: 'invalid'; error: string }
+    | { type: 'saved'; value: string }
+
+export function useAccordionTitleBehavior(
+    { value, onChange, inputValidator, inputTransformer }: AccordionTitleBehaviorProps,
+) {
+    const [isEditing, setEditing] = useState(false)
+    const [isSaved, setSaved] = useState(false)
+    const [error, setError] = useState<string | undefined>(undefined)
+    const [inputValue, setInputValue] = useState(value)
+    const textFieldRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if (isEditing && textFieldRef.current) {
+            textFieldRef.current.focus()
+        }
+    }, [isEditing])
+
+    useEffect(() => setInputValue(value), [value])
+
+    function resolveSaveOutcome(): SaveOutcome {
+        const trimmed = inputValue.trim()
+        if (trimmed === value.trim()) {
+            return { type: 'unchanged' }
+        }
+
+        const validationError = inputValidator(trimmed)
+        if (validationError) {
+            return { type: 'invalid', error: validationError }
+        }
+
+        return { type: 'saved', value: trimmed }
+    }
+
+    function save() {
+        const outcome = resolveSaveOutcome()
+
+        if (outcome.type === 'invalid') {
+            setSaved(false)
+            setError(outcome.error)
+            return
+        }
+
+        setError(undefined)
+        setSaved(true)
+        setEditing(false)
+
+        if (outcome.type === 'saved') {
+            onChange(outcome.value)
+        }
+
+        if (textFieldRef.current) {
+            textFieldRef.current.blur()
+        }
+    }
+
+    function change(e: React.ChangeEvent<HTMLInputElement>) {
+        const rawValue = e.target.value
+        const transformedValue = inputTransformer ? inputTransformer(rawValue) : rawValue
+        setInputValue(transformedValue)
+
+        if (shouldValidateOnChange(transformedValue, value)) {
+            setError(inputValidator(transformedValue))
+        } else {
+            setError(undefined)
+        }
+    }
+
+    function keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.key === 'Enter') {
+            event.preventDefault()
+            if (textFieldRef.current) {
+                save()
+            }
+        } else if (event.key === 'Escape') {
+            event.preventDefault()
+            setInputValue(value)
+            setError(undefined)
+            setEditing(false)
+            setSaved(true)
+            if (textFieldRef.current) {
+                textFieldRef.current.blur()
+            }
+        }
+    }
+
+    function blur() {
+        if (!isSaved) {
+            setInputValue(value)
+        }
+        setError(undefined)
+        setEditing(false)
+    }
+
+    return {
+        isEditing,
+        error,
+        inputValue,
+        textFieldRef,
+        handlers: {
+            blur,
+            change,
+            keyDown,
+            preventFocusLoss: (e: React.MouseEvent) => e.preventDefault(),
+            stopClickPropagation: (e: React.MouseEvent) => e.stopPropagation(),
+            editClick: (e: React.MouseEvent) => {
+                e.stopPropagation()
+                setEditing(true)
+                setSaved(false)
+            },
+            saveClick: (e: React.MouseEvent) => {
+                e.stopPropagation()
+                save()
+            },
+        },
+    }
+}
+
+function shouldValidateOnChange(transformedValue: string, originalValue: string) {
+    return transformedValue.trim() !== originalValue.trim() || originalValue.trim() === ''
+}

@@ -1,0 +1,123 @@
+import { cyrb53 } from '../../shared/lib/hash/cyrb53'
+import { urlPatternMatcher } from '../../shared/service/urlPatternMatcher'
+import { isUserScriptsEnabled } from '../../shared/service/userScripts'
+import { SHARED_CODE, USER_SCRIPT_ID } from '../../shared/constants'
+import { AlwaysOnTiming, DEFAULT_ALWAYS_ON_TIMING } from '../../shared/service/settings/alwaysOnTiming'
+import { Script, ScriptsByPattern } from '../../shared/types'
+
+export interface PersistentScriptsState {
+    scripts: ScriptsByPattern
+    runAt: AlwaysOnTiming
+}
+
+export function wrapCssAsUserScript(css: string): string {
+    return `(() => {
+        const s = document.createElement('style');
+        s.textContent = ${JSON.stringify(css)};
+        (document.head ?? document.documentElement).appendChild(s);
+    })();`
+}
+
+export function computeDesiredRegistrations(
+    scripts: ScriptsByPattern,
+    runAt: AlwaysOnTiming = DEFAULT_ALWAYS_ON_TIMING,
+): chrome.userScripts.RegisteredUserScript[] {
+    const sharedAlways = (scripts[SHARED_CODE] ?? []).filter(item => item.runMode === 'always')
+
+    return Object.entries(scripts)
+        .filter(([containerId]) => containerId !== SHARED_CODE)
+        .flatMap(([pattern, items]): chrome.userScripts.RegisteredUserScript[] => {
+            const ownAlways = items.filter(item => item.runMode === 'always')
+            if (ownAlways.length === 0) {
+                return []
+            }
+
+            const matcher = urlPatternMatcher(pattern)
+            if (!matcher.valid) {
+                return []
+            }
+
+            return [{
+                id: idForPattern(pattern),
+                matches: [pattern],
+                runAt,
+                world: 'USER_SCRIPT',
+                worldId: USER_SCRIPT_ID,
+                js: toScriptSources([...sharedAlways, ...ownAlways]),
+            }]
+        })
+}
+
+export async function syncPersistentScripts(
+    scripts: ScriptsByPattern,
+    runAt: AlwaysOnTiming = DEFAULT_ALWAYS_ON_TIMING,
+): Promise<boolean> {
+    if (!await isUserScriptsEnabled()) {
+        console.warn('Skipped syncing Always on scripts: "Allow User Scripts" is turned off.')
+        return false
+    }
+
+    const desired = computeDesiredRegistrations(scripts, runAt)
+    try {
+        await chrome.userScripts.unregister()
+        if (desired.length > 0) {
+            await chrome.userScripts.register(desired)
+        }
+
+        return true
+    } catch (err) {
+        console.error('Failed to sync persistent (always on) scripts:', err)
+
+        return false
+    }
+}
+
+export function createSerializedPersistentScriptsSync(
+    readState: () => Promise<PersistentScriptsState>,
+): () => Promise<boolean> {
+    let running: Promise<boolean> | null = null
+    let rerunRequested = false
+
+    async function syncLatest(): Promise<boolean> {
+        try {
+            const { scripts, runAt } = await readState()
+            return await syncPersistentScripts(scripts, runAt)
+        } catch (err) {
+            console.error('Failed to read scripts for persistent-script resync:', err)
+
+            return false
+        }
+    }
+
+    async function drain(): Promise<boolean> {
+        let succeeded: boolean
+        do {
+            rerunRequested = false
+            succeeded = await syncLatest()
+        } while (rerunRequested)
+
+        running = null
+
+        return succeeded
+    }
+
+    return function requestSync() {
+        if (running) {
+            rerunRequested = true
+            return running
+        }
+
+        running = drain()
+        return running
+    }
+}
+
+function toScriptSources(items: Script[]): chrome.userScripts.ScriptSource[] {
+    return items.map(item => ({
+        code: item.type === 'css' ? wrapCssAsUserScript(item.content) : item.content,
+    }))
+}
+
+function idForPattern(pattern: string): string {
+    return `always-${cyrb53(pattern).toString(36)}`
+}

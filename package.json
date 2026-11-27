@@ -1,0 +1,68 @@
+{
+    "name": "injectcode",
+    "version": "2.0.0",
+    "packageManager": "pnpm@12.23.0",
+    "scripts": {
+        "build": "webpack --mode production",
+        "dev": "webpack --mode development",
+        "start": "webpack --watch",
+        "type-check": "tsc --noEmit && tsc --noEmit -p e2e",
+        "lint": "eslint ./src ./test ./e2e ./playwright.config.ts ./webpack.config.js --ext .ts,.tsx",
+        "lint-fix": "eslint ./src ./test ./e2e ./playwright.config.ts ./webpack.config.js --ext .ts,.tsx --fix",
+        "test": "vitest run",
+        "e2e": "playwright test",
+        "audit": "pnpm audit",
+        "audit-fix": "pnpm audit --fix=override",
+        "validate": "pnpm run audit && pnpm run type-check && pnpm run lint && pnpm run test && pnpm run build && pnpm run e2e"
+    },
+    "author": {
+        "name": "Jaak Kütt",
+        "email": "jaak.kytt@gmail.com",
+        "url": "https://jaak.kytt.ee/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jaakkytt/InjectCode.git"
+    },
+    "bugs": {
+        "url": "https://github.com/jaakkytt/InjectCode/issues"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@dnd-kit/core": "^6.3.1",
+        "@dnd-kit/sortable": "^10.0.0",
+        "@dnd-kit/utilities": "^3.2.2",
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@eslint/eslintrc": "^3.3.7",
+        "@eslint/js": "^10.0.1",
+        "@fontsource/roboto": "^5.3.0",
+        "@mui/icons-material": "^9.6.0",
+        "@mui/material": "^9.6.0",
+        "@playwright/test": "^1.65.1",
+        "@types/chrome": "^0.3.8",
+        "@types/node": "^26.6.11",
+        "@types/react": "^19.3.3",
+        "@types/react-dom": "^19.3.0",
+        "@typescript-eslint/eslint-plugin": "^8.74.0",
+        "@typescript-eslint/parser": "^8.74.0",
+        "@typescript/native": "npm:typescript@^7.0.2",
+        "browser-extension-url-match": "^1.2.0",
+        "copy-webpack-plugin": "^14.0.0",
+        "css-loader": "^7.1.5",
+        "eslint": "^10.15.0",
+        "eslint-import-resolver-typescript": "^4.4.5",
+        "eslint-plugin-import-x": "^4.18.1",
+        "globals": "^17.14.0",
+        "html-webpack-plugin": "^5.6.8",
+        "prism-react-editor": "^3.4.0",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
+        "style-loader": "^4.0.0",
+        "ts-loader": "^9.6.2",
+        "typescript": "npm:@typescript/typescript6@^6.0.2",
+        "vitest": "^5.1.2",
+        "webpack": "^5.113.0",
+        "webpack-cli": "^7.3.1"
+    }
+}
