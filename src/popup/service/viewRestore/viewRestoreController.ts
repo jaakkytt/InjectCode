@@ -62,6 +62,14 @@ export function createViewRestoreController(
         environment.requestFrame(refreshTop)
     }
 
+    function urlBlockCreated(urlBlockId: string) {
+        recordInteraction({ kind: 'urlBlock', id: urlBlockId, urlBlockId })
+
+        environment.requestFrame(() => {
+            registry.anchor('urlBlock', urlBlockId)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+        })
+    }
+
     function editorFocused(scriptId: string, urlBlockId: string, selection: InputSelection) {
         if (!isRestored) {
             return
@@ -119,7 +127,7 @@ export function createViewRestoreController(
                 break
             }
             case 'urlBlockCreated':
-                recordInteraction({ kind: 'urlBlock', id: interaction.urlBlockId, urlBlockId: interaction.urlBlockId })
+                urlBlockCreated(interaction.urlBlockId)
                 break
             case 'codeBlockToggled': {
                 const { scriptId, urlBlockId, isOpen } = interaction

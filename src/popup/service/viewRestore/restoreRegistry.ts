@@ -4,6 +4,7 @@ import { AnchorKind } from './viewRestore.types'
 
 export interface Anchor {
     getBoundingClientRect(): { top: number }
+    scrollIntoView(options: ScrollIntoViewOptions): void
 }
 
 export interface EditorHandle {

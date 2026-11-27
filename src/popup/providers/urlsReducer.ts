@@ -1,3 +1,4 @@
+import { orderUrlBlocks } from '../lib/urlBlockOrder'
 import { Script, ScriptsByPattern } from '../../shared/types'
 import { Action, ScriptPatch, StoreState } from '../types'
 
@@ -131,7 +132,7 @@ function ensureWorking(state: StoreState): StoreState {
 function applyNormalAction(state: ScriptsByPattern, action: Action): ScriptsByPattern {
     switch (action.name) {
         case 'added': {
-            return { ...state, [action.id]: [] }
+            return orderUrlBlocks({ ...state, [action.id]: [] })
         }
         case 'renamed': {
             const { id, title } = action
@@ -140,14 +141,7 @@ function applyNormalAction(state: ScriptsByPattern, action: Action): ScriptsByPa
                 return state
             }
 
-            const updated = { ...rest, [title]: old }
-
-            const [first, ...others] = Object.keys(updated)
-
-            return [first, ...others.sort()].reduce((acc, k) => {
-                acc[k] = updated[k]
-                return acc
-            }, {} as ScriptsByPattern)
+            return orderUrlBlocks({ ...rest, [title]: old })
         }
         case 'deleted': {
             const copy = { ...state }

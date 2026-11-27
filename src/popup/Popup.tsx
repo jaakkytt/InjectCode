@@ -6,6 +6,7 @@ import Footer from './components/footer/Footer'
 import AccordionSkeleton from './components/sortable/AccordionSkeleton'
 import UrlAccordion from './components/sortable/UrlAccordion'
 import UrlTabs from './components/UrlTabs'
+import { orderUrlBlocks } from './lib/urlBlockOrder'
 import { useCurrentUrl } from './providers/CurrentUrlProvider'
 import { ExistingUrlsProvider } from './providers/ExistingUrlsProvider'
 import { useFeedbackDispatch } from './providers/FeedbackProvider'
@@ -37,8 +38,10 @@ const Popup = () => {
 
     useEffect(() => {
         storage.get(STORAGE_SCRIPTS, { [SHARED_CODE]: [] }).then((data) => {
-            persistedScripts.current = data
-            dispatch({ name: 'hydrate', payload: data })
+            const scripts = orderUrlBlocks(data)
+
+            persistedScripts.current = scripts
+            dispatch({ name: 'hydrate', payload: scripts })
         })
     }, [])
 

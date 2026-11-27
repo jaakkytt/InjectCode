@@ -98,6 +98,27 @@ describe('urlsRootReducer script edits during a drag', () => {
     })
 })
 
+describe('urlsRootReducer URL block order', () => {
+    it('adds a URL block at its alphabetical place below Shared', () => {
+        const next = urlsRootReducer(stateWithUrlBlocks(['Shared', 'https://a.com/*']), {
+            name: 'added',
+            id: '*://test.com/',
+        })
+
+        expect(Object.keys(next.committed)).toEqual(['Shared', '*://test.com/', 'https://a.com/*'])
+    })
+
+    it('moves Shared first on rename even when it was not first', () => {
+        const next = urlsRootReducer(stateWithUrlBlocks(['*://test.com/', 'Shared', 'https://a.com/*']), {
+            name: 'renamed',
+            id: 'https://a.com/*',
+            title: 'https://b.com/*',
+        })
+
+        expect(Object.keys(next.committed)).toEqual(['Shared', '*://test.com/', 'https://b.com/*'])
+    })
+})
+
 function makeItem(overrides: Partial<Script> = {}): Script {
     return {
         id: overrides.id ?? 'item-id',
@@ -112,6 +133,15 @@ function makeItem(overrides: Partial<Script> = {}): Script {
 function stateWith(item: Script): StoreState {
     return {
         committed: { 'https://example.com/*': [item] },
+        working: null,
+        isDirty: false,
+        isHydrated: true,
+    }
+}
+
+function stateWithUrlBlocks(urlBlockIds: string[]): StoreState {
+    return {
+        committed: Object.fromEntries(urlBlockIds.map(id => [id, []])),
         working: null,
         isDirty: false,
         isHydrated: true,

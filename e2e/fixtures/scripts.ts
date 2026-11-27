@@ -11,6 +11,8 @@ export const TAB_A = { id: 7, url: 'https://a.example/page' }
 export const TAB_A2 = { id: 8, url: 'https://a.example/other' }
 export const TAB_C = { id: 9, url: 'https://c.example/' }
 
+const SITE_A_HTTPS = 'https://a.example/*'
+
 const LONG_SCRIPT_LINES = 200
 const FILLER_SCRIPTS = 7
 
@@ -39,6 +41,12 @@ export const SCRIPTS: ScriptsByPattern = {
         script('js-zeta', 'Zeta', 'js', 'console.log("zeta")'),
         script('js-eta', 'Eta', 'js', 'console.log("eta")'),
         script('css-theta', 'Theta', 'css', 'body { color: blue }'),
+    ],
+    [SITE_A_HTTPS]: [
+        script('js-lambda', 'Lambda', 'js', 'console.log("lambda")'),
+        script('js-omicron', 'Omicron', 'js', 'console.log("omicron")'),
+        script('js-rho', 'Rho', 'js', 'console.log("rho")'),
+        script('css-chi', 'Chi', 'css', 'body { color: purple }'),
     ],
 }
 

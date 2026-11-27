@@ -80,7 +80,7 @@ export class PopupPage {
         const dialog = this.page.getByRole('dialog')
         await dialog.getByRole('textbox').fill(pattern)
         await dialog.getByRole('button', { name: 'Add' }).click()
-        await expect(this.urlBlockHeader(pattern)).toBeVisible()
+        await expect(this.urlBlockHeader(pattern)).toBeInViewport({ ratio: 1 })
     }
 
     async openNewScriptDialog(): Promise<void> {
