@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-27
+
 ### Changed
 
 - **[#4]** **Breaking:** Rebuilt for Chrome Manifest V3
@@ -51,3 +53,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added global XhrMonitor object for working with ajax pages
 
 [#4]: https://github.com/jaakkytt/InjectCode/issues/4
+[2.0.0]: https://github.com/jaakkytt/InjectCode/tree/v2.0.0

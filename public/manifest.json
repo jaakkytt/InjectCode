@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "InjectCode",
-    "description": "Store and inject code to browser pages made super easy.",
+    "description": "Store and manage your own JavaScript and CSS and run it on the pages you choose.",
     "minimum_chrome_version": "138",
     "action": {
         "default_popup": "popup.html",

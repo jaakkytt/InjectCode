@@ -11,6 +11,19 @@ create it once:
 docker volume create pnpm-store
 ```
 
+## Rebuild the images
+
+The services run in two images built from `development/Dockerfile`: `injectcode-e2e` for `validate`, `e2e` and
+`e2e-debug`, and `injectcode-tools` for all the others. Both carry Node (the `FROM` lines in the Dockerfile) and pnpm
+(`packageManager` in `package.json`). The e2e image also carries the Chromium build matched to the `@playwright/test`
+version in `pnpm-lock.yaml`. Rebuild both after changing any of these:
+
+```sh
+docker compose -f development/compose.yml build
+```
+
+`run --build <service>` rebuilds only the image of the service it runs and leaves the other image stale.
+
 ## Install dependencies
 
 ```sh
@@ -29,11 +42,7 @@ docker compose -f development/compose.yml run --rm install-update
 docker compose -f development/compose.yml run --rm build
 ```
 
-Rebuild the toolchain image first if the Dockerfile changed:
-
-```sh
-docker compose -f development/compose.yml run --rm --build build
-```
+If the Dockerfile changed, [rebuild the images](#rebuild-the-images) first.
 
 Output is written to `dist/` on the host, ready to be loaded as an unpacked extension via
 `chrome://extensions`.
@@ -62,9 +71,9 @@ docker compose -f development/compose.yml run --rm test
 
 ## End-to-end tests
 
-Playwright drives the built extension in Chromium, so build first. The `e2e` image carries the browser, matched
-to the `@playwright/test` version in `pnpm-lock.yaml` (pnpm likewise comes from `packageManager` in
-`package.json`), so after bumping either, rebuild the image with `--build`:
+Playwright drives the built extension in Chromium, so build first. The e2e image carries the browser, matched to the
+`@playwright/test` version in `pnpm-lock.yaml`. After bumping it, [rebuild the images](#rebuild-the-images), otherwise
+Playwright fails with `Executable doesn't exist at /ms-playwright/...`.
 
 ```sh
 docker compose -f development/compose.yml run --rm build
@@ -86,7 +95,7 @@ To fix what it reports, see [Fix vulnerable dependencies](#fix-vulnerable-depend
 
 ## Validate all
 
-Runs `audit`, `type-check`, `lint`, `test` and `build` in that order, stopping at the first failure:
+Runs `audit`, `type-check`, `lint`, `test`, `build` and `e2e` in that order, stopping at the first failure:
 
 ```sh
 docker compose -f development/compose.yml run --rm validate
@@ -139,11 +148,18 @@ their own, the overrides are no longer needed, and they can hold back newer vers
 them and lets the audit add back only what is still vulnerable.
 
 1. Delete the whole `overrides` list from `pnpm-workspace.yaml`.
-2. Update every dependency in `package.json` to its newest version, including new major versions beyond the ranges in
+2. Update pnpm and Node by hand, since the next step leaves them alone: pnpm in `packageManager` in `package.json`
+   (newest version on [npm](https://www.npmjs.com/package/pnpm)), Node in both `FROM` lines of
+   `development/Dockerfile` (a `<version>-bookworm-slim` tag from [Docker Hub](https://hub.docker.com/_/node)).
+3. Update every dependency in `package.json` to its newest version, including new major versions beyond the ranges in
    `package.json`. This rewrites `package.json` and `pnpm-lock.yaml`:
     ```sh
     docker compose -f development/compose.yml run --rm update-latest
     ```
-3. Review the diff in `package.json`. For each major version bump, check that package's changelog for breaking changes.
-4. Follow [Fix vulnerable dependencies](#fix-vulnerable-dependencies) above. `validate` there also catches breakage from
+4. Review the diff in `package.json`. For each major version bump, check that package's changelog for breaking changes.
+   Keep `@types/node` on the same major as the Node in the Dockerfile: if `update-latest` moved it past that, set it
+   back in `package.json` and run `install-update`.
+5. [Rebuild the images](#rebuild-the-images), so that `validate` in the next step runs on the new Node and pnpm, with
+   the browser for the new `@playwright/test` version.
+6. Follow [Fix vulnerable dependencies](#fix-vulnerable-dependencies) above. `validate` there also catches breakage from
    the major bumps.

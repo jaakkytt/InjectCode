@@ -1,14 +1,14 @@
 InjectCode
 ==========
 
-A Chrome extension to store your own JavaScript and CSS and run it on the pages you choose.
+A Chrome extension to store and manage your own JavaScript and CSS and run it on the pages you choose.
 
 > Version 1 was available on the
 [Chrome Web Store](https://chrome.google.com/webstore/detail/injectcode/flhghpihapijancfhnicbnjifdodohpi), but it has
 been taken down because it wasn't migrated to Manifest V3 in time. Version 2 is that migration and is in the process of
 being published there again. Until then, install it from a release zip as described below.
 
-<img src="popup.png" width="581" alt="The InjectCode popup showing Shared scripts and an Always on script under a URL pattern">
+<img src="popup.png" width="1280" alt="The InjectCode popup showing Shared scripts and an Always on script under a URL pattern">
 
 > **InjectCode is a tool for developers.** It runs code you write on the websites you choose, with full access to those
 > pages, including any site you are logged in to. Don't use it unless you understand what your scripts do, and never add

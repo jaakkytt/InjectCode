@@ -17,6 +17,12 @@ services:
       - node_modules-sandbox:/app/node_modules
       - pnpm-store-sandbox:/pnpm-store
 
+  update-latest:
+    volumes:
+      - ..:/app
+      - node_modules-sandbox:/app/node_modules
+      - pnpm-store-sandbox:/pnpm-store
+
   build:
     volumes:
       - ..:/app

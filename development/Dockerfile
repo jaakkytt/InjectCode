@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS versions
+FROM node:26.13.1-bookworm-slim AS versions
 
 WORKDIR /versions
 COPY package.json pnpm-lock.yaml ./
@@ -6,12 +6,13 @@ RUN sed -n 's/^ *"packageManager": *"pnpm@\([^"]*\)".*/\1/p' package.json > pnpm
     && sed -n "s/^  '@playwright\/test@\([0-9][0-9.]*\)':.*/\1/p" pnpm-lock.yaml | head -1 > playwright \
     && test -s pnpm && test -s playwright
 
-FROM node:24-bookworm-slim AS toolchain
+FROM node:26.13.1-bookworm-slim AS toolchain
 
 ENV COREPACK_HOME=/usr/local/corepack
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 COPY --from=versions /versions/pnpm /tmp/pnpm-version
-RUN corepack enable && corepack prepare "pnpm@$(cat /tmp/pnpm-version)" --activate && rm /tmp/pnpm-version
+RUN npm install -g corepack && rm -rf /root/.npm
+RUN corepack enable && corepack prepare "pnpm@$(cat /tmp/pnpm-version)" --activate && pnpm --version && rm /tmp/pnpm-version
 RUN chown -R node:node "$COREPACK_HOME"
 RUN mkdir -p /pnpm-store && chown node:node /pnpm-store
 RUN mkdir -p /app/node_modules && chown node:node /app/node_modules
