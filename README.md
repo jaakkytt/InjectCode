@@ -33,8 +33,11 @@ See [PRIVACY.md](PRIVACY.md) for exactly what is stored, what the extension read
 
 ## Getting started
 
-Requires Chrome 138 or newer. Every release on the [Releases page](https://github.com/jaakkytt/InjectCode/releases)
-has the exact zip submitted to the Chrome Web Store, so you can see precisely what the extension contains:
+Requires Chrome 138 or newer. It has also been tested on Chrome, Edge and Brave. Other desktop browsers based on
+Chromium 138 or newer should work too, but haven't been tested.
+
+Every release on the [Releases page](https://github.com/jaakkytt/InjectCode/releases) has the exact zip submitted to
+the Chrome Web Store, so you can see precisely what the extension contains:
 
 1. Download the zip from the release and extract it to a folder.
 2. Open `chrome://extensions` and turn on *Developer mode*.
@@ -61,5 +64,6 @@ changes.
 
 ## Issues and license
 
-Report bugs in [GitHub issues](https://github.com/jaakkytt/InjectCode/issues). InjectCode is released under the [MIT License](LICENSE),
-third-party attributions are listed in [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+Report bugs in [GitHub issues](https://github.com/jaakkytt/InjectCode/issues) and include the name and version of
+your browser. InjectCode is released under the [MIT License](LICENSE), third-party attributions are listed in
+[ATTRIBUTIONS.md](ATTRIBUTIONS.md).

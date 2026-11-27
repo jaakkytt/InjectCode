@@ -711,7 +711,8 @@ const Options = () => (
                             removed since version 1.
                         </SectionText>
                         <SectionText>
-                            Please report bugs in <ExternalLink href={ISSUES_URL}>GitHub issues</ExternalLink>.
+                            Please report bugs in <ExternalLink href={ISSUES_URL}>GitHub issues</ExternalLink> and
+                            include the name and version of your browser.
                         </SectionText>
                     </Section>
                 </Sections>
